@@ -26,7 +26,8 @@ const rateLimitFields = `rateLimit { cost remaining resetAt }`
 
 const pullRequestFields = `number title body state isDraft createdAt updatedAt closedAt mergedAt
       baseRefName additions deletions changedFiles authorAssociation
-      author { login __typename }`
+      author { login __typename }
+      closingIssuesReferences(first: 10) { nodes { number repository { nameWithOwner } labels(first: 20) { nodes { name } } } }`
 
 const actorFields = `author { login __typename }`
 

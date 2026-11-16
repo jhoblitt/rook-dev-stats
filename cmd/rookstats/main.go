@@ -1,4 +1,4 @@
-// Command rookstats: Fetch ceph/ceph pull requests and build the data behind the statistics site
+// Command rookstats: Fetch rook/rook pull requests and build the data behind the statistics site
 //
 // Managed by go-conventions (references/layout.md owns the main shape).
 package main

@@ -16,8 +16,8 @@ import (
 func newFetchCmd(v *viper.Viper) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "fetch",
-		Short: "Walk ceph/ceph pull requests from GitHub into the local raw cache",
-		Long: `Walk ceph/ceph pull requests from GitHub into the local raw cache.
+		Short: "Walk rook/rook pull requests from GitHub into the local raw cache",
+		Long: `Walk rook/rook pull requests from GitHub into the local raw cache.
 
 The GitHub token is read from ROOKSTATS_GITHUB_TOKEN, GH_TOKEN or
 GITHUB_TOKEN, in that order.
@@ -55,8 +55,8 @@ its range again; without it, only those updated since they were cached.`,
 		},
 	}
 	f := cmd.Flags()
-	f.String("since", "", "walk back to pull requests updated at this RFC 3339 time; default a day before the data directory's fetched_through, or, with no meta.json there, the window start, when ceph/ceph was created (ROOKSTATS_SINCE)")
-	f.Bool("full", false, "walk back to the window start, when ceph/ceph was created, listing every pull request (ROOKSTATS_FULL)")
+	f.String("since", "", "walk back to pull requests updated at this RFC 3339 time; default a day before the data directory's fetched_through, or, with no meta.json there, the window start, when rook/rook was created (ROOKSTATS_SINCE)")
+	f.Bool("full", false, "walk back to the window start, when rook/rook was created, listing every pull request (ROOKSTATS_FULL)")
 	f.Bool("refetch", false, "fetch again each pull request the walk lists, every one updated since --since or its default (the window start with --full) and every open one, though cached at the same updatedAt, re-downloading each of them (ROOKSTATS_REFETCH)")
 	f.String("cache-dir", ".cache", "raw cache directory (ROOKSTATS_CACHE_DIR)")
 	f.String("data", "data", "committed data directory, read for meta.json (ROOKSTATS_DATA)")

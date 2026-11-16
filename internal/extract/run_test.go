@@ -160,7 +160,7 @@ var _ = Describe("Run", func() {
 		Expect(files()).To(HaveKey(filepath.Join(record.PRsDir, "2026-08.jsonl")))
 		Expect(record.ReadAuthors(dataDir)).To(Equal(map[string]int{"alice-example": 12, "erin-example": 0}))
 		Expect(files()[record.MetaFile].content).To(Equal(`{
-  "repo": "ceph/ceph",
+  "repo": "rook/rook",
   "window_start": "2026-05-15T00:00:00Z",
   "fetched_through": "2026-11-15T12:00:00Z",
   "github_counts": {
@@ -389,10 +389,10 @@ var _ = Describe("Run", func() {
 			window = time.Time{}
 		})
 
-		It("starts it when ceph/ceph was created, leaving prior_prs null only before that", func() {
+		It("starts it when rook/rook was created, leaving prior_prs null only before that", func() {
 			cache(
-				entry(1, "kim", time.Date(2011, 8, 31, 23, 59, 59, 0, time.UTC)),
-				entry(2, "kim", time.Date(2011, 9, 1, 0, 0, 0, 0, time.UTC)),
+				entry(1, "kim", time.Date(2016, 7, 7, 23, 59, 59, 0, time.UTC)),
+				entry(2, "kim", time.Date(2016, 7, 8, 0, 0, 0, 0, time.UTC)),
 			)
 			baselines(map[string]int{"kim": 0})
 			counts(day(11, 15), 0, 0)
@@ -401,7 +401,7 @@ var _ = Describe("Run", func() {
 
 			Expect(records()[1].PriorPRs).To(BeNil(), "PR opened a second before the window")
 			Expect(records()[2].PriorPRs).To(HaveValue(Equal(0)), "PR opened at the window start")
-			Expect(record.ReadMeta(dataDir)).To(HaveField("WindowStart", time.Date(2011, 9, 1, 0, 0, 0, 0, time.UTC)))
+			Expect(record.ReadMeta(dataDir)).To(HaveField("WindowStart", time.Date(2016, 7, 8, 0, 0, 0, 0, time.UTC)))
 		})
 
 		It("counts every earlier record of a human author, and leaves a bot's and a deleted account's null", func() {
@@ -410,8 +410,8 @@ var _ = Describe("Run", func() {
 			ghost := entry(6, "ghost", time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC))
 			ghost.Author = nil
 			cache(
-				entry(1, "kim", time.Date(2013, 2, 1, 0, 0, 0, 0, time.UTC)),
-				entry(2, "lee", time.Date(2015, 6, 1, 0, 0, 0, 0, time.UTC)),
+				entry(1, "kim", time.Date(2016, 8, 1, 0, 0, 0, 0, time.UTC)),
+				entry(2, "lee", time.Date(2017, 6, 1, 0, 0, 0, 0, time.UTC)),
 				entry(3, "kim", time.Date(2018, 4, 1, 0, 0, 0, 0, time.UTC)),
 				bot,
 				ghost,
@@ -423,7 +423,7 @@ var _ = Describe("Run", func() {
 			run()
 
 			got := records()
-			Expect(got[1].PriorPRs).To(HaveValue(Equal(0)), "kim's first PR, in 2013")
+			Expect(got[1].PriorPRs).To(HaveValue(Equal(0)), "kim's first PR, in 2016")
 			Expect(got[3].PriorPRs).To(HaveValue(Equal(1)), "kim's second PR")
 			Expect(got[4].PriorPRs).To(HaveValue(Equal(2)), "kim's third PR")
 			Expect(got[7].PriorPRs).To(HaveValue(Equal(3)), "kim's fourth PR")

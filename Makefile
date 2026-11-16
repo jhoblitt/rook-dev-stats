@@ -84,14 +84,13 @@ check: generate-check fmt-check vet lint fix-check tidy-check test ## The local 
 # fetch reads the token from ROOKSTATS_GITHUB_TOKEN, GH_TOKEN or
 # GITHUB_TOKEN; with none of them set, gh's token is passed to fetch alone.
 .PHONY: data-refresh
-data-refresh: ## Pull from GitHub, re-derive the records, read new ticket types, check
+data-refresh: ## Pull from GitHub, re-derive the records, check
 	@if [ -z "$${ROOKSTATS_GITHUB_TOKEN}$${GH_TOKEN}$${GITHUB_TOKEN}" ]; then \
 	  ROOKSTATS_GITHUB_TOKEN=$$(gh auth token) || exit 1; \
 	  export ROOKSTATS_GITHUB_TOKEN; \
 	fi; \
 	go run ./cmd/rookstats fetch
 	go run ./cmd/rookstats extract
-	go run ./cmd/rookstats tickets
 	go run ./cmd/rookstats check
 
 .PHONY: data-check

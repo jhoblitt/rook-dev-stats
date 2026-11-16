@@ -79,6 +79,12 @@ var _ = Describe("queries", func() {
 		Entry("a merge's url and merge commit", ghapi.TimelineItems, "... on MergedEvent { createdAt url commit { oid } }"),
 	)
 
+	It("selects a listed pull request's first ten closing issues, each with its number, repository and first twenty labels, unpaged", func() {
+		Expect(ghapi.PullRequests.Text).To(ContainSubstring(
+			"closingIssuesReferences(first: 10) { nodes { number repository { nameWithOwner } labels(first: 20) { nodes { name } } } }"))
+		Expect(ghapi.Connections).NotTo(ContainElement(ghapi.Connection("closingIssuesReferences")))
+	})
+
 	It("asks for no databaseId, which GitHub deprecates for 64-bit ids", func() {
 		for _, q := range all() {
 			Expect(q.Text).NotTo(MatchRegexp(`\bdatabaseId\b`), "query %s", q.Name)

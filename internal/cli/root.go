@@ -30,7 +30,7 @@ func newRootCmd(stdin io.Reader, stdout, stderr io.Writer) *cobra.Command {
 	v := viper.New()
 	cmd := &cobra.Command{
 		Use:           "rookstats",
-		Short:         "Fetch ceph/ceph pull requests and build the data behind the statistics site",
+		Short:         "Fetch rook/rook pull requests and build the data behind the statistics site",
 		Version:       version.String(),
 		SilenceUsage:  true,
 		SilenceErrors: true,

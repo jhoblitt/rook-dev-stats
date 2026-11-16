@@ -59,7 +59,7 @@ type Record struct {
 	Files     int      `json:"files"`
 	Labels    []string `json:"labels"`
 	Commits   Commits  `json:"commits"`
-	// PriorPRs is the author's count of pull requests opened in ceph/ceph
+	// PriorPRs is the author's count of pull requests opened in rook/rook
 	// before this one. It is nil when the author has no baseline in
 	// authors.json, as for a bot or a deleted account, and for a pull
 	// request opened before the window start.

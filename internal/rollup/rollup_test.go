@@ -693,7 +693,7 @@ var _ = Describe("Build", func() {
 			in := loadInput()
 			in.Records, in.Meta = []record.Record{r}, nil
 			m := buildInput(in).meta()
-			Expect(m.Repo).To(Equal("ceph/ceph"))
+			Expect(m.Repo).To(Equal("rook/rook"))
 			Expect(m.WindowStart).To(Equal(epoch(fetch.WindowStart)))
 			Expect(m.FetchedThrough).To(Equal(epoch(h(30))))
 		})

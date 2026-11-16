@@ -34,6 +34,15 @@ type Label struct {
 	Name string `json:"name"`
 }
 
+// ClosingIssue is an issue GitHub links to a pull request as one it closes,
+// which may be in another repository. Labels are the issue's first twenty.
+type ClosingIssue struct {
+	Number int `json:"number"`
+	// Repository is the issue's repository as owner/name.
+	Repository string  `json:"repository"`
+	Labels     []Label `json:"labels"`
+}
+
 // Commit is one of a pull request's commits.
 type Commit struct {
 	OID           string    `json:"oid"`
@@ -104,10 +113,13 @@ type Entry struct {
 	AuthorAssociation string     `json:"authorAssociation"`
 	Author            *Actor     `json:"author"`
 	Labels            []Label    `json:"labels"`
-	Commits           []Commit   `json:"commits"`
-	Comments          []Comment  `json:"comments"`
-	Reviews           []Review   `json:"reviews"`
-	TimelineItems     []Event    `json:"timelineItems"`
+	// ClosingIssues is GitHub's closingIssuesReferences, its first ten and
+	// not paged further; empty when GitHub's reply left them out.
+	ClosingIssues []ClosingIssue `json:"closingIssuesReferences"`
+	Commits       []Commit       `json:"commits"`
+	Comments      []Comment      `json:"comments"`
+	Reviews       []Review       `json:"reviews"`
+	TimelineItems []Event        `json:"timelineItems"`
 	// CommitNames is set only for a pull request whose author is null, and
 	// nil for one fetched before entries carried names until fetch
 	// completes it, or for good when GitHub could no longer resolve the

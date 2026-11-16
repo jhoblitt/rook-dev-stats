@@ -21,6 +21,12 @@
             "authorAssociation": "MEMBER",
             "author": {"login": "alice", "__typename": "User"},
             "labels": {"pageInfo": {"hasNextPage": false, "endCursor": null}, "nodes": []},
+            "closingIssuesReferences": {
+              "nodes": [
+                {"number": 16712, "repository": {"nameWithOwner": "rook/rook"}, "labels": {"nodes": [{"name": "bug"}, {"name": "csi"}]}},
+                {"number": 5120, "repository": {"nameWithOwner": "ceph/ceph-csi"}, "labels": {"nodes": []}}
+              ]
+            },
             "commits": {
               "pageInfo": {"hasNextPage": false, "endCursor": "MQ"},
               "nodes": [

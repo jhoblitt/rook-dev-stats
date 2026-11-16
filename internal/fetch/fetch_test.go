@@ -32,7 +32,7 @@ var (
 	walkStart = time.Date(2026, 11, 15, 12, 0, 0, 0, time.UTC)
 	// created is the repository's createdAt in the counts specs: later in
 	// the day than the default window start.
-	created = time.Date(2011, 9, 1, 17, 30, 0, 0, time.UTC)
+	created = time.Date(2016, 7, 8, 17, 30, 0, 0, time.UTC)
 )
 
 func at(hours int) time.Time { return base.Add(time.Duration(hours) * time.Hour) }
@@ -204,6 +204,10 @@ var _ = Describe("Run", func() {
 		want := pr(1, 5, "MERGED")
 		want.MergedAt = new(at(5))
 		want.Labels = []fetch.Label{{Name: "rgw"}, {Name: "tests"}, {Name: "backport"}}
+		want.ClosingIssues = []fetch.ClosingIssue{
+			{Number: 40, Repository: "rook/rook", Labels: []fetch.Label{{Name: "bug"}, {Name: "csi"}}},
+			{Number: 39, Repository: "ceph/ceph-csi", Labels: []fetch.Label{}},
+		}
 		want.Commits = commits(6)
 		want.Comments = comments(3)
 		want.Reviews = reviews(4)
@@ -279,7 +283,7 @@ var _ = Describe("Run", func() {
 
 		asked := server.Operations(ghapi.CommitNames(0).Name)
 		Expect(asked).To(HaveLen(1))
-		Expect(asked[0].Variables).To(Equal(map[string]any{"owner": "ceph", "name": "ceph", "first": 2.0, "n0": 2.0}))
+		Expect(asked[0].Variables).To(Equal(map[string]any{"owner": "rook", "name": "rook", "first": 2.0, "n0": 2.0}))
 		var afters []string
 		for _, r := range server.Operations(ghapi.CommitNamesPage.Name) {
 			Expect(r.Int("number")).To(Equal(2))
@@ -578,7 +582,7 @@ var _ = Describe("Run", func() {
 		It("is an error, rewriting nothing, when GitHub cannot resolve the repository the names are asked of", func() {
 			server.Intercept(func(_ int, r fetchtest.Request) *fetchtest.Reply {
 				if r.Operation == ghapi.CommitNames(0).Name {
-					return &fetchtest.Reply{Status: 200, Body: `{"data":{"repository":null},"errors":[{"type":"NOT_FOUND","path":["repository"],"message":"Could not resolve to a Repository with the name 'ceph/ceph'."}]}`}
+					return &fetchtest.Reply{Status: 200, Body: `{"data":{"repository":null},"errors":[{"type":"NOT_FOUND","path":["repository"],"message":"Could not resolve to a Repository with the name 'rook/rook'."}]}`}
 				}
 				return nil
 			})
@@ -658,6 +662,45 @@ var _ = Describe("Run", func() {
 
 		Expect(entry(69877).Comments).To(HaveExactElements(HaveField("DatabaseID", BeZero())))
 	})
+
+	It("caches the closing issues, each with its repository and labels, in GitHub's order, without paging them", func() {
+		serveLinksPage(func(s string) string { return s })
+
+		Expect(run(fetch.WindowStart)).To(Succeed())
+
+		Expect(entry(69877).ClosingIssues).To(Equal([]fetch.ClosingIssue{
+			{Number: 16712, Repository: "rook/rook", Labels: []fetch.Label{{Name: "bug"}, {Name: "csi"}}},
+			{Number: 5120, Repository: "ceph/ceph-csi", Labels: []fetch.Label{}},
+		}))
+		Expect(readJSON(filepath.Join(cacheDir, "raw", "69877.json"))).To(HaveKeyWithValue("closingIssuesReferences", HaveExactElements(
+			Equal(map[string]any{
+				"number": 16712.0, "repository": "rook/rook",
+				"labels": []any{map[string]any{"name": "bug"}, map[string]any{"name": "csi"}},
+			}),
+			Equal(map[string]any{"number": 5120.0, "repository": "ceph/ceph-csi", "labels": []any{}}),
+		)))
+		Expect(server.Requests()).To(HaveEach(HaveField("Operation", Not(ContainSubstring("ClosingIssues")))),
+			"no further page is asked for")
+	})
+
+	DescribeTable("caches no closing issues for a listed PR whose reply lacks them, and walks on",
+		func(closing string) {
+			serveLinksPage(func(s string) string {
+				before, rest, _ := strings.Cut(s, `"closingIssuesReferences": {`)
+				_, after, _ := strings.Cut(rest, `"commits": {`)
+				return before + closing + `"commits": {` + after
+			})
+
+			Expect(run(fetch.WindowStart)).To(Succeed())
+
+			Expect(entry(69877).ClosingIssues).To(BeEmpty())
+			Expect(readJSON(filepath.Join(cacheDir, "raw", "69877.json"))).To(HaveKeyWithValue("closingIssuesReferences", Equal([]any{})))
+			Expect(filepath.Join(cacheDir, fetch.MetaFile)).To(BeAnExistingFile(), "the walk finished")
+		},
+		Entry("missing", ``),
+		Entry("null", `"closingIssuesReferences": null,
+            `),
+	)
 
 	It("caches the ids, addresses and SHAs that links to GitHub are built from, under GitHub's names", func() {
 		serveLinksPage(func(s string) string { return s })
@@ -1148,7 +1191,7 @@ var _ = Describe("Run", func() {
 				And(MatchError(ghapi.ErrUnavailable), MatchError(ContainSubstring("asking whether cached pull requests exist")))),
 			Entry("a GraphQL error other than NOT_FOUND", fetchtest.Reply{Status: 200, Body: `{"errors":[{"type":"FORBIDDEN","message":"Resource not accessible by integration"}]}`},
 				MatchError(And(ContainSubstring("asking whether cached pull requests exist"), ContainSubstring("Resource not accessible")))),
-			Entry("a NOT_FOUND of the repository rather than the PR", fetchtest.Reply{Status: 200, Body: `{"data":{"repository":null},"errors":[{"type":"NOT_FOUND","path":["repository"],"message":"Could not resolve to a Repository with the name 'ceph/ceph'."}]}`},
+			Entry("a NOT_FOUND of the repository rather than the PR", fetchtest.Reply{Status: 200, Body: `{"data":{"repository":null},"errors":[{"type":"NOT_FOUND","path":["repository"],"message":"Could not resolve to a Repository with the name 'rook/rook'."}]}`},
 				MatchError(ContainSubstring("Could not resolve to a Repository"))),
 			Entry("a reply without the PR", fetchtest.Reply{Status: 200, Body: `{"data":{"repository":{}}}`},
 				MatchError(ContainSubstring("no answer for pull request 2 in repository.p0"))),
@@ -1460,7 +1503,7 @@ var _ = Describe("Run", func() {
 				MatchError(And(ContainSubstring("pull request 2"), ContainSubstring("Resource not accessible by integration"))),
 				Not(MatchError(ghapi.ErrUnavailable)),
 			)),
-		Entry("a NOT_FOUND of the repository rather than the PR", fetchtest.Reply{Status: 200, Body: `{"data":{"repository":null},"errors":[{"type":"NOT_FOUND","path":["repository"],"message":"Could not resolve to a Repository with the name 'ceph/ceph'."}]}`},
+		Entry("a NOT_FOUND of the repository rather than the PR", fetchtest.Reply{Status: 200, Body: `{"data":{"repository":null},"errors":[{"type":"NOT_FOUND","path":["repository"],"message":"Could not resolve to a Repository with the name 'rook/rook'."}]}`},
 			MatchError(And(ContainSubstring("pull request 2"), ContainSubstring("Could not resolve to a Repository")))),
 	)
 
@@ -1657,8 +1700,8 @@ var _ = Describe("Run", func() {
 		baselines := server.Operations(ghapi.AuthorBaselines(0).Name)
 		Expect(baselines).To(HaveLen(1))
 		Expect(baselines[0].Variables).To(Equal(map[string]any{
-			"q0": "repo:ceph/ceph is:pr author:alice created:<2026-05-15",
-			"q1": "repo:ceph/ceph is:pr author:bob created:<2026-05-15",
+			"q0": "repo:rook/rook is:pr author:alice created:<2026-05-15",
+			"q1": "repo:rook/rook is:pr author:bob created:<2026-05-15",
 		}))
 		Expect(readJSON(filepath.Join(cacheDir, "authors.json"))).To(Equal(map[string]any{
 			"window_start": "2026-05-15T00:00:00Z",
@@ -1667,7 +1710,7 @@ var _ = Describe("Run", func() {
 		Expect(logged("asking every author's prior pull requests again")).To(BeEmpty())
 
 		Expect(server.Operations(ghapi.Counts.Name)).To(HaveLen(1))
-		Expect(searched()).To(Equal([]string{"repo:ceph/ceph is:pr created:>=2026-05-15"}))
+		Expect(searched()).To(Equal([]string{"repo:rook/rook is:pr created:>=2026-05-15"}))
 		Expect(readJSON(filepath.Join(cacheDir, "meta.json"))).To(Equal(map[string]any{
 			"window_start":            "2026-05-15T00:00:00Z",
 			"walk_started":            "2026-11-15T12:00:00Z",
@@ -1691,8 +1734,8 @@ var _ = Describe("Run", func() {
 			baselines := server.Operations(ghapi.AuthorBaselines(0).Name)
 			Expect(baselines).To(HaveLen(1))
 			Expect(baselines[0].Variables).To(Equal(map[string]any{
-				"q0": "repo:ceph/ceph is:pr author:alice created:<2026-05-15",
-				"q1": "repo:ceph/ceph is:pr author:carol created:<2026-05-15",
+				"q0": "repo:rook/rook is:pr author:alice created:<2026-05-15",
+				"q1": "repo:rook/rook is:pr author:carol created:<2026-05-15",
 			}))
 			Expect(readJSON(filepath.Join(cacheDir, "authors.json"))).To(Equal(map[string]any{
 				"window_start": "2026-05-15T00:00:00Z",
@@ -1767,7 +1810,7 @@ var _ = Describe("Run", func() {
 		Expect(readJSON(filepath.Join(cacheDir, "authors.json"))).To(HaveKeyWithValue("authors", HaveLen(27)))
 	})
 
-	It("asks for the baselines and counts from ceph/ceph's creation by default, by the listing alone", func() {
+	It("asks for the baselines and counts from rook/rook's creation by default, by the listing alone", func() {
 		window = time.Time{}
 		serve(pr(1, 1, "OPEN"))
 
@@ -1776,7 +1819,7 @@ var _ = Describe("Run", func() {
 		baselines := server.Operations(ghapi.AuthorBaselines(0).Name)
 		Expect(baselines).To(HaveLen(1))
 		Expect(baselines[0].Variables).To(Equal(map[string]any{
-			"q0": "repo:ceph/ceph is:pr author:alice created:<2011-09-01",
+			"q0": "repo:rook/rook is:pr author:alice created:<2016-07-08",
 		}))
 		Expect(server.Operations(ghapi.Counts.Name)).To(HaveLen(1))
 		Expect(searched()).To(BeEmpty())
@@ -1813,9 +1856,9 @@ var _ = Describe("Run", func() {
 			Entry("by the listing's total when the window starts at the repository's creation",
 				created, 3.0, "listing", nil),
 			Entry("by the listing's total when the window starts before the repository's creation",
-				time.Date(2011, 9, 1, 0, 0, 0, 0, time.UTC), 3.0, "listing", nil),
+				time.Date(2016, 7, 8, 0, 0, 0, 0, time.UTC), 3.0, "listing", nil),
 			Entry("by the search when the window starts a day after the repository's creation",
-				created.Add(24*time.Hour), 2.0, "search", []string{"repo:ceph/ceph is:pr created:>=2011-09-02"}),
+				created.Add(24*time.Hour), 2.0, "search", []string{"repo:rook/rook is:pr created:>=2016-07-09"}),
 		)
 
 		Context("when GitHub's search fails", func() {
@@ -1877,13 +1920,13 @@ var _ = Describe("Run", func() {
 				`{"data":{"repository":{"createdAt":null,"total":{"totalCount":3},"open":{"totalCount":1}}}}`,
 				"reply without repository.createdAt"),
 			Entry("without the total", ghapi.Counts.Name,
-				`{"data":{"repository":{"createdAt":"2011-09-01T17:30:00Z","open":{"totalCount":1}}}}`,
+				`{"data":{"repository":{"createdAt":"2016-07-08T17:30:00Z","open":{"totalCount":1}}}}`,
 				"reply without repository.pullRequests.totalCount"),
 			Entry("with a total without its count", ghapi.Counts.Name,
-				`{"data":{"repository":{"createdAt":"2011-09-01T17:30:00Z","total":{},"open":{"totalCount":1}}}}`,
+				`{"data":{"repository":{"createdAt":"2016-07-08T17:30:00Z","total":{},"open":{"totalCount":1}}}}`,
 				"reply without repository.pullRequests.totalCount"),
 			Entry("without the open total", ghapi.Counts.Name,
-				`{"data":{"repository":{"createdAt":"2011-09-01T17:30:00Z","total":{"totalCount":3}}}}`,
+				`{"data":{"repository":{"createdAt":"2016-07-08T17:30:00Z","total":{"totalCount":3}}}}`,
 				"reply without repository.pullRequests(states: OPEN).totalCount"),
 			Entry("without repository", ghapi.Counts.Name,
 				`{"data":{}}`,
@@ -1892,6 +1935,13 @@ var _ = Describe("Run", func() {
 				`{"data":{"search":{}}}`,
 				"reply without search.issueCount"),
 		)
+	})
+})
+
+var _ = Describe("the source repository", func() {
+	It("is rook/rook, read from the day it was created", func() {
+		Expect(fetch.Owner + "/" + fetch.Name).To(Equal("rook/rook"))
+		Expect(fetch.WindowStart).To(Equal(time.Date(2016, 7, 8, 0, 0, 0, 0, time.UTC)))
 	})
 })
 
@@ -1908,7 +1958,7 @@ var _ = Describe("ReadMeta", func() {
 	}
 
 	It("reads the counts and their source", func() {
-		write(`{"window_start":"2011-09-01T00:00:00Z","walk_started":"2026-11-15T12:00:00Z","opened_in_window":73914,"opened_in_window_source":"listing","open":2035}`)
+		write(`{"window_start":"2016-07-08T00:00:00Z","walk_started":"2026-11-15T12:00:00Z","opened_in_window":73914,"opened_in_window_source":"listing","open":2035}`)
 
 		Expect(fetch.ReadMeta(cacheDir)).To(Equal(fetch.Meta{
 			WindowStart:          fetch.WindowStart,
@@ -1920,15 +1970,15 @@ var _ = Describe("ReadMeta", func() {
 	})
 
 	It("reads whether every deleted account's entry holds its names, and a meta.json written before it recorded that as not yet", func() {
-		write(`{"window_start":"2011-09-01T00:00:00Z","walk_started":"2026-11-15T12:00:00Z","opened_in_window":73914,"opened_in_window_source":"listing","open":2035,"deleted_authors_named":true}`)
+		write(`{"window_start":"2016-07-08T00:00:00Z","walk_started":"2026-11-15T12:00:00Z","opened_in_window":73914,"opened_in_window_source":"listing","open":2035,"deleted_authors_named":true}`)
 		Expect(fetch.ReadMeta(cacheDir)).To(HaveField("DeletedAuthorsNamed", true))
 
-		write(`{"window_start":"2011-09-01T00:00:00Z","walk_started":"2026-11-15T12:00:00Z","opened_in_window":73914,"opened_in_window_source":"listing","open":2035}`)
+		write(`{"window_start":"2016-07-08T00:00:00Z","walk_started":"2026-11-15T12:00:00Z","opened_in_window":73914,"opened_in_window_source":"listing","open":2035}`)
 		Expect(fetch.ReadMeta(cacheDir)).To(HaveField("DeletedAuthorsNamed", false))
 	})
 
 	It("reads a meta.json written before it recorded the source as counted by the search, as every count then was", func() {
-		write(`{"window_start":"2011-09-01T00:00:00Z","walk_started":"2026-11-15T12:00:00Z","opened_in_window":72447,"open":2035}`)
+		write(`{"window_start":"2016-07-08T00:00:00Z","walk_started":"2026-11-15T12:00:00Z","opened_in_window":72447,"open":2035}`)
 
 		Expect(fetch.ReadMeta(cacheDir)).To(HaveField("OpenedInWindowSource", record.SourceSearch))
 	})
@@ -1959,7 +2009,7 @@ var _ = Describe("DefaultSince", func() {
 
 	It("is a day before the last fetch", func() {
 		Expect(os.WriteFile(filepath.Join(dataDir, "meta.json"),
-			[]byte(`{"repo":"ceph/ceph","fetched_through":"2026-11-10T06:00:00Z","open":3}`), 0o600)).To(Succeed())
+			[]byte(`{"repo":"rook/rook","fetched_through":"2026-11-10T06:00:00Z","open":3}`), 0o600)).To(Succeed())
 
 		Expect(fetch.DefaultSince(dataDir)).To(Equal(time.Date(2026, 11, 9, 6, 0, 0, 0, time.UTC)))
 	})
@@ -1967,7 +2017,7 @@ var _ = Describe("DefaultSince", func() {
 	DescribeTable("by the window the meta records",
 		func(window string, want time.Time) {
 			Expect(os.WriteFile(filepath.Join(dataDir, "meta.json"),
-				[]byte(`{"repo":"ceph/ceph","window_start":"`+window+`","fetched_through":"2026-11-10T06:00:00Z"}`), 0o600)).To(Succeed())
+				[]byte(`{"repo":"rook/rook","window_start":"`+window+`","fetched_through":"2026-11-10T06:00:00Z"}`), 0o600)).To(Succeed())
 
 			Expect(fetch.DefaultSince(dataDir)).To(Equal(want))
 		},
