@@ -119,9 +119,10 @@ var checklistLine = regexp.MustCompile(`^(?:[-*+]\s*)?\[\s*([xX]?)\s*\]\s*(.*)$`
 
 // templateLabel is, lower-cased, a label that says no more than the
 // AI-guidelines box of rook/rook's pull request template, with or without
-// its link and its condition. Plain words may name other guides beside
-// the AI guidelines, as in "reviewed developer guide and ai guidelines".
-var templateLabel = regexp.MustCompile(`^reviewed (?:[a-z ]+ )?(?:\[ai guidelines\]\([^)]*\)|ai guidelines)(?:,? if ai assisted with the pr)?\.?$`)
+// its link and its condition. It may name another guide first, as in
+// "reviewed developer guide and ai guidelines", but no other words: they
+// could say how AI was used.
+var templateLabel = regexp.MustCompile(`^reviewed (?:(?:the )?[a-z]+ guides? and )?(?:\[ai guidelines\]\([^)]*\)|ai guidelines)(?:,? if ai assisted with the pr)?\.?$`)
 
 // mergifyBreak is where Mergify joins its sentence to the description of
 // the pull request it backports.

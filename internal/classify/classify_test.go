@@ -236,6 +236,17 @@ var _ = Describe("Records", func() {
 			Expect(got.Families).To(Equal([]string{"claude"}))
 		})
 
+		It("counts a ticked box line that carries a disclosure phrase as description under the data's tables", func() {
+			b, err := os.ReadFile(filepath.Join("..", "..", "data", tables.ToolsFile))
+			Expect(err).NotTo(HaveOccurred())
+			t = loadTables(map[string]string{tables.ToolsFile: string(b)})
+			r := pr(1)
+			r.Disclosure, _ = extract.Candidates(nil, "- [x] Reviewed the code generated with copilot and ai guidelines\r\n")
+			got := one(r)
+			Expect(got.Disclosure).To(Equal(classify.DisclosureDescription))
+			Expect(got.Families).To(Equal([]string{"copilot"}))
+		})
+
 		It("gives a Mergify backport that carries its original's description, box ticked, the original's disclosure", func() {
 			const original = "**Description of your changes:**\r\n\r\nFix the leak.\r\n\r\n**Checklist:**\r\n\r\n" +
 				"- [x] Unit tests have been added, if necessary.\r\n" +
