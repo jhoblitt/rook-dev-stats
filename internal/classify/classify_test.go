@@ -12,7 +12,6 @@ import (
 	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
-	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 var _ = Describe("Records", func() {
@@ -24,7 +23,7 @@ var _ = Describe("Records", func() {
 
 	one := func(r record.Record) classify.PR {
 		GinkgoHelper()
-		prs := classify.Records(t, nil, []record.Record{r})
+		prs := classify.Records(t, []record.Record{r})
 		Expect(prs).To(HaveLen(1))
 		Expect(prs[0].Number).To(Equal(r.Number))
 		return prs[0]
@@ -266,26 +265,9 @@ var _ = Describe("Records", func() {
 	})
 
 	Describe("kind", func() {
-		var tickets map[int]tracker.Ticket
-
-		BeforeEach(func() {
-			tickets = map[int]tracker.Ticket{
-				1:  {Type: "Bug"},
-				2:  {Type: ""},
-				3:  {Type: "Weird"},
-				4:  {Type: "Feature"},
-				10: {Type: tracker.TypeBackport, Parent: 1},
-				11: {Type: tracker.TypeBackport, Parent: 99},
-				12: {Type: tracker.TypeBackport},
-				20: {Type: tracker.TypeBackport, Parent: 21},
-				21: {Type: tracker.TypeBackport, Parent: 20},
-				30: {Type: "Tasks"},
-			}
-		})
-
 		kindOf := func(recs ...record.Record) []classify.PR {
 			GinkgoHelper()
-			return classify.Records(t, tickets, recs)
+			return classify.Records(t, recs)
 		}
 
 		withHints := func(n int, h record.KindHints, labels ...string) record.Record {
@@ -295,6 +277,15 @@ var _ = Describe("Records", func() {
 			return r
 		}
 
+		// issue is an issue of the records' own repository.
+		issue := func(n int, labels ...string) record.Issue {
+			return record.Issue{Number: n, Repository: "rook/rook", Labels: labels}
+		}
+
+		closes := func(issues ...record.Issue) record.KindHints {
+			return record.KindHints{Issues: issues}
+		}
+
 		DescribeTable("comes from the first source in the table's order that gives one",
 			func(r record.Record, kind, source string) {
 				got := kindOf(r)[0]
@@ -302,100 +293,107 @@ var _ = Describe("Records", func() {
 				Expect(got.KindSource).To(Equal(source))
 			},
 			Entry("no hints", pr(1), "", ""),
-			Entry("ticked boxes that agree, references_ticket aside",
-				withHints(1, record.KindHints{Checklist: []string{record.CheckReferencesTicket, record.CheckNewFeature}, Tickets: []int{1}}),
-				"feature", tables.SourceChecklist),
-			Entry("ticked boxes that disagree fall through to the tracker",
-				withHints(1, record.KindHints{Checklist: []string{record.CheckVeryRecentBug, record.CheckNewFeature}, Tickets: []int{4}}),
-				"feature", tables.SourceTracker),
-			Entry("only references_ticket ticked falls through",
-				withHints(1, record.KindHints{Checklist: []string{record.CheckReferencesTicket}}, "bug-fix"),
-				"bugfix", tables.SourceLabels),
-			Entry("the first ticket whose type gives a kind, past a missing, an empty and an unmapped type",
-				withHints(1, record.KindHints{Tickets: []int{99, 2, 3, 4, 1}}),
-				"feature", tables.SourceTracker),
-			Entry("a type other than the kinds' own",
-				withHints(1, record.KindHints{Tickets: []int{30}}),
-				"other", tables.SourceTracker),
-			Entry("a Backport ticket stands for its parent",
-				withHints(1, record.KindHints{Tickets: []int{10}}),
-				"bugfix", tables.SourceTracker),
-			Entry("a Backport ticket whose parent is missing gives nothing",
-				withHints(1, record.KindHints{Tickets: []int{11, 4}}),
-				"feature", tables.SourceTracker),
-			Entry("a Backport ticket with no parent gives nothing",
-				withHints(1, record.KindHints{Tickets: []int{12, 4}}),
-				"feature", tables.SourceTracker),
-			Entry("Backport tickets that are each other's parent give nothing",
-				withHints(1, record.KindHints{Tickets: []int{20}}, "feature"),
-				"feature", tables.SourceLabels),
 			Entry("kind labels that agree",
 				withHints(1, record.KindHints{}, "bug-fix", "rgw"),
 				"bugfix", tables.SourceLabels),
 			Entry("kind labels that disagree",
 				withHints(1, record.KindHints{}, "bug-fix", "feature"),
 				"", ""),
+			Entry("a label before a closing issue",
+				withHints(1, closes(issue(7, "feature")), "dependencies"),
+				"other", tables.SourceLabels),
+			Entry("kind labels that disagree leave the closing issue to decide",
+				withHints(1, closes(issue(7, "docs")), "bug-fix", "feature"),
+				"docs", tables.SourceIssues),
+			Entry("an issue whose labels disagree gives nothing, so the next issue decides",
+				withHints(1, closes(issue(7, "bug", "feature"), issue(8, "feature"))),
+				"feature", tables.SourceIssues),
+			Entry("an issue with no kind label gives nothing, so the next issue decides",
+				withHints(1, closes(issue(7, "wontfix"), issue(8), issue(9, "bug", "csi"))),
+				"bugfix", tables.SourceIssues),
+			Entry("an issue's labels map by issue_labels, not labels",
+				withHints(1, closes(issue(7, "bug-fix"))),
+				"", ""),
+			Entry("an issue of another repository never decides",
+				withHints(1, closes(record.Issue{Number: 7, Repository: "ceph/ceph-csi", Labels: []string{"bug"}})),
+				"", ""),
+			Entry("an issue of another repository is passed over for the next",
+				withHints(1, closes(
+					record.Issue{Number: 7, Repository: "ceph/ceph-csi", Labels: []string{"bug"}},
+					issue(8, "feature"),
+				)),
+				"feature", tables.SourceIssues),
+			Entry("issues that all disagree",
+				withHints(1, closes(issue(7, "bug", "docs"), issue(8, "feature", "bug"))),
+				"", ""),
 		)
 
 		It("follows the table's order", func() {
 			t = loadTables(map[string]string{tables.KindsFile: `
 kinds: [{id: bugfix, name: Bug fix}, {id: feature, name: Feature}]
-checklist: {new_feature: feature}
-tracker: {Bug: bugfix}
 labels: {bug-fix: bugfix}
-order: [labels, checklist]
+issue_labels: {feature: feature}
+order: [issues, labels]
 `})
 			got := kindOf(
-				withHints(1, record.KindHints{Checklist: []string{record.CheckNewFeature}}, "bug-fix"),
-				withHints(2, record.KindHints{Checklist: []string{record.CheckNewFeature}}),
-				withHints(3, record.KindHints{Tickets: []int{1}}),
+				withHints(1, closes(issue(7, "feature")), "bug-fix"),
+				withHints(2, closes(issue(7)), "bug-fix"),
 			)
-			Expect(got[0]).To(And(HaveField("Kind", "bugfix"), HaveField("KindSource", tables.SourceLabels)))
-			Expect(got[1]).To(And(HaveField("Kind", "feature"), HaveField("KindSource", tables.SourceChecklist)))
-			Expect(got[2]).To(And(HaveField("Kind", ""), HaveField("KindSource", "")), "tracker is not in the order")
+			Expect(got[0]).To(And(HaveField("Kind", "feature"), HaveField("KindSource", tables.SourceIssues)))
+			Expect(got[1]).To(And(HaveField("Kind", "bugfix"), HaveField("KindSource", tables.SourceLabels)))
+		})
+
+		It("leaves out a source the order does not name", func() {
+			t = loadTables(map[string]string{tables.KindsFile: `
+kinds: [{id: feature, name: Feature}]
+issue_labels: {feature: feature}
+order: [labels]
+`})
+			got := kindOf(withHints(1, closes(issue(7, "feature"))))
+			Expect(got[0]).To(And(HaveField("Kind", ""), HaveField("KindSource", "")), "issues is not in the order")
 		})
 
 		Describe("of a backport", func() {
 			It("is its original's kind, before its own sources", func() {
 				got := kindOf(
-					withHints(1, record.KindHints{Checklist: []string{record.CheckNewFeature}}),
-					withHints(2, record.KindHints{Tickets: []int{1}, BackportOf: 1}),
+					withHints(1, closes(issue(7, "feature"))),
+					withHints(2, record.KindHints{BackportOf: 1}, "bug-fix"),
 				)
 				Expect(got[1]).To(And(HaveField("Kind", "feature"), HaveField("KindSource", classify.SourceOriginal)))
 			})
 
 			It("is its original's kind when the original took its own from its original", func() {
 				got := kindOf(
-					withHints(1, record.KindHints{Checklist: []string{record.CheckDocUpdate}}),
+					withHints(1, closes(issue(7, "docs"))),
 					withHints(2, record.KindHints{BackportOf: 1}),
-					withHints(3, record.KindHints{Tickets: []int{1}, BackportOf: 2}),
+					withHints(3, record.KindHints{BackportOf: 2}, "bug-fix"),
 				)
 				Expect(got[1]).To(And(HaveField("Kind", "docs"), HaveField("KindSource", classify.SourceOriginal)))
 				Expect(got[2]).To(And(HaveField("Kind", "docs"), HaveField("KindSource", classify.SourceOriginal)))
 			})
 
 			It("comes from its own sources when the original is not in the records", func() {
-				got := kindOf(withHints(2, record.KindHints{Tickets: []int{1}, BackportOf: 1}))
-				Expect(got[0]).To(And(HaveField("Kind", "bugfix"), HaveField("KindSource", tables.SourceTracker)))
+				got := kindOf(withHints(2, record.KindHints{BackportOf: 1}, "bug-fix"))
+				Expect(got[0]).To(And(HaveField("Kind", "bugfix"), HaveField("KindSource", tables.SourceLabels)))
 			})
 
 			It("comes from its own sources when the original has no kind", func() {
-				got := kindOf(pr(1), withHints(2, record.KindHints{Tickets: []int{1}, BackportOf: 1}))
-				Expect(got[1]).To(And(HaveField("Kind", "bugfix"), HaveField("KindSource", tables.SourceTracker)))
+				got := kindOf(pr(1), withHints(2, record.KindHints{BackportOf: 1}, "bug-fix"))
+				Expect(got[1]).To(And(HaveField("Kind", "bugfix"), HaveField("KindSource", tables.SourceLabels)))
 			})
 
 			It("comes from its own sources when it names itself", func() {
-				got := kindOf(withHints(1, record.KindHints{Tickets: []int{1}, BackportOf: 1}))
-				Expect(got[0]).To(And(HaveField("Kind", "bugfix"), HaveField("KindSource", tables.SourceTracker)))
+				got := kindOf(withHints(1, record.KindHints{Issues: []record.Issue{issue(7, "bug")}, BackportOf: 1}))
+				Expect(got[0]).To(And(HaveField("Kind", "bugfix"), HaveField("KindSource", tables.SourceIssues)))
 			})
 
 			It("comes from its own sources when the backports form a cycle", func() {
 				got := kindOf(
-					withHints(1, record.KindHints{Checklist: []string{record.CheckNewFeature}, BackportOf: 2}),
+					withHints(1, record.KindHints{Issues: []record.Issue{issue(7, "feature")}, BackportOf: 2}),
 					withHints(2, record.KindHints{BackportOf: 1}, "bug-fix"),
 					withHints(3, record.KindHints{BackportOf: 1}),
 				)
-				Expect(got[0]).To(And(HaveField("Kind", "feature"), HaveField("KindSource", tables.SourceChecklist)))
+				Expect(got[0]).To(And(HaveField("Kind", "feature"), HaveField("KindSource", tables.SourceIssues)))
 				Expect(got[1]).To(And(HaveField("Kind", "bugfix"), HaveField("KindSource", tables.SourceLabels)))
 				Expect(got[2]).To(And(HaveField("Kind", "feature"), HaveField("KindSource", classify.SourceOriginal)),
 					"a backport of a PR in a cycle")
@@ -403,7 +401,7 @@ order: [labels, checklist]
 
 			It("does not depend on the order of the records", func() {
 				recs := []record.Record{
-					withHints(1, record.KindHints{Checklist: []string{record.CheckNewFeature}, BackportOf: 2}),
+					withHints(1, record.KindHints{Issues: []record.Issue{issue(7, "feature")}, BackportOf: 2}),
 					withHints(2, record.KindHints{BackportOf: 1}, "bug-fix"),
 					withHints(3, record.KindHints{BackportOf: 1}),
 					withHints(4, record.KindHints{BackportOf: 3}),

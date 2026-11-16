@@ -14,10 +14,9 @@ import (
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/rollup"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
-	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
-// dataDir holds the hand-made dataset: the tables, the tickets, meta.json
+// dataDir holds the hand-made dataset: the tables, meta.json
 // and records that between them exercise every event kind, disclosure
 // class and kind source.
 const dataDir = "testdata/data"
@@ -29,11 +28,9 @@ func loadInput() rollup.Input {
 	Expect(err).NotTo(HaveOccurred())
 	recs, err := record.ReadRecords(dataDir)
 	Expect(err).NotTo(HaveOccurred())
-	tickets, err := tracker.Read(dataDir)
-	Expect(err).NotTo(HaveOccurred())
 	meta, err := record.ReadMeta(dataDir)
 	Expect(err).NotTo(HaveOccurred())
-	return rollup.Input{Tables: t, Tickets: tickets, Records: recs, Meta: &meta}
+	return rollup.Input{Tables: t, Records: recs, Meta: &meta}
 }
 
 var opened = time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC)
@@ -75,7 +72,7 @@ func pr(number int) record.Record {
 // output is Build's files, decoded on demand.
 type output map[string][]byte
 
-// build rolls recs up with the testdata tables, tickets and meta.
+// build rolls recs up with the testdata tables and meta.
 func build(recs ...record.Record) output {
 	GinkgoHelper()
 	in := loadInput()
@@ -212,9 +209,30 @@ type tableJSON struct {
 	Authors    []string       `json:"authors"`
 	Commits    [][]commitJSON `json:"commits"`
 	Refs       []string       `json:"refs"`
-	Tickets    [][]int        `json:"tickets"`
+	Issues     [][]issueJSON  `json:"issues"`
 	BackportOf []int          `json:"backport_of"`
 	KindSource []string       `json:"kind_source"`
+}
+
+// issueJSON is a closing issue as the table file writes it:
+// [number, repository].
+type issueJSON struct {
+	Number     int
+	Repository string
+}
+
+func (i *issueJSON) UnmarshalJSON(b []byte) error {
+	var a []json.RawMessage
+	if err := json.Unmarshal(b, &a); err != nil {
+		return err
+	}
+	if len(a) != 2 {
+		return fmt.Errorf("an issue is %d values, not 2", len(a))
+	}
+	if err := json.Unmarshal(a[0], &i.Number); err != nil {
+		return err
+	}
+	return json.Unmarshal(a[1], &i.Repository)
 }
 
 type indexJSON struct {
@@ -277,6 +295,14 @@ func (o output) table(year int) tableJSON {
 	var t tableJSON
 	o.decode(fmt.Sprintf("table-%d.json", year), &t)
 	return t
+}
+
+// tableRaw is a year's table columns, each left encoded.
+func (o output) tableRaw(year int) map[string]json.RawMessage {
+	GinkgoHelper()
+	var cols map[string]json.RawMessage
+	o.decode(fmt.Sprintf("table-%d.json", year), &cols)
+	return cols
 }
 
 // ev is one event of a year's events file, its indexes resolved through

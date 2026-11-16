@@ -1,26 +1,28 @@
 package classify
 
 import (
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
-	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
+
+// ownRepository is the repository the records are of, as an issue names
+// its repository.
+const ownRepository = fetch.Owner + "/" + fetch.Name
 
 // ownKind is the kind a pull request's own hints and labels give, from the
 // first source in kinds.yaml's order that gives one.
-func ownKind(t *tables.Tables, tickets map[int]tracker.Ticket, r *record.Record) (kind, source string) {
+func ownKind(t *tables.Tables, r *record.Record) (kind, source string) {
 	var h record.KindHints
 	if r.KindHints != nil {
 		h = *r.KindHints
 	}
 	for _, src := range t.Kinds.Order {
 		switch src {
-		case tables.SourceChecklist:
-			kind = agreed(h.Checklist, t.Kinds.Checklist)
-		case tables.SourceTracker:
-			kind = trackerKind(t, tickets, h.Tickets)
 		case tables.SourceLabels:
 			kind = agreed(r.Labels, t.Kinds.Labels)
+		case tables.SourceIssues:
+			kind = issuesKind(t, h.Issues)
 		}
 		if kind != "" {
 			return kind, src
@@ -46,35 +48,17 @@ func agreed(keys []string, m map[string]string) string {
 	return kind
 }
 
-// trackerKind is the kind of the first ticket whose type gives one.
-func trackerKind(t *tables.Tables, tickets map[int]tracker.Ticket, ids []int) string {
-	for _, id := range ids {
-		if kind := ticketKind(t, tickets, id); kind != "" {
+// issuesKind is the kind of the first issue whose labels agree on one. An
+// issue of another repository gives nothing: its labels are that
+// project's, and may mean something else.
+func issuesKind(t *tables.Tables, issues []record.Issue) string {
+	for _, is := range issues {
+		if is.Repository != ownRepository {
+			continue
+		}
+		if kind := agreed(is.Labels, t.Kinds.IssueLabels); kind != "" {
 			return kind
 		}
-	}
-	return ""
-}
-
-// ticketKind follows a ticket mapped to tables.Parent to its parent. A
-// ticket not in tickets.json, one the tracker would not show, an unmapped
-// type, a missing parent, or parents that loop give nothing.
-func ticketKind(t *tables.Tables, tickets map[int]tracker.Ticket, id int) string {
-	seen := map[int]bool{}
-	for !seen[id] {
-		seen[id] = true
-		tk, ok := tickets[id]
-		if !ok || tk.Type == "" {
-			return ""
-		}
-		kind, ok := t.Kinds.Tracker[tk.Type]
-		switch {
-		case !ok:
-			return ""
-		case kind != tables.Parent:
-			return kind
-		}
-		id = tk.Parent
 	}
 	return ""
 }

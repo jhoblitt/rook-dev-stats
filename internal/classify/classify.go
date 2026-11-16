@@ -1,7 +1,7 @@
 // Package classify applies the hand-edited tables to the committed records:
 // who is human, what each comment is, how a pull request discloses LLM use
 // and with which tools, its components and its kind. Every verdict is a
-// pure function of the records, the tables and data/tickets.json.
+// pure function of the records and the tables.
 package classify
 
 import (
@@ -11,7 +11,6 @@ import (
 	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
-	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 // Comment kinds, named as the site's event kinds.
@@ -77,8 +76,8 @@ type PR struct {
 	Components []string
 	// Kind is a kind id, or "" when unknown.
 	Kind string
-	// KindSource is tables.SourceChecklist, SourceTracker or SourceLabels,
-	// SourceOriginal, or "" when the kind is unknown.
+	// KindSource is tables.SourceLabels or SourceIssues, SourceOriginal, or
+	// "" when the kind is unknown.
 	KindSource string
 }
 
@@ -115,11 +114,11 @@ type Candidate struct {
 // Records classifies every record, the result index for index with recs.
 // A backport's kind needs the kind of the pull request it names, so the
 // whole set is classified at once.
-func Records(t *tables.Tables, tickets map[int]tracker.Ticket, recs []record.Record) []PR {
+func Records(t *tables.Tables, recs []record.Record) []PR {
 	prs := make([]PR, len(recs))
 	for i := range recs {
 		prs[i] = classify(t, &recs[i])
-		prs[i].Kind, prs[i].KindSource = ownKind(t, tickets, &recs[i])
+		prs[i].Kind, prs[i].KindSource = ownKind(t, &recs[i])
 	}
 	resolveOriginals(recs, prs)
 	return prs

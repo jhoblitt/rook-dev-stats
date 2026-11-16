@@ -62,7 +62,7 @@ var _ = Describe("Candidates", func() {
 		Entry("Signed-off-by naming a person called Claude", "Signed-off-by: Claude Dupont <c@example.com>", none()),
 		Entry("Reviewed-by naming Copilot", "Reviewed-by: Copilot", none()),
 		Entry("Link to an assistant's site", "Link: https://claude.ai/share/0000", none()),
-		Entry("Fixes naming a tracker issue", "Fixes: https://tracker.ceph.com/issues/12345", none()),
+		Entry("Fixes naming an issue", "Fixes: https://github.com/rook/rook/issues/12345", none()),
 
 		// Prose, and trailer-shaped lines that are not kept as trailers.
 		Entry("the prose near miss", "Assisted by Claude Opus-5.5", prose("Assisted by Claude Opus-5.5")),
@@ -91,7 +91,7 @@ var _ = Describe("Candidates", func() {
 
 	DescribeTable("a PR description line",
 		func(line string, want record.Disclosure) {
-			body := "## Description\r\n\r\n" + line + "\r\n\r\n## Checklist\r\n- [x] Tracker\r\n"
+			body := "**Description of your changes:**\r\n\r\n" + line + "\r\n\r\n**Checklist:**\r\n\r\n- [x] Documentation has been updated, if necessary.\r\n"
 			Expect(extract.Candidates(nil, body)).To(Equal(want), "line %q", line)
 		},
 
@@ -466,7 +466,7 @@ var _ = Describe("Candidates", func() {
 	It("finds trailers above a backport's cherry-pick line and Conflicts paragraph", func() {
 		msg := "osd: fix a leak\n\n" +
 			"Free the buffer on the error path.\n\n" +
-			"Fixes: https://tracker.ceph.com/issues/12345\n" +
+			"Resolves: #12345\n" +
 			"Assisted-by: Claude Code\n" +
 			"Signed-off-by: Jane Roe <jane@example.com>\n" +
 			"(cherry picked from commit 0123456789abcdef0123456789abcdef01234567)\n\n" +

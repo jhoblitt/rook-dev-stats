@@ -12,7 +12,6 @@ import (
 	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
-	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 var _ = Describe("Check", func() {
@@ -43,7 +42,7 @@ var _ = Describe("Check", func() {
 			{By: "dependabot", Bot: true, Text: "rebased"},
 			{By: "ci-user", Text: "retest"},
 		}
-		r1.KindHints = &record.KindHints{Tickets: []int{1}}
+		r1.KindHints = &record.KindHints{Issues: []record.Issue{{Number: 7, Repository: "rook/rook", Labels: []string{"bug"}}}}
 
 		r2 := pr(2)
 		r2.Base = "squid"
@@ -57,12 +56,7 @@ var _ = Describe("Check", func() {
 		r3.State = record.StateMerged
 
 		return classify.CheckInput{
-			Tables: loadTables(nil),
-			Tickets: map[int]tracker.Ticket{
-				1:  {Type: "Bug"},
-				2:  {Type: ""},
-				10: {Type: tracker.TypeBackport, Parent: 1},
-			},
+			Tables:  loadTables(nil),
 			Records: []record.Record{r1, r2, r3},
 			Meta:    meta(2, 1),
 			Top:     10,
@@ -97,7 +91,7 @@ Base branches: 2
 `))
 	})
 
-	It("passes the tables alone, with no records, meta or tickets", func() {
+	It("passes the tables alone, with no records or meta", func() {
 		Expect(classify.Check(classify.CheckInput{Tables: in.Tables}, out)).To(Succeed())
 		Expect(out.String()).To(Equal(`Counts: no meta.json to compare with
 Pull requests by deleted accounts: 0, named from their commits: 0, distinct names: 0
@@ -277,10 +271,7 @@ Description`))
 			}
 			in.Meta = meta(7, 6)
 		}, `labels.yaml: label "core" is on 5 pull requests and no table classifies it`),
-		Entry("a ticket type kinds.yaml does not map", func() {
-			in.Tickets[5] = tracker.Ticket{Type: "Weird"}
-			in.Tickets[3] = tracker.Ticket{Type: "Weird"}
-		}, `kinds.yaml: ticket type "Weird" in tickets.json (tickets 3, 5) has no tracker entry`),
+
 		Entry("more PRs opened in the window than GitHub counted", func() {
 			in.Meta = meta(1, 1)
 		}, `meta.json: the records hold 2 pull requests opened in the window, GitHub's search counted 1: more than 0.5% apart`),
@@ -364,14 +355,14 @@ Counted disclosures that match no family: 2
 
 	It("lists every problem at once, and still reports", func() {
 		in.Records[2].Disclosure.Trailers = []string{"Generated-by: Claude", "Assisted-by: Bard"}
-		in.Tickets[3] = tracker.Ticket{Type: "Weird"}
+
 		in.Meta = meta(1, 1)
 
 		err := classify.Check(in, out)
 		Expect(err).To(MatchError(And(
 			ContainSubstring(`trailer key "generated-by"`),
 			ContainSubstring(`trailer key "assisted-by"`),
-			ContainSubstring(`ticket type "Weird"`),
+
 			ContainSubstring(`opened in the window`),
 		)))
 		Expect(out.String()).To(ContainSubstring("Base branches: 2"))

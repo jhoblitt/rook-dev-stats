@@ -47,7 +47,7 @@ func newRootCmd(stdin io.Reader, stdout, stderr io.Writer) *cobra.Command {
 	pf.String("log-level", "info", "log level: debug, info, warn, or error (ROOKSTATS_LOG_LEVEL)")
 	pf.String("log-format", "json", "log format: json or text (ROOKSTATS_LOG_FORMAT)")
 
-	cmd.AddCommand(newFetchCmd(v), newExtractCmd(v), newTicketsCmd(v), newCheckCmd(v), newRollupCmd(v))
+	cmd.AddCommand(newFetchCmd(v), newExtractCmd(v), newCheckCmd(v), newRollupCmd(v))
 
 	return cmd
 }

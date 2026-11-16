@@ -355,23 +355,35 @@ var _ = Describe("Build", func() {
 				Expect(o.one("kind")).To(Equal(kind), "kind")
 				Expect(o.table(2026).KindSource).To(Equal([]string{source}), "kind_source")
 			},
-			Entry("from the checklist", &record.KindHints{Checklist: []string{record.CheckNewFeature}}, []string{}, int64(1), "checklist"),
-			Entry("from a ticket", &record.KindHints{Tickets: []int{90002}}, []string{}, int64(0), "tracker"),
+			Entry("from a closing issue", &record.KindHints{Issues: []record.Issue{
+				{Number: 9002, Repository: "rook/rook", Labels: []string{"feature"}},
+			}}, []string{}, int64(1), "issues"),
 			Entry("from a label", nil, []string{"cleanup"}, int64(2), "labels"),
 			Entry("unknown: -1 and no source", nil, []string{}, int64(-1), ""),
 		)
 
-		It("takes a backport's kind from its original, with its tickets and backport_of", func() {
+		It("takes a backport's kind from its original, with its closing issues and backport_of", func() {
 			orig, bp := pr(1), pr(2)
-			orig.KindHints = &record.KindHints{Checklist: []string{record.CheckDocUpdate}}
-			bp.Base = "squid"
-			bp.KindHints = &record.KindHints{Tickets: []int{90002, 90001}, BackportOf: 1}
+			orig.KindHints = &record.KindHints{Issues: []record.Issue{{Number: 9004, Repository: "rook/rook", Labels: []string{"docs"}}}}
+			bp.Base = "release-1.18"
+			bp.KindHints = &record.KindHints{Issues: []record.Issue{
+				{Number: 9002, Repository: "rook/rook", Labels: []string{"feature"}},
+				{Number: 4001, Repository: "ceph/ceph-csi", Labels: []string{"bug"}},
+			}, BackportOf: 1}
 			o := build(orig, bp)
 			Expect(o.col(2026, "kind")).To(Equal([]int64{3, 3}))
 			t := o.table(2026)
-			Expect(t.KindSource).To(Equal([]string{"checklist", "original"}))
-			Expect(t.Tickets).To(Equal([][]int{{}, {90002, 90001}}))
+			Expect(t.KindSource).To(Equal([]string{"issues", "original"}))
+			Expect(t.Issues).To(Equal([][]issueJSON{
+				{{Number: 9004, Repository: "rook/rook"}},
+				{{Number: 9002, Repository: "rook/rook"}, {Number: 4001, Repository: "ceph/ceph-csi"}},
+			}))
+			Expect(string(o.tableRaw(2026)["issues"])).To(Equal(`[[[9004,"rook/rook"]],[[9002,"rook/rook"],[4001,"ceph/ceph-csi"]]]`))
 			Expect(t.BackportOf).To(Equal([]int{0, 1}))
+		})
+
+		It("writes an empty list, not null, for no closing issue", func() {
+			Expect(string(build(pr(1)).tableRaw(2026)["issues"])).To(Equal("[[]]"))
 		})
 
 		DescribeTable("backport_link: whether the description links the pull request it backports",
@@ -383,7 +395,7 @@ var _ = Describe("Build", func() {
 			},
 			Entry("a link to one in the data", &record.KindHints{BackportOf: 1}, int64(1)),
 			Entry("a link to one not in the data", &record.KindHints{BackportOf: 99999}, int64(1)),
-			Entry("hints with no link", &record.KindHints{Tickets: []int{90002}}, int64(0)),
+			Entry("hints with no link", &record.KindHints{Issues: []record.Issue{{Number: 9002, Repository: "rook/rook"}}}, int64(0)),
 			Entry("no hints", nil, int64(0)),
 			Entry("a link that is not a pull request number", &record.KindHints{BackportOf: -1}, int64(0)),
 		)

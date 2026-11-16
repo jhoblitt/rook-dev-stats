@@ -14,7 +14,6 @@ import (
 	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
-	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 var _ = Describe("check", func() {
@@ -42,9 +41,8 @@ var _ = Describe("check", func() {
 	}
 
 	// writeData writes one record carrying trailers, or a trailer that
-	// passes when none are given, beside meta.json and one ticket of
-	// ticketType.
-	writeData := func(ticketType string, trailers ...string) {
+	// passes when none are given, beside meta.json.
+	writeData := func(trailers ...string) {
 		GinkgoHelper()
 		if len(trailers) == 0 {
 			trailers = []string{"Assisted-by: Claude Code"}
@@ -59,26 +57,26 @@ var _ = Describe("check", func() {
 				{At: opened, By: "bob", Text: "LGTM"},
 			},
 			Disclosure: record.Disclosure{Trailers: trailers, CommitProse: commitProse},
-			KindHints:  &record.KindHints{Tickets: []int{90000}},
+			KindHints: &record.KindHints{Issues: []record.Issue{
+				{Number: 16685, Repository: "rook/rook", Labels: []string{"bug"}},
+			}},
 		}})
 		Expect(err).NotTo(HaveOccurred())
 		_, err = record.WriteMeta(dataDir, record.Meta{
-			Repo: "ceph/ceph", WindowStart: fetch.WindowStart, FetchedThrough: opened,
+			Repo: "rook/rook", WindowStart: fetch.WindowStart, FetchedThrough: opened,
 			GitHubCounts: record.Counts{OpenedInWindow: 1, Open: 1},
 		})
 		Expect(err).NotTo(HaveOccurred())
-		_, err = tracker.Write(dataDir, map[int]tracker.Ticket{90000: {Type: ticketType}})
-		Expect(err).NotTo(HaveOccurred())
 	}
 
-	It("passes the seed tables alone, with no records, meta or tickets", func() {
+	It("passes the seed tables alone, with no records or meta", func() {
 		Expect(run("--report")).To(Succeed())
 		Expect(stdout.String()).To(ContainSubstring("Counts: no meta.json to compare with\n"))
 		Expect(stdout.String()).To(ContainSubstring("Base branches: 0\n"))
 	})
 
-	It("reads the records, meta and tickets beside the tables", func() {
-		writeData("Bug")
+	It("reads the records and meta beside the tables", func() {
+		writeData()
 
 		Expect(run("--report")).To(Succeed())
 		Expect(stdout.String()).To(ContainSubstring("Counts: 1 opened in the window (GitHub's search: 1), 1 open (GitHub's listing: 1)\n"))
@@ -86,9 +84,9 @@ var _ = Describe("check", func() {
 	})
 
 	It("fails, listing the problems it found", func() {
-		writeData("Weird")
+		writeData("Made-by: Claude")
 
-		Expect(run()).To(MatchError(ContainSubstring(`ticket type "Weird"`)))
+		Expect(run()).To(MatchError(ContainSubstring(`trailer key "made-by"`)))
 	})
 
 	It("fails on a broken table, naming it", func() {
@@ -101,14 +99,14 @@ var _ = Describe("check", func() {
 	})
 
 	It("lists at most --top entries in each report", func() {
-		writeData("Bug")
+		writeData()
 
 		Expect(run("--report", "--top", "1")).To(Succeed())
 		Expect(stdout.String()).To(ContainSubstring("Accounts with the most comments, not typed bots by GitHub: 2\n      1  alice\n    and 1 more\n"))
 	})
 
 	It("lists every entry with --top 0", func() {
-		writeData("Bug")
+		writeData()
 
 		Expect(run("--report", "--top", "0")).To(Succeed())
 		Expect(stdout.String()).To(ContainSubstring("Accounts with the most comments, not typed bots by GitHub: 2\n      1  alice\n      1  bob\n"))
@@ -116,14 +114,14 @@ var _ = Describe("check", func() {
 	})
 
 	It("prints no report, and so no login, without --report", func() {
-		writeData("Bug")
+		writeData()
 
 		Expect(run()).To(Succeed())
 		Expect(stdout.String()).To(BeEmpty())
 	})
 
 	It("prints the reports, logins among them, with --report", func() {
-		writeData("Bug")
+		writeData()
 
 		Expect(run("--report")).To(Succeed())
 		Expect(stdout.String()).To(ContainSubstring("Accounts with the most comments, not typed bots by GitHub: 2\n      1  alice\n      1  bob\n"))
@@ -131,7 +129,7 @@ var _ = Describe("check", func() {
 
 	DescribeTable("names a candidate's problem, its key and its PR, never its line, without --report",
 		func(trailer, key string) {
-			writeData("Bug", trailer)
+			writeData(trailer)
 
 			err := run()
 			Expect(err).To(MatchError(And(ContainSubstring(key), ContainSubstring("#7"))))
@@ -147,7 +145,7 @@ var _ = Describe("check", func() {
 
 	DescribeTable("quotes a candidate's line with --report",
 		func(trailer string) {
-			writeData("Bug", trailer)
+			writeData(trailer)
 
 			Expect(run("--report")).NotTo(Succeed())
 			Expect(stdout.String()).To(ContainSubstring("      1  " + trailer + "\n"))
@@ -159,7 +157,7 @@ var _ = Describe("check", func() {
 	Describe("two commits' lines that match a phrase only when joined", func() {
 		BeforeEach(func() {
 			commitProse = []string{"Addressed review comments from Copilot", "Wrote unit tests for the LLM gateway"}
-			writeData("Bug")
+			writeData()
 		})
 
 		It("are a hint with --report, and not a problem", func() {
@@ -176,9 +174,9 @@ var _ = Describe("check", func() {
 	})
 
 	It("prints only its problems on failure without --report", func() {
-		writeData("Weird")
+		writeData("Made-by: Claude")
 
-		Expect(run()).To(MatchError(ContainSubstring(`ticket type "Weird"`)))
+		Expect(run()).To(MatchError(ContainSubstring(`trailer key "made-by"`)))
 		Expect(stdout.String()).To(BeEmpty())
 	})
 })
