@@ -6,8 +6,8 @@ type KindHints struct {
 	// Issues is the issues GitHub links as closed by the pull request, in
 	// GitHub's order.
 	Issues []Issue `json:"issues,omitempty"`
-	// BackportOf is the pull request the description says this one is a
-	// backport of.
+	// BackportOf is the pull request the description or title says this
+	// one is a backport of.
 	BackportOf int `json:"backport_of,omitempty"`
 }
 

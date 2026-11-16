@@ -1,7 +1,7 @@
 {
   "number": 70001,
   "title": "squid: rgw: fix a <leak> & a race",
-  "body": "backport of https://github.com/ceph/ceph/pull/69001\r\n",
+  "body": "<hr>This is an automatic backport of pull request #69001 done by [Mergify](https://mergify.com).",
   "state": "MERGED",
   "isDraft": false,
   "createdAt": "2026-06-02T08:00:00Z",
