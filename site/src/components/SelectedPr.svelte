@@ -1,12 +1,12 @@
 <!--
   The selected PR in brief: a link to it on GitHub, its kind and what decided
-  it, the tracker tickets it references, and for a backport the PR it
+  it, the issues GitHub links as closed by it, and for a backport the PR it
   backports. All but the link and the kind's name come from its year's table
   file, which its section loads.
 -->
 <script lang="ts">
   import type { Dataset } from '../lib/data';
-  import { type TableLoad, kindDecided, prUrl, ticketUrl } from '../lib/table';
+  import { type TableLoad, issueName, issueUrl, kindDecided, prUrl } from '../lib/table';
 
   interface Props {
     data: Dataset;
@@ -26,7 +26,7 @@
   const number = $derived(data.prs.number[row] as number);
   const repo = $derived(data.meta.repo);
   const loaded = $derived(table?.status === 'loaded' ? table.table : null);
-  const tickets = $derived(loaded?.tickets[index] ?? []);
+  const issues = $derived(loaded?.issues[index] ?? []);
   const original = $derived(loaded?.backport_of[index] ?? 0);
   // The original may be in a year the period does not load; asking costs the
   // index only then.
@@ -48,7 +48,7 @@
   {#if table === undefined || table.status === 'loading'}
     <p class="muted" role="status">Loading its details…</p>
   {:else if table.status === 'error'}
-    <p class="muted">Its kind’s source, tickets and backport could not be loaded: {table.message}.</p>
+    <p class="muted">Its kind’s source, issues and backport could not be loaded: {table.message}.</p>
     <dl><div><dt>Kind</dt><dd>{data.meta.kinds[kind]?.name ?? 'unknown'}</dd></div></dl>
   {:else}
     <dl>
@@ -56,14 +56,14 @@
         <dt>Kind</dt>
         <dd>{kindDecided(data.meta.kinds, kind, table.table.kind_source[index] ?? '')}</dd>
       </div>
-      {#if tickets.length > 0}
+      {#if issues.length > 0}
         <div>
-          <dt>Tracker ticket{tickets.length === 1 ? '' : 's'}</dt>
+          <dt>Closes</dt>
           <dd>
-            {#each tickets as t, i (i)}{#if i > 0}{', '}{/if}{@render external(
-                ticketUrl(t),
-                `Ticket ${t}`,
-                `Ticket ${t} on tracker.ceph.com`,
+            {#each issues as is, i (i)}{#if i > 0}{', '}{/if}{@render external(
+                issueUrl(is[1], is[0]),
+                issueName(repo, is),
+                `Issue ${issueName(repo, is)} on GitHub`,
               )}{/each}
           </dd>
         </div>

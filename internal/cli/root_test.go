@@ -27,9 +27,10 @@ var _ = Describe("Run", func() {
 
 	It("lists every subcommand in its help", func() {
 		Expect(run("--help")).To(Succeed())
-		for _, name := range []string{"fetch", "extract", "tickets", "check", "rollup"} {
+		for _, name := range []string{"fetch", "extract", "check", "rollup"} {
 			Expect(stdout.String()).To(MatchRegexp(`(?m)^  %s\s`, name), "subcommand %q", name)
 		}
+		Expect(stdout.String()).NotTo(MatchRegexp(`(?m)^  tickets\s`), "the tracker's subcommand is gone")
 	})
 
 	// With no token and an endpoint under .invalid, fetch could reach no

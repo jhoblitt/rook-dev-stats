@@ -417,7 +417,7 @@ describe('the selected PR', () => {
     return within(screen.getByRole('region', { name: /^Pull request #/ })).getByRole('group', { name: /^Selected PR/ });
   }
 
-  it('links to GitHub, says its kind and what decided it, and links its tickets and the PR it backports', async () => {
+  it('links to GitHub, says its kind and what decided it, and links the issues it closes and the PR it backports', async () => {
     const { props, loc } = await page('#/?target=all&pr=66800');
     render(App, props);
     await waitFor(() => expect(panel().textContent).toContain('Bug fix, from the PR it backports'));
@@ -425,9 +425,10 @@ describe('the selected PR', () => {
     expect(open.textContent).toBe('Open on GitHub');
     expect(open.getAttribute('href')).toBe('https://github.com/ceph/ceph/pull/66800');
     expect(open.getAttribute('rel')).toBe('noopener noreferrer');
-    const ticket = within(panel()).getByRole('link', { name: 'Ticket 72140 on tracker.ceph.com, opens in a new tab' });
-    expect(ticket.getAttribute('href')).toBe('https://tracker.ceph.com/issues/72140');
-    expect(ticket.getAttribute('target')).toBe('_blank');
+    const issue = within(panel()).getByRole('link', { name: 'Issue #72140 on GitHub, opens in a new tab' });
+    expect(issue.textContent).toBe('#72140');
+    expect(issue.getAttribute('href')).toBe('https://github.com/ceph/ceph/issues/72140');
+    expect(issue.getAttribute('target')).toBe('_blank');
     const original = within(panel()).getByRole('link', { name: '#66500 on GitHub, opens in a new tab' });
     expect(original.getAttribute('href')).toBe('https://github.com/ceph/ceph/pull/66500');
     await fireEvent.click(within(panel()).getByRole('button', { name: 'Show #66500 here' }));
@@ -441,12 +442,30 @@ describe('the selected PR', () => {
     expect(within(panel()).queryByRole('button', { name: /^Show #63980/ })).toBeNull();
   });
 
-  it('lists a ticket named twice twice, without breaking', async () => {
-    // The loader does not promise unique tickets: 66900's two, with the first repeated.
+  it('links an issue of another repository there, named with its repository', async () => {
+    render(App, (await page('#/?pr=66900')).props);
+    await waitFor(() => expect(panel().textContent).toContain('Closes'));
+    const own = within(panel()).getByRole('link', { name: 'Issue #72377 on GitHub, opens in a new tab' });
+    expect(own.getAttribute('href')).toBe('https://github.com/ceph/ceph/issues/72377');
+    const other = within(panel()).getByRole('link', { name: 'Issue ceph/ceph-csi#4001 on GitHub, opens in a new tab' });
+    expect(other.textContent).toBe('ceph/ceph-csi#4001');
+    expect(other.getAttribute('href')).toBe('https://github.com/ceph/ceph-csi/issues/4001');
+  });
+
+  it('lists an issue named twice twice, without breaking', async () => {
+    // The loader does not promise unique issues: 66900's two, with the first repeated.
     const table = (await import('../lib/__fixtures__/data/table-2026.json')).default;
-    const tickets = table.tickets.map((t: number[], i: number) => (i === 8 ? [72377, 72378, 72377] : t));
-    render(App, (await page('#/?pr=66900', { 'table-2026.json': { ...table, tickets } })).props);
-    await waitFor(() => expect(within(panel()).getAllByRole('link', { name: /^Ticket 72377 / })).toHaveLength(2));
+    const issues = table.issues.map((t, i) =>
+      i === 8
+        ? [
+            [72377, 'ceph/ceph'],
+            [4001, 'ceph/ceph-csi'],
+            [72377, 'ceph/ceph'],
+          ]
+        : t,
+    );
+    render(App, (await page('#/?pr=66900', { 'table-2026.json': { ...table, issues } })).props);
+    await waitFor(() => expect(within(panel()).getAllByRole('link', { name: /^Issue #72377 / })).toHaveLength(2));
   });
 
   it('shows nothing, and does not throw, for a PR not in the data', async () => {

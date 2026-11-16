@@ -161,7 +161,7 @@ export function commentCounts(data: Dataset, rows: Uint32Array, period: Period):
 }
 
 /** The sources of a PR's kind, as the table's `kind_source` names them, and `unknown`. */
-export const KIND_SOURCE_ROWS = ['checklist', 'tracker', 'labels', 'original', 'unknown'] as const;
+export const KIND_SOURCE_ROWS = ['labels', 'issues', 'original', 'unknown'] as const;
 export type KindSourceRow = (typeof KIND_SOURCE_ROWS)[number];
 
 function tableFor(tables: ReadonlyMap<number, TableYear>, year: number): TableYear {

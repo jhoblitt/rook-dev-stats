@@ -1,6 +1,6 @@
 # Target, component and kind
 
-A pull request's target is the branch it asks to merge into. Its components come from its labels. Its kind, where it can be told, comes from what the pull request, its tracker tickets and its labels say about it.
+A pull request's target is the branch it asks to merge into. Its components come from its labels. Its kind, where it can be told, comes from its labels and from the labels of the issues it closes.
 
 ## Target
 
@@ -14,9 +14,8 @@ Each label is read through [`data/labels.yaml`](https://github.com/jhoblitt/ceph
 
 A kind is a bug fix, a feature, a cleanup, documentation, other, or unknown. A backport, a pull request whose description says "backport of" followed by a link to a ceph/ceph pull request or its number, takes the kind of the pull request it backports, when that one is in the data and has a kind. Otherwise the kind comes from the first of these sources that gives one, in the order [`data/kinds.yaml`](https://github.com/jhoblitt/ceph-dev-stats/blob/main/data/kinds.yaml) sets:
 
-- **The checklist.** A ticked box in the description that begins "New feature", "Very recent bug", "Doc update" or "Code cleanup", the boxes of ceph/ceph's pull-request template, names a feature, a bug fix, documentation or a cleanup. The checklist decides only when every ticked box that names a kind names the same one. "References tracker ticket" names none.
-- **A tracker ticket's type.** The tracker.ceph.com tickets a pull request links to, first those on a commit's `Fixes:` line, then those in its description, are tried in that order, and the first whose type gives a kind decides. A Bug is a bug fix; a Feature or an Enhancement a feature; a Cleanup a cleanup; Documentation documentation; a Backport ticket stands for the ticket it was copied from; every other type the table lists is other. A type the table does not list gives no kind, and `cephstats check` fails on it.
-- **A label.** The labels `bug-fix`, `feature` and `cleanup` name a kind, and decide only when every such label on the pull request names the same one.
+- **A label.** A label the table lists, such as `bug`, `feature`, `docs` or `code cleanup`, names a kind, and the labels decide only when every such label on the pull request names the same one.
+- **A closing issue's labels.** The issues GitHub links as closed by the pull request are tried in GitHub's order, and the first whose kind labels, the same as a pull request's but `dependencies`, all name the same kind decides. An issue whose labels disagree, or that has none of them, is passed over for the next. An issue of another repository never decides, since its labels are another project's. GitHub links closing issues only for pull requests to the default branch.
 
 A pull request that none of these decides is unknown. On the data as of {{asOf}}, {{kind.unknown}} of the {{prs.active}} pull requests open at some point in the last {{const.recentMonths}} months are of unknown kind ({{kind.unknownShare}}).
 
@@ -24,4 +23,4 @@ A pull request that none of these decides is unknown. On the data as of {{asOf}}
 
 ## What it cannot show
 
-A ticket's type is the tracker's own, set by whoever filed or sorted the ticket, and may be wrong: a ticket filed as a Bug for what is a new feature makes its pull request a bug fix here. A type is read from the tracker once and not again, so a type changed on the tracker since then is not seen. A ticked box and a label are likewise statements by whoever set them. None of these is checked against the change itself.
+A label is a statement by whoever set it, and may be wrong: an issue labelled `bug` for what is a new feature makes its pull request a bug fix here. The labels are those at the last fetch, not those set when the pull request merged. None of these is checked against the change itself.

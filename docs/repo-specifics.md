@@ -138,15 +138,28 @@ Rook where it had fit Ceph.
   - the ticked boxes of the PR template's Tracker section;
   - the type of the first tracker.ceph.com ticket it references;
   - the labels `bug-fix`, `feature` and `cleanup`.
-- **rook:** a backport takes its original's kind. Otherwise:
-  - kind labels;
-  - then the labels of the issues GitHub links as closed by the pull
-    request.
+- **rook:** a backport takes its original's kind. Otherwise, in
+  `data/kinds.yaml`'s `order: [labels, issues]`:
+  - kind labels: `bug`, `feature`, `code enhancement`, `docs`,
+    `code cleanup`, `technical debt`, and Dependabot's `dependencies` as
+    other;
+  - then the first closing issue whose `issue_labels` agree on a kind.
+    Issues and pull requests share the repository's labels, so
+    `issue_labels` lists the same kind labels as `labels` but
+    `dependencies`. Area labels such as `test`, `build` and `ci` name no
+    kind. Only issues of rook/rook count: another project's labels mean
+    other things.
 
-  Rook's template has no kind boxes.
-- **Where:** `internal/extract/hints.go`, `internal/classify/kind.go`,
-  `internal/tables/kinds.go`, `data/kinds.yaml`.
-- **Found:** the two projects' PR templates and labels.
+  Rook's template has no kind boxes, so the checklist source, the
+  `Check*` hints and the `checklist` table are gone.
+- **Where:** `internal/extract/hints.go` (`Hints`) and
+  `internal/extract/extract.go` (`closingIssues`), `internal/classify/kind.go`
+  (`issuesKind`, `ownRepository`), `internal/tables/kinds.go`
+  (`SourceLabels`, `SourceIssues`), `data/kinds.yaml`.
+- **Found:** the two projects' PR templates and labels. On rook/rook's
+  whole history the kind is unknown for 64.5% of the 7,843 pull requests
+  to `master` and 76.1% of all 11,876, before backports are linked to
+  their originals.
 
 ### External issue tracker
 - **Varies:** whether issues live on GitHub or on another host that the tool
@@ -156,8 +169,13 @@ Rook where it had fit Ceph.
   ticket's address. A Backport ticket stands for its parent's type: 15,116
   of 34,457 saved tickets are of that type.
 - **rook:** GitHub issues only. No second host is asked.
-- **Where:** `internal/tracker` and the `tickets` command, removed for Rook.
-- **Found:** porting.
+- **Where:** removed for Rook: the `internal/tracker` package, the
+  `tickets` command, `data/tickets.json`, the `tracker` table of
+  `data/kinds.yaml` and the `Fixes:` trailer ticket extraction. The site
+  links an issue on GitHub instead of on the tracker.
+- **Found:** porting. 33 rook/rook pull requests name a tracker.ceph.com
+  ticket in a `Fixes:` trailer or their description; those tickets no
+  longer decide anything.
 
 ### Closing issues
 - **Varies:** whether GitHub's closing references exist to read, and where
@@ -167,8 +185,16 @@ Rook where it had fit Ceph.
   requests to the default branch, so a backport gets its kind through its
   original. An issue may belong to another repository, so each cached issue
   keeps its repository. A null entry in the list is skipped where it is
-  read.
-- **Where:** `internal/ghapi/queries.go`, `internal/fetch/cache.go`.
+  read. The record keeps every issue in GitHub's order, with its
+  repository and labels (`kind_hints.issues`); only rook/rook's decide a
+  kind, and the site links each at its own repository's address. 2,191
+  pull requests close at least one issue; 8 close one in another
+  repository.
+- **Where:** `internal/ghapi/queries.go`, `internal/fetch/cache.go`,
+  `internal/extract/extract.go` (`closingIssues`), `internal/record/hints.go`
+  (`Issue`), `internal/rollup/year.go` (the table file's `issues`),
+  `site/src/lib/table.ts` (`issueUrl`, `issueName`),
+  `site/src/components/SelectedPr.svelte`.
 - **Found:** Task 2's implementer and reviewer.
 
 ## AI disclosure
@@ -276,7 +302,9 @@ Rook where it had fit Ceph.
 - **Varies:** the examples the tests are built from.
 - **ceph:** recorded responses and fixtures carry Ceph's tracker addresses,
   backport descriptions and dates.
-- **rook:** they are replaced task by task.
+- **rook:** they are replaced task by task. The extract fixtures and the
+  site fixture carry closing issues instead of tracker tickets; the site
+  fixture is otherwise still Ceph's.
 - **Where:** `internal/extract/testdata`, `site/src/lib/__fixtures__`,
   `site/e2e/smoke.spec.ts`.
 - **Found:** the sibling.

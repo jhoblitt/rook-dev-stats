@@ -12,14 +12,13 @@ import (
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/rollup"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
-	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 func newRollupCmd(v *viper.Viper) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rollup",
 		Short: "Write the statistics site's data from the records and the tables",
-		Long: `Classify the records with the hand-edited tables and tickets.json, and
+		Long: `Classify the records with the hand-edited tables, and
 write the statistics site's data: meta.json; for each year, the columns
 of the pull requests that finished in it, their events, and their table
 of titles and links, with the pull requests still open filed under the
@@ -28,10 +27,10 @@ filed under, by number.
 
 Only the files whose content changes are rewritten, and a file of a year
 that no longer has a pull request is removed. Other files in the output
-directory are left alone. tickets.json and meta.json are optional, and so
-are records: with none, the data is an empty dataset the site can load.
-Rollup does not run check: tables that do not yet classify every label
-or ticket type still roll up.`,
+directory are left alone. meta.json is optional, and so are records:
+with none, the data is an empty dataset the site can load. Rollup does
+not run check: tables that do not yet classify every label still roll
+up.`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			in, err := rollupInput(v.GetString("data"))
@@ -69,11 +68,7 @@ func rollupInput(dir string) (rollup.Input, error) {
 	if err != nil {
 		return rollup.Input{}, err
 	}
-	tickets, err := tracker.Read(dir)
-	if err != nil {
-		return rollup.Input{}, err
-	}
-	in := rollup.Input{Tables: t, Tickets: tickets, Records: recs}
+	in := rollup.Input{Tables: t, Records: recs}
 	switch m, err := record.ReadMeta(dir); {
 	case err == nil:
 		in.Meta = &m

@@ -1,14 +1,14 @@
 {
   "number": 70003,
   "title": "osd: drop a stale assert",
-  "body": "The assert no longer holds since the peering rework.\r\n\r\n## Checklist\r\n- Tracker (select at least one)\r\n  - [x] References tracker ticket\r\n  - [X] Very recent bug; references commit where it was introduced\r\n  - [ ] New feature (ticket optional)\r\n  - [ ] Doc update (no ticket needed)\r\n  - [ ] Code cleanup (no ticket needed)\r\n- Tests (select at least one)\r\n  - [x] No tests\r\n",
+  "body": "The assert no longer holds since the peering rework.\r\n\r\n**Issue resolved by this Pull Request:**\r\nResolves #16685\r\n\r\n**Checklist:**\r\n\r\n- [x] **Commit Message Formatting**: Commit titles and messages follow guidelines in the [developer guide](https://rook.io/docs/rook/latest/Contributing/development-flow/#commit-structure).\r\n- [x] Reviewed the developer guide on [Submitting a Pull Request](https://rook.io/docs/rook/latest/Contributing/development-flow/#submitting-a-pull-request)\r\n- [ ] [Pending release notes](https://github.com/rook/rook/blob/master/PendingReleaseNotes.md) updated with breaking and/or notable changes for the next minor release.\r\n- [ ] Documentation has been updated, if necessary.\r\n- [ ] Unit tests have been added, if necessary.\r\n- [ ] Integration tests have been added, if necessary.\r\n",
   "state": "MERGED",
   "isDraft": false,
   "createdAt": "2026-08-10T06:00:00Z",
   "updatedAt": "2026-09-01T00:00:00Z",
   "closedAt": "2026-08-30T20:00:00Z",
   "mergedAt": "2026-08-30T20:00:00Z",
-  "baseRefName": "main",
+  "baseRefName": "master",
   "additions": 1,
   "deletions": 3,
   "changedFiles": 1,
@@ -18,11 +18,31 @@
     "__typename": "User"
   },
   "labels": [],
+  "closingIssuesReferences": [
+    {
+      "number": 16685,
+      "repository": "rook/rook",
+      "labels": [
+        {
+          "name": "wontfix"
+        },
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    null,
+    {
+      "number": 4001,
+      "repository": "ceph/ceph-csi",
+      "labels": []
+    }
+  ],
   "commits": [
     {
       "authoredDate": "2026-08-09T22:00:00Z",
       "committedDate": "2026-08-25T10:00:00Z",
-      "message": "osd: drop a stale assert\n\nFixes: https://tracker.ceph.com/issues/90030\nCo-authored-by: Frank Example <frank@example.com>\nCo-authored-by: Claude <noreply@anthropic.com>\nSigned-off-by: Erin Example <erin@example.com>\n"
+      "message": "osd: drop a stale assert\n\nThe assert no longer holds since the peering rework.\n\nResolves: #16685\nCo-authored-by: Frank Example <frank@example.com>\nCo-authored-by: Claude <noreply@anthropic.com>\nSigned-off-by: Erin Example <erin@example.com>\n"
     }
   ],
   "comments": [],

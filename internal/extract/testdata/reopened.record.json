@@ -4,7 +4,7 @@
   "title": "osd: drop a stale assert",
   "author": {"login": "erin-example", "bot": false},
   "association": "first_time_contributor",
-  "base": "main",
+  "base": "master",
   "created": "2026-08-10T06:00:00Z",
   "state": "merged",
   "draft": false,
@@ -30,5 +30,8 @@
   ],
   "comments": [],
   "disclosure": {"trailers": ["Co-authored-by: Claude <noreply@anthropic.com>"], "description": [], "commit_prose": []},
-  "kind_hints": {"checklist": ["references_ticket", "very_recent_bug"], "tickets": [90030]}
+  "kind_hints": {"issues": [
+    {"number": 16685, "repository": "rook/rook", "labels": ["bug", "wontfix"]},
+    {"number": 4001, "repository": "ceph/ceph-csi"}
+  ]}
 }

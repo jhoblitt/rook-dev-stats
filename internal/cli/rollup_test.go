@@ -41,7 +41,7 @@ var _ = Describe("rollup", func() {
 		return out
 	}
 
-	It("writes the site's data from the records, tables, tickets and meta", func() {
+	It("writes the site's data from the records, tables and meta", func() {
 		dataDir := filepath.Join("..", "rollup", "testdata", "data")
 		golden := filepath.Join("..", "rollup", "testdata", "golden")
 

@@ -67,10 +67,11 @@ type tableFile struct {
 	// Commits are each row's [sha, authored, committed].
 	Commits [][][]any `json:"commits"`
 	// Refs are one per event, in the events file's order.
-	Refs       []string `json:"refs"`
-	Tickets    [][]int  `json:"tickets"`
-	BackportOf []int    `json:"backport_of"`
-	KindSource []string `json:"kind_source"`
+	Refs []string `json:"refs"`
+	// Issues are each row's closing issues, each [number, repository].
+	Issues     [][][]any `json:"issues"`
+	BackportOf []int     `json:"backport_of"`
+	KindSource []string  `json:"kind_source"`
 }
 
 func newYear() *year {
@@ -185,7 +186,7 @@ func (b *builder) add(r *record.Record, p *classify.PR) error {
 	t.Titles = append(t.Titles, r.Title)
 	t.Authors = append(t.Authors, r.Author.Login)
 	t.Commits = append(t.Commits, commitList(r))
-	t.Tickets = append(t.Tickets, tickets(r))
+	t.Issues = append(t.Issues, issues(r))
 	t.BackportOf = append(t.BackportOf, backportOf(r))
 	t.KindSource = append(t.KindSource, source)
 	return nil
@@ -395,12 +396,12 @@ func commitList(r *record.Record) [][]any {
 	return list
 }
 
-func tickets(r *record.Record) []int {
-	out := []int{}
+func issues(r *record.Record) [][]any {
+	out := [][]any{}
 	if r.KindHints != nil {
-		for _, t := range r.KindHints.Tickets {
-			if t > 0 {
-				out = append(out, t)
+		for _, is := range r.KindHints.Issues {
+			if is.Number > 0 && is.Repository != "" {
+				out = append(out, []any{is.Number, is.Repository})
 			}
 		}
 	}

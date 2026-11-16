@@ -79,7 +79,7 @@ func fromEntry(e fetch.Entry) (r record.Record, withheld map[string]int, err err
 		Reviews:     reviews(e.Reviews),
 		Comments:    comments(e.Comments),
 		Disclosure:  disclosure,
-		KindHints:   Hints(messages, e.Body),
+		KindHints:   Hints(e.Number, e.Title, messages, e.Body, closingIssues(e.ClosingIssues)),
 	}, withheld, nil
 }
 
@@ -105,6 +105,23 @@ func author(e fetch.Entry) record.Actor {
 		a.Name = e.CommitNames.Name()
 	}
 	return a
+}
+
+// closingIssues are cs in GitHub's order, less any GitHub gave as null,
+// which decodes with no number or no repository.
+func closingIssues(cs []fetch.ClosingIssue) []record.Issue {
+	var out []record.Issue
+	for _, c := range cs {
+		if c.Number == 0 || c.Repository == "" {
+			continue
+		}
+		is := record.Issue{Number: c.Number, Repository: c.Repository}
+		if len(c.Labels) > 0 {
+			is.Labels = labels(c.Labels)
+		}
+		out = append(out, is)
+	}
+	return out
 }
 
 func labels(ls []fetch.Label) []string {

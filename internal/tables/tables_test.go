@@ -65,10 +65,9 @@ const validKinds = `
 kinds:
   - {id: bugfix, name: Bug fix}
   - {id: feature, name: Feature}
-checklist: {new_feature: feature, very_recent_bug: bugfix}
-tracker: {Bug: bugfix, Feature: feature, Backport: parent}
 labels: {bug-fix: bugfix}
-order: [checklist, tracker, labels]
+issue_labels: {bug: bugfix, feature: feature}
+order: [labels, issues]
 `
 
 // writeTables writes a valid set of tables into a new directory, with any
@@ -107,8 +106,9 @@ var _ = Describe("Load", func() {
 		Expect(t.Commands.List).To(HaveLen(3))
 		Expect(t.Labels.Components).To(HaveLen(3))
 		Expect(t.Kinds.List).To(Equal([]tables.Kind{{ID: "bugfix", Name: "Bug fix"}, {ID: "feature", Name: "Feature"}}))
-		Expect(t.Kinds.Tracker).To(HaveKeyWithValue("Backport", tables.Parent))
-		Expect(t.Kinds.Order).To(Equal([]string{tables.SourceChecklist, tables.SourceTracker, tables.SourceLabels}))
+		Expect(t.Kinds.Labels).To(Equal(map[string]string{"bug-fix": "bugfix"}))
+		Expect(t.Kinds.IssueLabels).To(Equal(map[string]string{"bug": "bugfix", "feature": "feature"}))
+		Expect(t.Kinds.Order).To(Equal([]string{tables.SourceLabels, tables.SourceIssues}))
 	})
 
 	It("loads the committed seed tables", func() {
@@ -244,33 +244,37 @@ var _ = Describe("Load", func() {
 		Entry("the reserved kind id all", tables.KindsFile,
 			"kinds:\n  - {id: all, name: All}\n",
 			`kinds: id "all" is reserved`),
-		Entry("the reserved kind id parent", tables.KindsFile,
-			"kinds:\n  - {id: parent, name: Parent}\n",
-			`kinds: id "parent" is reserved`),
+
 		Entry("a kind without an id", tables.KindsFile,
 			"kinds:\n  - {name: Bug fix}\n",
 			"kinds: entry 1 has no id"),
 		Entry("a kind without a name", tables.KindsFile,
 			"kinds:\n  - {id: bugfix}\n",
 			`kinds: "bugfix" has no name`),
-		Entry("a checklist box that is not in the template", tables.KindsFile,
-			"kinds: [{id: feature, name: Feature}]\nchecklist: {new_feeture: feature}\n",
-			`checklist: "new_feeture" is not a box of the template`),
-		Entry("a checklist box mapped to no kind", tables.KindsFile,
-			"kinds: [{id: feature, name: Feature}]\nchecklist: {new_feature: feat}\n",
-			`checklist: "new_feature" maps to "feat", which is not a kind`),
-		Entry("a checklist box mapped to parent", tables.KindsFile,
-			"kinds: [{id: feature, name: Feature}]\nchecklist: {new_feature: parent}\n",
-			`checklist: "new_feature" maps to "parent", which is not a kind`),
-		Entry("a ticket type mapped to no kind", tables.KindsFile,
-			"kinds: [{id: bugfix, name: Bug fix}]\ntracker: {Bug: bugfx}\n",
-			`tracker: "Bug" maps to "bugfx", which is not a kind`),
+		Entry("the Ceph checklist table", tables.KindsFile,
+			"kinds: [{id: feature, name: Feature}]\nchecklist: {new_feature: feature}\n",
+			"yaml: unmarshal errors:\n  line 2: field checklist not found"),
+		Entry("the Ceph tracker table", tables.KindsFile,
+			"kinds: [{id: bugfix, name: Bug fix}]\ntracker: {Bug: bugfix}\n",
+			"yaml: unmarshal errors:\n  line 2: field tracker not found"),
 		Entry("a kind label mapped to no kind", tables.KindsFile,
 			"kinds: [{id: bugfix, name: Bug fix}]\nlabels: {bug-fix: bug}\n",
 			`labels: "bug-fix" maps to "bug", which is not a kind`),
+		Entry("an issue label mapped to no kind", tables.KindsFile,
+			"kinds: [{id: bugfix, name: Bug fix}]\nissue_labels: {bug: bugfx}\n",
+			`issue_labels: "bug" maps to "bugfx", which is not a kind`),
+		Entry("an issue label mapped to parent", tables.KindsFile,
+			"kinds: [{id: bugfix, name: Bug fix}]\nissue_labels: {bug: parent}\n",
+			`issue_labels: "bug" maps to "parent", which is not a kind`),
 		Entry("an unknown source in the order", tables.KindsFile,
-			"order: [checklist, title]\n",
-			`order: "title" is not a source`),
+			"order: [labels, title]\n",
+			`order: "title" is not a source; the sources are labels and issues`),
+		Entry("the tracker in the order", tables.KindsFile,
+			"order: [tracker, labels]\n",
+			`order: "tracker" is not a source`),
+		Entry("the checklist in the order", tables.KindsFile,
+			"order: [checklist, labels]\n",
+			`order: "checklist" is not a source`),
 		Entry("a source twice in the order", tables.KindsFile,
 			"order: [labels, labels]\n",
 			`order: "labels" appears twice`),
@@ -376,6 +380,6 @@ var _ = Describe("Kinds", func() {
 	It("knows its kinds", func() {
 		t := load(nil)
 		Expect(t.Kinds.Has("bugfix")).To(BeTrue())
-		Expect(t.Kinds.Has(tables.Parent)).To(BeFalse())
+		Expect(t.Kinds.Has("parent")).To(BeFalse())
 	})
 })

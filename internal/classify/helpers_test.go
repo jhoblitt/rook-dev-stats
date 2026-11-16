@@ -50,10 +50,9 @@ kinds:
   - {id: feature, name: Feature}
   - {id: docs, name: Documentation}
   - {id: other, name: Other}
-checklist: {new_feature: feature, very_recent_bug: bugfix, doc_update: docs}
-tracker: {Bug: bugfix, Feature: feature, Backport: parent, Tasks: other}
-labels: {bug-fix: bugfix, feature: feature}
-order: [checklist, tracker, labels]
+labels: {bug-fix: bugfix, feature: feature, dependencies: other}
+issue_labels: {bug: bugfix, feature: feature, docs: docs}
+order: [labels, issues]
 `,
 }
 

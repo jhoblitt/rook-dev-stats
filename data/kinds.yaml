@@ -3,8 +3,8 @@
 # otherwise the sources below are tried in `order`, and a pull request none
 # of them decides is unknown.
 
-# The kinds, in the order the site shows them. `unknown`, `all` and
-# `parent` are reserved.
+# The kinds, in the order the site shows them. `unknown` and `all` are
+# reserved.
 kinds:
   - {id: bugfix, name: Bug fix}
   - {id: feature, name: Feature}
@@ -12,37 +12,8 @@ kinds:
   - {id: docs, name: Documentation}
   - {id: other, name: Other}
 
-# A ticked box of the PR template. It decides only when every ticked box
-# listed here names the same kind; "References tracker ticket" names none.
-checklist:
-  new_feature: feature
-  very_recent_bug: bugfix
-  doc_update: docs
-  code_cleanup: cleanup
-
-# A tracker ticket's type. The first referenced ticket whose type gives a
-# kind decides; `parent` stands for the type of the ticket a Backport
-# ticket was copied from.
-tracker:
-  Bug: bugfix
-  Feature: feature
-  Enhancement: feature
-  Cleanup: cleanup
-  Documentation: docs
-  Backport: parent
-  Support: other
-  Tasks: other
-  Subtask: other
-  QA Run: other
-  QA Review: other
-  Motion: other
-  Election: other
-  Assignment: other
-  Working Group: other
-  Ceph Release: other
-
-# A label. It decides only when every kind label the pull request carries
-# names the same kind.
+# A label of the pull request. It decides only when every kind label the
+# pull request carries names the same kind.
 labels:
   bug: bugfix
   feature: feature
@@ -53,4 +24,20 @@ labels:
   # Dependabot's label on every update it opens.
   dependencies: other
 
-order: [checklist, tracker, labels]
+# A label of an issue the pull request closes, as GitHub links them. The
+# first issue whose kind labels all name the same kind decides. Only the
+# issues of rook/rook count: another project's labels mean other things.
+# GitHub links closing issues only for pull requests to the default branch,
+# so a backport takes its kind from its original. Issues and pull requests
+# share the repository's labels, so this lists the same kind labels as
+# `labels` above; labels that name an area, such as `test`, `build` or
+# `ci`, say nothing about the kind of change.
+issue_labels:
+  bug: bugfix
+  feature: feature
+  code enhancement: feature
+  docs: docs
+  code cleanup: cleanup
+  technical debt: cleanup
+
+order: [labels, issues]

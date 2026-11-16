@@ -78,7 +78,7 @@ var _ = Describe("the hand-made dataset", func() {
 		}
 		Expect(kinds).To(HaveLen(len(m.EventKinds)), "every event kind")
 		Expect(classes).To(HaveLen(len(m.Disclosure)), "every disclosure class")
-		Expect(sources).To(HaveLen(5), "every kind source and none")
+		Expect(sources).To(Equal(map[string]bool{"labels": true, "issues": true, "original": true, "": true}), "every kind source and none")
 		Expect(m.PeopleBots).NotTo(BeEmpty())
 		Expect(m.PeopleDeleted).NotTo(BeEmpty(), "a deleted account named by its commits")
 		Expect(m.People).To(ContainElement("ghost"), "the pooled deleted accounts beside it")
@@ -122,7 +122,7 @@ var _ = Describe("the hand-made dataset", func() {
 			t := o.table(y)
 			for name, c := range map[string]int{
 				"titles": len(t.Titles), "authors": len(t.Authors), "commits": len(t.Commits),
-				"tickets": len(t.Tickets), "backport_of": len(t.BackportOf), "kind_source": len(t.KindSource),
+				"issues": len(t.Issues), "backport_of": len(t.BackportOf), "kind_source": len(t.KindSource),
 			} {
 				Expect(c).To(Equal(rows), "table-%d.json column %q", y, name)
 			}

@@ -52,17 +52,12 @@ environment variable.
 - `extract` turns the cached pull requests into the committed records under
   `data/`, rewriting only the files whose content changes. Every run
   re-derives each record from its cached entry in the current format.
-- `tickets` asks tracker.ceph.com for the type of each tracker ticket the
-  records reference that `data/tickets.json` does not hold yet. It asks
-  anonymously, for up to 100 tickets a request and at most one request a
-  second. `--refresh` asks again about the tickets the tracker would not
-  show before.
 - `check` validates the hand-edited tables against the records and fails,
   listing every problem, on a table that does not load, a `tools.yaml`
   with no `unspecified` family, a trailer or label no table accounts for,
-  a counted disclosure that names no tool family, a ticket type
-  `kinds.yaml` does not map, or record counts more than 0.5% from
-  GitHub's, naming which of GitHub's counts it compared with. A candidate
+  a counted disclosure that names no tool family, or record counts more
+  than 0.5% from GitHub's, naming which of GitHub's counts it compared
+  with. A candidate
   line can name a person, so the failure names a trailer or disclosure
   problem only by its trailer key, how many lines and which pull
   requests. `--report` also prints those lines, how many pull requests
@@ -71,7 +66,7 @@ environment variable.
   candidate lines that match a disclosure phrase only when joined, and
   what the tables do not match yet.
 - `rollup` classifies the records in `data/` with the hand-edited tables
-  and `data/tickets.json`, and writes the site's data files: `meta.json`;
+  and writes the site's data files: `meta.json`;
   `prs-<year>.json`, `events-<year>.json` and `table-<year>.json` for each
   year, holding the pull requests that finished in it, with those still
   open under the year of `fetched_through`, each with all of its events
@@ -96,10 +91,9 @@ are derived from it by `rookstats rollup` and are not committed.
 
 | File | What it holds | Written by |
 |---|---|---|
-| `prs/YYYY-MM.jsonl` | one record per pull request, in the file of the month it was opened: its author, times, state, size, labels, commits, lifecycle events, reviews and comments, and the lines that might disclose AI use or say what kind of change it is. The author of a pull request opened by an account since deleted is the login `ghost` and, when its commits give one, a `name` | `extract` |
+| `prs/YYYY-MM.jsonl` | one record per pull request, in the file of the month it was opened: its author, times, state, size, labels, commits, lifecycle events, reviews and comments, the lines that might disclose AI use, the issues GitHub links as closed by it, and the pull request it says it backports. The author of a pull request opened by an account since deleted is the login `ghost` and, when its commits give one, a `name` | `extract` |
 | `authors.json` | for each author, how many pull requests they opened before `meta.json`'s `window_start`: the baseline their `prior_prs` starts from, and 0 for everyone once that is 2011-09-01. `extract` adds the cache's baselines to it while `meta.json` is of the window `extract` derives for, and otherwise replaces it with them | `extract` |
 | `meta.json` | the window start, when the last walk began, and GitHub's counts at its end: the pull requests opened since the window start, and those open. The open ones are the total of the repository's pull-request listing. So are those opened since the window start when it is no later than the repository's creation, since every pull request is then in the window; for a later window they are the count of a search, which has been seen to omit pull requests the listing returns. `opened_in_window_source` says which, `listing` or `search`; a `meta.json` without it is from the search | `extract` |
-| `tickets.json` | the type of each tracker ticket a record references, and the ticket a Backport ticket was copied from | `tickets` |
 | `tools.yaml` | what counts as a disclosure, and which tool it names | by hand |
 | `bots.yaml` | accounts GitHub types as users whose comments are automated | by hand |
 | `commands.yaml` | comments that only trigger automation | by hand |
@@ -140,7 +134,7 @@ new pull.
 ## Updating
 
 ```sh
-make data-refresh   # fetch, extract, tickets, check
+make data-refresh   # fetch, extract, check
 ```
 
 `data-refresh` takes the token from the environment as `fetch` does; when

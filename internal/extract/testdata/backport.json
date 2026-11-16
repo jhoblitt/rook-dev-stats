@@ -1,7 +1,7 @@
 {
   "number": 70001,
   "title": "squid: rgw: fix a <leak> & a race",
-  "body": "backport tracker: https://tracker.ceph.com/issues/90001\r\n\r\n---\r\n\r\nbackport of https://github.com/ceph/ceph/pull/69001\r\nparent tracker: https://tracker.ceph.com/issues/90000\r\n\r\nthis backport was staged using ceph-backport.sh version 16.0.0.0000\r\n",
+  "body": "backport of https://github.com/ceph/ceph/pull/69001\r\n",
   "state": "MERGED",
   "isDraft": false,
   "createdAt": "2026-06-02T08:00:00Z",
@@ -29,7 +29,7 @@
     {
       "authoredDate": "2026-02-10T09:00:00+01:00",
       "committedDate": "2026-06-01T12:00:00Z",
-      "message": "rgw: free the buffer on the error path\n\nThe error path returned before freeing the buffer.\n\nFixes: https://tracker.ceph.com/issues/90000\nAssisted-by: Claude Code\nSigned-off-by: Alice Example <alice@example.com>\n(cherry picked from commit 0123456789abcdef0123456789abcdef01234567)\n\nConflicts:\n\tsrc/rgw/rgw_op.cc\n\t- kept the squid include order\n"
+      "message": "rgw: free the buffer on the error path\n\nThe error path returned before freeing the buffer.\n\nResolves: #16685\nAssisted-by: Claude Code\nSigned-off-by: Alice Example <alice@example.com>\n(cherry picked from commit 0123456789abcdef0123456789abcdef01234567)\n\nConflicts:\n\tsrc/rgw/rgw_op.cc\n\t- kept the squid include order\n"
     },
     {
       "authoredDate": "2026-02-11T10:00:00Z",

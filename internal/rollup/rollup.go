@@ -22,7 +22,6 @@ import (
 	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
-	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 // The event kinds of a review. A comment's kinds are classify's, and a
@@ -54,8 +53,7 @@ var states = map[string]int{record.StateOpen: 0, record.StateMerged: 1, record.S
 
 // Input is what the site's data is rolled up from.
 type Input struct {
-	Tables  *tables.Tables
-	Tickets map[int]tracker.Ticket
+	Tables *tables.Tables
 	// Records are every record, in any order.
 	Records []record.Record
 	// Meta is data/meta.json, or nil when there is none.
@@ -117,7 +115,7 @@ type indexFile struct {
 func Build(in Input) ([]File, error) {
 	recs := slices.Clone(in.Records)
 	slices.SortFunc(recs, func(a, b record.Record) int { return cmp.Compare(a.Number, b.Number) })
-	prs := classify.Records(in.Tables, in.Tickets, recs)
+	prs := classify.Records(in.Tables, recs)
 
 	b := newBuilder(in, recs)
 	for i := range recs {

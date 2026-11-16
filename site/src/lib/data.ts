@@ -186,8 +186,11 @@ export interface Dataset {
 /** A commit of a PR: its SHA, then when it was authored and committed. */
 export type Commit = readonly [sha: string, authored: number, committed: number];
 
+/** An issue a PR closes: its number, then its repository as owner/name. */
+export type Issue = readonly [number: number, repository: string];
+
 /** Where a PR's kind was decided; `original` is the kind of the PR it backports. */
-export const KIND_SOURCES = ['checklist', 'tracker', 'labels', 'original'] as const;
+export const KIND_SOURCES = ['labels', 'issues', 'original'] as const;
 /** The empty string exactly when the kind is unknown. */
 export type KindSource = (typeof KIND_SOURCES)[number] | '';
 
@@ -205,8 +208,8 @@ export interface TableYear {
    * string when there is none, as for `reopened`.
    */
   refs: string[];
-  /** The tracker.ceph.com tickets each row references. */
-  tickets: number[][];
+  /** The issues GitHub links as closed by each row, in GitHub's order; an issue may be of another repository. */
+  issues: (readonly Issue[])[];
   /** The number of the PR each row backports, or 0. */
   backport_of: number[];
   kind_source: KindSource[];
@@ -455,6 +458,17 @@ const isCommit = (c: unknown): boolean =>
   isValue('time', c[1]) &&
   isValue('time', c[2]);
 
+/** owner/name, as GitHub spells a repository. */
+const REPOSITORY = /^[\w.-]+\/[\w.-]+$/;
+
+const isIssue = (i: unknown): boolean =>
+  Array.isArray(i) &&
+  i.length === 2 &&
+  Number.isSafeInteger(i[0]) &&
+  (i[0] as number) > 0 &&
+  typeof i[1] === 'string' &&
+  REPOSITORY.test(i[1]);
+
 const isKindSource = (s: unknown): s is KindSource =>
   s === '' || (KIND_SOURCES as readonly unknown[]).includes(s);
 
@@ -494,7 +508,7 @@ export function parseTable(raw: unknown, file: string, year: YearData, meta: Met
       if (typeof v !== 'string') return false;
       return v === '' || (shaKinds.includes(year.events.kind[i] as number) ? SHA : ID).test(v);
     }),
-    tickets: column('tickets', perRow, (v) => Array.isArray(v) && v.every((t) => Number.isSafeInteger(t) && t > 0)),
+    issues: column('issues', perRow, (v) => Array.isArray(v) && v.every(isIssue)),
     backport_of: column('backport_of', perRow, (v) => Number.isSafeInteger(v) && (v as number) >= 0),
     kind_source: column('kind_source', perRow, isKindSource),
   };

@@ -108,7 +108,7 @@ function withEveryKind(): Record<string, unknown> {
     authors: ['someone'],
     commits: [[[SHA('c'), hour(-20), hour(13)]]],
     refs: EVERY.map((e) => e.ref),
-    tickets: [[]],
+    issues: [[]],
     backport_of: [0],
     kind_source: [''],
   });

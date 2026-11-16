@@ -13,21 +13,19 @@ import (
 	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
-	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 const (
 	// minLabelPRs is how many pull requests a label must be on before it
 	// must be classified.
 	minLabelPRs = 5
-	// maxNamed is how many pull requests or tickets a problem names.
+	// maxNamed is how many pull requests a problem names.
 	maxNamed = 5
 )
 
 // CheckInput is what Check validates the tables against.
 type CheckInput struct {
 	Tables  *tables.Tables
-	Tickets map[int]tracker.Ticket
 	Records []record.Record
 	// Meta is nil when there is no meta.json.
 	Meta *record.Meta
@@ -51,7 +49,6 @@ type CheckInput struct {
 //     Co-authored-by, and that ignore does not list;
 //   - a counted disclosure that matches no family;
 //   - a label on 5 or more pull requests that no table classifies;
-//   - a ticket type in tickets.json that kinds.yaml does not map;
 //   - record counts more than 0.5% from GitHub's counts in meta.json.
 //
 // A candidate line can name a person, and the error is printed where out is
@@ -59,7 +56,7 @@ type CheckInput struct {
 // requests and only out quotes the line.
 func Check(in CheckInput, out io.Writer) error {
 	t := in.Tables
-	prs := Records(t, in.Tickets, in.Records)
+	prs := Records(t, in.Records)
 
 	var errs []error
 	if !slices.ContainsFunc(t.Tools.Families, func(f tables.Family) bool { return f.ID == unspecifiedFamily }) {
@@ -100,7 +97,7 @@ func Check(in CheckInput, out io.Writer) error {
 		errs = append(errs, fmt.Errorf("%s: no family matches %s (%s)", tables.ToolsFile, what, noFamily[key].summary()))
 	}
 	errs = append(errs, labelProblems(t, in.Records)...)
-	errs = append(errs, ticketProblems(t, in.Tickets)...)
+
 	counts, countErrs := compareCounts(in.Records, in.Meta)
 	errs = append(errs, countErrs...)
 
@@ -243,21 +240,6 @@ func labelProblems(t *tables.Tables, recs []record.Record) []error {
 	return errs
 }
 
-func ticketProblems(t *tables.Tables, tickets map[int]tracker.Ticket) []error {
-	unmapped := map[string][]int{}
-	for id, tk := range tickets {
-		if _, ok := t.Kinds.Tracker[tk.Type]; tk.Type != "" && !ok {
-			unmapped[tk.Type] = append(unmapped[tk.Type], id)
-		}
-	}
-	var errs []error
-	for _, typ := range slices.Sorted(maps.Keys(unmapped)) {
-		errs = append(errs, fmt.Errorf("%s: ticket type %q in %s (tickets %s) has no tracker entry",
-			tables.KindsFile, typ, tracker.File, list(unmapped[typ], "")))
-	}
-	return errs
-}
-
 // compareCounts allows the records and GitHub's counts to differ by 0.5%,
 // for pull requests opened or closed while the walk ran.
 func compareCounts(recs []record.Record, meta *record.Meta) (string, []error) {
@@ -341,23 +323,19 @@ func report(out io.Writer, title string, counts map[string]int, top int) {
 	}
 }
 
+// prList names the first few of the pull requests, in order.
 func prList(numbers []int) string {
-	return list(numbers, "#")
-}
-
-// list names the first few of ids in order, each with prefix.
-func list(ids []int, prefix string) string {
-	ids = slices.Sorted(slices.Values(ids))
+	numbers = slices.Sorted(slices.Values(numbers))
 	var b strings.Builder
-	for i, id := range ids {
+	for i, n := range numbers {
 		if i == maxNamed {
-			fmt.Fprintf(&b, " and %d more", len(ids)-maxNamed)
+			fmt.Fprintf(&b, " and %d more", len(numbers)-maxNamed)
 			break
 		}
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		b.WriteString(prefix + strconv.Itoa(id))
+		b.WriteString("#" + strconv.Itoa(n))
 	}
 	return b.String()
 }
