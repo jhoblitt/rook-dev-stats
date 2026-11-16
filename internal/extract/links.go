@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 )
 
 var eventAddress = regexp.MustCompile(`#event-(\d+)$`)

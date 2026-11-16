@@ -5,7 +5,7 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
 )
 
 // Parent is what a ticket type maps to when the ticket stands for its

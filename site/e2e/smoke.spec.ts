@@ -7,7 +7,7 @@
 
 import { type Locator, type Page, expect, test } from '@playwright/test';
 
-const REPO = 'https://github.com/jhoblitt/ceph-dev-stats';
+const REPO = 'https://github.com/jhoblitt/rook-dev-stats';
 const DATA_REPO = 'https://github.com/ceph/ceph';
 /** GitHub's form of a login (`site/src/lib/handles.ts`), as a user page's address. */
 const USER_PAGE = /^https:\/\/github\.com\/[A-Za-z0-9][A-Za-z0-9-]{0,38}$/;
@@ -96,7 +96,7 @@ async function bannerBottom(page: Page): Promise<number> {
 
 test('the page loads whole, with every section', async ({ page }) => {
   await open(page);
-  await expect(page.getByRole('heading', { level: 1, name: 'Ceph pull requests' })).toBeAttached();
+  await expect(page.getByRole('heading', { level: 1, name: 'Rook pull requests' })).toBeAttached();
   for (const name of ['Filters', 'Velocity', 'Review', 'AI use', 'Each PR', 'Timelines', 'Pull requests', 'People']) {
     await expect(page.getByRole('heading', { level: 2, name, exact: true }), name).toBeAttached();
   }
@@ -743,7 +743,7 @@ test('the footer shows a version and the repository link', async ({ page }) => {
   await expect(footer.getByRole('link', { name: REPO.replace(/^https:\/\//, ''), exact: true })).toHaveAttribute('href', REPO);
   // A released build links its version to that release's page; a local build may be `dev`.
   const version = footer.getByRole('link', { name: /^v\d+\.\d+\.\d+$/ });
-  if (process.env['CEPHSTATS_E2E_URL']) {
+  if (process.env['ROOKSTATS_E2E_URL']) {
     await expect(version, 'a published site shows its release').toBeVisible();
   } else {
     await expect(footer).toContainText(/(^|\s)(dev|v\d+\.\d+\.\d+)(\s|$)/);

@@ -6,7 +6,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
 )
 
 // The whole disclosure-candidate rule lives in this file. It finds

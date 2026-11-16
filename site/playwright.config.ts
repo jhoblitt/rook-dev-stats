@@ -2,15 +2,15 @@
 // real base path, in Chromium only. `make site-e2e` builds from the data first.
 //
 // To run the same spec against a published copy instead, set
-// CEPHSTATS_E2E_URL to the page's address and no local server is started:
+// ROOKSTATS_E2E_URL to the page's address and no local server is started:
 //
-//   cd site && CEPHSTATS_E2E_URL=https://jhoblitt.github.io/ceph-dev-stats/ npm run e2e
+//   cd site && ROOKSTATS_E2E_URL=https://jhoblitt.github.io/rook-dev-stats/ npm run e2e
 
 import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 4173;
-const LOCAL = `http://127.0.0.1:${PORT}/ceph-dev-stats/`;
-const published = process.env['CEPHSTATS_E2E_URL'];
+const LOCAL = `http://127.0.0.1:${PORT}/rook-dev-stats/`;
+const published = process.env['ROOKSTATS_E2E_URL'];
 // The spec navigates relative to the base, which only resolves inside it with a trailing slash.
 const BASE = published ? published.replace(/\/*$/, '/') : LOCAL;
 

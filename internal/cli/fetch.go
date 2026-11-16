@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
-	"github.com/jhoblitt/ceph-dev-stats/internal/ghapi"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/ghapi"
 )
 
 func newFetchCmd(v *viper.Viper) *cobra.Command {
@@ -19,7 +19,7 @@ func newFetchCmd(v *viper.Viper) *cobra.Command {
 		Short: "Walk ceph/ceph pull requests from GitHub into the local raw cache",
 		Long: `Walk ceph/ceph pull requests from GitHub into the local raw cache.
 
-The GitHub token is read from CEPHSTATS_GITHUB_TOKEN, GH_TOKEN or
+The GitHub token is read from ROOKSTATS_GITHUB_TOKEN, GH_TOKEN or
 GITHUB_TOKEN, in that order.
 
 A --since later than the default skips pull requests the next default walk
@@ -55,12 +55,12 @@ its range again; without it, only those updated since they were cached.`,
 		},
 	}
 	f := cmd.Flags()
-	f.String("since", "", "walk back to pull requests updated at this RFC 3339 time; default a day before the data directory's fetched_through, or, with no meta.json there, the window start, when ceph/ceph was created (CEPHSTATS_SINCE)")
-	f.Bool("full", false, "walk back to the window start, when ceph/ceph was created, listing every pull request (CEPHSTATS_FULL)")
-	f.Bool("refetch", false, "fetch again each pull request the walk lists, every one updated since --since or its default (the window start with --full) and every open one, though cached at the same updatedAt, re-downloading each of them (CEPHSTATS_REFETCH)")
-	f.String("cache-dir", ".cache", "raw cache directory (CEPHSTATS_CACHE_DIR)")
-	f.String("data", "data", "committed data directory, read for meta.json (CEPHSTATS_DATA)")
-	f.String("api-url", ghapi.DefaultEndpoint, "GitHub GraphQL endpoint (CEPHSTATS_API_URL)")
+	f.String("since", "", "walk back to pull requests updated at this RFC 3339 time; default a day before the data directory's fetched_through, or, with no meta.json there, the window start, when ceph/ceph was created (ROOKSTATS_SINCE)")
+	f.Bool("full", false, "walk back to the window start, when ceph/ceph was created, listing every pull request (ROOKSTATS_FULL)")
+	f.Bool("refetch", false, "fetch again each pull request the walk lists, every one updated since --since or its default (the window start with --full) and every open one, though cached at the same updatedAt, re-downloading each of them (ROOKSTATS_REFETCH)")
+	f.String("cache-dir", ".cache", "raw cache directory (ROOKSTATS_CACHE_DIR)")
+	f.String("data", "data", "committed data directory, read for meta.json (ROOKSTATS_DATA)")
+	f.String("api-url", ghapi.DefaultEndpoint, "GitHub GraphQL endpoint (ROOKSTATS_API_URL)")
 	return cmd
 }
 

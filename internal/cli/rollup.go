@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
-	"github.com/jhoblitt/ceph-dev-stats/internal/rollup"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tables"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tracker"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/rollup"
+	"github.com/jhoblitt/rook-dev-stats/internal/tables"
+	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 func newRollupCmd(v *viper.Viper) *cobra.Command {
@@ -55,8 +55,8 @@ or ticket type still roll up.`,
 		},
 	}
 	f := cmd.Flags()
-	f.String("data", "data", "committed data directory (CEPHSTATS_DATA)")
-	f.String("out", "site/public/data", "directory the site's data is written to (CEPHSTATS_OUT)")
+	f.String("data", "data", "committed data directory (ROOKSTATS_DATA)")
+	f.String("out", "site/public/data", "directory the site's data is written to (ROOKSTATS_OUT)")
 	return cmd
 }
 

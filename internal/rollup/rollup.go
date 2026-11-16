@@ -18,11 +18,11 @@ import (
 	"slices"
 	"time"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/classify"
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tables"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tracker"
+	"github.com/jhoblitt/rook-dev-stats/internal/classify"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/tables"
+	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 // The event kinds of a review. A comment's kinds are classify's, and a

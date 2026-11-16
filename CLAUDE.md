@@ -6,7 +6,7 @@ jhoblitt/conventions-claude`, then `/plugin install
 go-conventions@conventions-claude`, and load `go-conventions:go-conventions`
 before writing Go here.
 
-- Module: `github.com/jhoblitt/ceph-dev-stats`
-- Binary: `cephstats` (`cmd/cephstats`)
-- Environment prefix: `CEPHSTATS_`
+- Module: `github.com/jhoblitt/rook-dev-stats`
+- Binary: `rookstats` (`cmd/rookstats`)
+- Environment prefix: `ROOKSTATS_`
 <!-- go-conventions:end -->

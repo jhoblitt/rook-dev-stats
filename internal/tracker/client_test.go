@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/tracker"
+	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 var _ = Describe("Client", func() {
@@ -48,7 +48,7 @@ var _ = Describe("Client", func() {
 		Expect(reqs[0].Method).To(Equal(http.MethodGet))
 		Expect(reqs[0].Path).To(Equal("/issues.json"))
 		Expect(reqs[0].Query).To(Equal("issue_id=90001,90002,90003&status_id=*&include=relations&limit=100"))
-		Expect(reqs[0].Header.Get("User-Agent")).To(MatchRegexp(`^cephstats/[^\s()/]+$`))
+		Expect(reqs[0].Header.Get("User-Agent")).To(MatchRegexp(`^rookstats/[^\s()/]+$`))
 		for _, h := range []string{"Authorization", "Cookie", "X-Redmine-Api-Key", "From"} {
 			Expect(reqs[0].Header.Values(h)).To(BeEmpty(), "header %s", h)
 		}

@@ -1,13 +1,13 @@
-# ceph-dev-stats
+# rook-dev-stats
 
-[![ci](https://github.com/jhoblitt/ceph-dev-stats/actions/workflows/ci.yml/badge.svg)](https://github.com/jhoblitt/ceph-dev-stats/actions/workflows/ci.yml)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/jhoblitt/ceph-dev-stats/badge)](https://scorecard.dev/viewer/?uri=github.com/jhoblitt/ceph-dev-stats)
+[![ci](https://github.com/jhoblitt/rook-dev-stats/actions/workflows/ci.yml/badge.svg)](https://github.com/jhoblitt/rook-dev-stats/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/jhoblitt/rook-dev-stats/badge)](https://scorecard.dev/viewer/?uri=github.com/jhoblitt/rook-dev-stats)
 
 Interactive statistics on [ceph/ceph](https://github.com/ceph/ceph) pull
 requests: how long a pull request waits for a human response, for approval
 and for merge, how much of that is spent after the code stopped changing,
 and whether disclosed AI assistance is changing any of it. A Go tool,
-`cephstats`, fetches the pull requests and builds the data; a static site
+`rookstats`, fetches the pull requests and builds the data; a static site
 renders it and computes the statistics in the browser.
 
 The design is
@@ -15,16 +15,16 @@ The design is
 
 ## Install
 
-The `cephstats` tool builds from this checkout:
+The `rookstats` tool builds from this checkout:
 
 ```sh
-go build -o bin/cephstats ./cmd/cephstats
+go build -o bin/rookstats ./cmd/rookstats
 ```
 
 ## Usage
 
-`cephstats --help` lists the subcommands; `cephstats <subcommand> --help`
-lists each one's flags, every flag also settable as a `CEPHSTATS_`
+`rookstats --help` lists the subcommands; `rookstats <subcommand> --help`
+lists each one's flags, every flag also settable as a `ROOKSTATS_`
 environment variable.
 
 - `fetch` walks ceph/ceph's pull requests from GitHub into the local raw
@@ -35,7 +35,7 @@ environment variable.
   to the window start, listing every pull request in the repository's
   history. `--refetch` fetches again every pull request the walk lists,
   even one cached at the same `updatedAt`. It reads the GitHub token from
-  `CEPHSTATS_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, in that order.
+  `ROOKSTATS_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN`, in that order.
   Only for a pull request whose author's account was deleted, which GitHub
   gives as no author at all, it also reads the name git records for each
   commit's author and committer, and not the address git records with
@@ -92,7 +92,7 @@ environment variable.
 ## Data
 
 Everything under `data/` is committed and public. The site's data files
-are derived from it by `cephstats rollup` and are not committed.
+are derived from it by `rookstats rollup` and are not committed.
 
 | File | What it holds | Written by |
 |---|---|---|
@@ -152,7 +152,7 @@ counts in `data/meta.json`, taken as the walk that wrote it ended. The
 failure names the count it compared with: `listing`, or `search` for a
 `data/meta.json` written before the listing's total was used, which the
 next `make data-refresh` replaces with the listing's. Fewer records mean a
-walk missed some, which `CEPHSTATS_FULL=true make data-refresh` lists and
+walk missed some, which `ROOKSTATS_FULL=true make data-refresh` lists and
 fetches; more mean the records keep pull requests GitHub no longer lists,
 which no refresh removes. No table edit clears a count failure.
 
@@ -192,7 +192,7 @@ pull requests updated since a day before the last walk began, then every
 open one, and fetches each one not cached yet or whose `updatedAt` is later
 than its cached copy's; one cached at the same `updatedAt`, in the current
 format, is kept as it is. `--full`, which `make data-refresh` takes from
-`CEPHSTATS_FULL=true`, lists every pull request since the window start
+`ROOKSTATS_FULL=true`, lists every pull request since the window start
 instead. That catches one a narrower walk never listed, and fetches again
 every entry of an older cache format, but it does not fetch again an entry
 whose `updatedAt` has not moved.
@@ -202,20 +202,20 @@ change has been seen: GitHub began returning the commit of an old
 force-push without touching the pull request. Comparing a refreshed cache
 with a walk into an empty one, over 6,270 pull requests, found it once,
 and it changed only that event's link. `--refetch`, which
-`make data-refresh` takes from `CEPHSTATS_REFETCH=true`, picks such a
+`make data-refresh` takes from `ROOKSTATS_REFETCH=true`, picks such a
 change up: it fetches again every pull request the walk lists, though
 cached at the same `updatedAt`, and replaces its entry, and `extract` then
 re-derives its record. With `--full` that is every pull request since the
 window start:
 
 ```sh
-CEPHSTATS_FULL=true CEPHSTATS_REFETCH=true make data-refresh
+ROOKSTATS_FULL=true ROOKSTATS_REFETCH=true make data-refresh
 ```
 
 Over the six-month window a walk that fetched every pull request took about
 28 minutes for 6,270 of them; the whole history is roughly twelve times as
 many. If it stops, the entries it replaced stay, but it does not resume:
-run again with `CEPHSTATS_REFETCH=true`, it fetches every pull request
+run again with `ROOKSTATS_REFETCH=true`, it fetches every pull request
 again; without it, only those updated since they were cached, and the rest
 keep the entries they had.
 
@@ -261,23 +261,23 @@ the pinned linter, and that pin lives in the `Makefile`.
 The page is a Vite, Svelte and TypeScript site under `site/`, built with the
 Node version in `.nvmrc`. It computes every figure in the browser from data
 files it fetches at run time from `site/public/data/`, which
-`cephstats rollup` writes from `data/` and git ignores.
+`rookstats rollup` writes from `data/` and git ignores.
 
 ```sh
 make site-install   # npm ci --ignore-scripts
-make site-build     # cephstats rollup, then vite build into site/dist
+make site-build     # rookstats rollup, then vite build into site/dist
 make site-test      # typecheck and unit tests
 ```
 
 `site-build` and `site-test` install the dependencies first when
 `node_modules` is missing or older than the lockfile. With no records under
-`data/prs/`, `cephstats rollup` writes an empty dataset, so `site-build`
+`data/prs/`, `rookstats rollup` writes an empty dataset, so `site-build`
 works on a fresh clone.
 
 To work on the site without the Go side, `make site-dev-data` copies the
 test fixture into `site/public/data/`; then run `npm run dev` in `site/` for
 a live server, or `npm run build` and `npm run preview` to serve the built
-site under its Pages base path, `/ceph-dev-stats/`. A build takes its
+site under its Pages base path, `/rook-dev-stats/`. A build takes its
 version from `APP_VERSION`; without it the footer reads `dev`.
 
 ## License

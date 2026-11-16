@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/classify"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/classify"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
 )
 
 // year is the three files of the pull requests filed under one year, each a

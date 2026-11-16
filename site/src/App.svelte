@@ -19,8 +19,8 @@
   const { selection } = page;
 
   const titles: Record<Route, string> = {
-    report: 'Ceph pull requests',
-    methods: 'Methods · Ceph pull requests',
+    report: 'Rook pull requests',
+    methods: 'Methods · Rook pull requests',
   };
 
   let main: HTMLElement;

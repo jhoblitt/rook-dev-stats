@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tables"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tracker"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/tables"
+	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 const (

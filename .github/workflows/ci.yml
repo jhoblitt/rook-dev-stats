@@ -124,7 +124,7 @@ jobs:
           go-version-file: go.mod
           check-latest: true
 
-      - name: cephstats check
+      - name: rookstats check
         run: make data-check
 
   # The site under site/, built from the committed records under data/ and

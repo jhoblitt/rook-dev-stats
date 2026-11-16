@@ -12,9 +12,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/cli"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tracker"
+	"github.com/jhoblitt/rook-dev-stats/internal/cli"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 var _ = Describe("tickets", func() {

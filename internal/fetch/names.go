@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/ghapi"
+	"github.com/jhoblitt/rook-dev-stats/internal/ghapi"
 )
 
 // namesPerRequest is how many pull requests one CommitNames request asks

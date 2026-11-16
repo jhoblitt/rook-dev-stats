@@ -13,7 +13,7 @@ export const FIXTURE = {
   'table-2026.json': table2026,
 };
 
-export const BASE = '/ceph-dev-stats/data/';
+export const BASE = '/rook-dev-stats/data/';
 
 /**
  * A fetch serving the fixture under BASE, with files replaced (a string is

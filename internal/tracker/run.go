@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"slices"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
 )
 
 // Config is one run's settings.

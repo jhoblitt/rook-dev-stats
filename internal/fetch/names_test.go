@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 )
 
 // signed is commits whose committers and authors are the pairs given, in

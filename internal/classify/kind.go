@@ -1,9 +1,9 @@
 package classify
 
 import (
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tables"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tracker"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/tables"
+	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 // ownKind is the kind a pull request's own hints and labels give, from the

@@ -1,4 +1,4 @@
-module github.com/jhoblitt/ceph-dev-stats
+module github.com/jhoblitt/rook-dev-stats
 
 go 1.27
 

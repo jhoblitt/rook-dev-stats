@@ -211,7 +211,7 @@ func (c *Client) post(ctx context.Context, body []byte) (json.RawMessage, error)
 	}
 	req.Header.Set("Authorization", "bearer "+c.token)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", "cephstats")
+	req.Header.Set("User-Agent", "rookstats")
 
 	resp, err := c.http.Do(req)
 	if err != nil {

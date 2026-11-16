@@ -19,7 +19,7 @@ formatters:
         group-params: true
     goimports:
       local-prefixes:
-        - "github.com/jhoblitt/ceph-dev-stats"
+        - "github.com/jhoblitt/rook-dev-stats"
 
 linters:
   default: none

@@ -15,8 +15,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
 )
 
 // Config is one run's settings.
@@ -244,7 +244,7 @@ type sources struct {
 // the cache while data/authors.json exists.
 func readSources(cfg Config) (sources, error) {
 	window := windowOf(cfg.WindowStart)
-	fix := "run `cephstats fetch` to ask GitHub again " + window
+	fix := "run `rookstats fetch` to ask GitHub again " + window
 
 	cachedPath := filepath.Join(cfg.CacheDir, fetch.AuthorsFile)
 	cached, err := fetch.ReadBaselines(cfg.CacheDir)

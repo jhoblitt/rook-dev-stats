@@ -1,6 +1,6 @@
-// The seam between `cephstats rollup` and the site: what the rollup writes
+// The seam between `rookstats rollup` and the site: what the rollup writes
 // for its hand-made dataset (internal/rollup/testdata/golden/, rewritten by
-// `CEPHSTATS_UPDATE_GOLDEN=1 go test ./internal/rollup/`) must load through
+// `ROOKSTATS_UPDATE_GOLDEN=1 go test ./internal/rollup/`) must load through
 // the site's own loader. The values checked by hand here follow from the
 // records in internal/rollup/testdata/data/.
 import { describe, expect, it } from 'vitest';

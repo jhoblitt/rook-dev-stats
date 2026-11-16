@@ -3,7 +3,7 @@ import { svelteTesting } from '@testing-library/svelte/vite';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  base: '/ceph-dev-stats/',
+  base: '/rook-dev-stats/',
   // Under vitest, svelteTesting resolves Svelte's client build, so component
   // tests can mount, and cleans up after each test.
   plugins: [svelte(), ...(process.env['VITEST'] ? [svelteTesting()] : [])],

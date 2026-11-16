@@ -14,9 +14,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/extract"
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/extract"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
 )
 
 // file is what a spec knows of a file under the data directory: its bytes,
@@ -461,7 +461,7 @@ var _ = Describe("Run", func() {
 					ContainSubstring(filepath.Join(cacheDir, file)),
 					ContainSubstring(want),
 					ContainSubstring("not for the window from 2026-05-15"),
-					ContainSubstring("run `cephstats fetch`"),
+					ContainSubstring("run `rookstats fetch`"),
 				)))
 				Expect(files()).To(BeEmpty())
 			},
@@ -506,7 +506,7 @@ var _ = Describe("Run", func() {
 
 					err := extractErr()
 
-					Expect(err).To(MatchError(And(ContainSubstring(want), ContainSubstring("run `cephstats fetch`"))))
+					Expect(err).To(MatchError(And(ContainSubstring(want), ContainSubstring("run `rookstats fetch`"))))
 					Expect(rewritten(before, files())).To(BeEmpty())
 				},
 				Entry("no meta.json in the cache", fetch.AuthorsFile, "meta.json is for the window from 2026-07-01, not for the window from 2026-05-15"),

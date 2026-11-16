@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/rollup"
+	"github.com/jhoblitt/rook-dev-stats/internal/rollup"
 )
 
 // goldenDir holds Build's output for dataDir, byte for byte. The site's
@@ -19,7 +19,7 @@ import (
 // they are the seam between the two halves. After a deliberate change to
 // the output, rewrite them with
 //
-//	CEPHSTATS_UPDATE_GOLDEN=1 go test ./internal/rollup/
+//	ROOKSTATS_UPDATE_GOLDEN=1 go test ./internal/rollup/
 //
 // and review the diff.
 const goldenDir = "testdata/golden"
@@ -40,7 +40,7 @@ var _ = Describe("the hand-made dataset", func() {
 	})
 
 	It("matches the golden files byte for byte", func() {
-		if os.Getenv("CEPHSTATS_UPDATE_GOLDEN") != "" {
+		if os.Getenv("ROOKSTATS_UPDATE_GOLDEN") != "" {
 			_, err := rollup.Write(goldenDir, files)
 			Expect(err).NotTo(HaveOccurred())
 		}

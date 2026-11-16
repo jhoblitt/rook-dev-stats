@@ -14,8 +14,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/ghapi"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/ghapi"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
 )
 
 // The repository the walk reads.
