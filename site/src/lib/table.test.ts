@@ -18,7 +18,8 @@ import {
   sortWords,
   tableOrder,
   tableRows,
-  ticketUrl,
+  issueName,
+  issueUrl,
   windowRows,
   yearsOfRows,
 } from './table';
@@ -197,18 +198,23 @@ describe('cells', () => {
 
 describe('kindDecided', () => {
   it('says the kind and what decided it in words', () => {
-    expect(kindDecided(META.kinds, 0, 'tracker')).toBe('Bug fix, from its tracker ticket');
-    expect(kindDecided(META.kinds, 1, 'checklist')).toBe('Feature, from the PR’s checklist');
     expect(kindDecided(META.kinds, 2, 'labels')).toBe('Cleanup, from its labels');
+    expect(kindDecided(META.kinds, 1, 'issues')).toBe('Feature, from the labels of an issue it closes');
     expect(kindDecided(META.kinds, 0, 'original')).toBe('Bug fix, from the PR it backports');
     expect(kindDecided(META.kinds, -1, '')).toBe('unknown: nothing decided it');
   });
 });
 
 describe('links', () => {
-  it('builds the PR’s and the ticket’s addresses', () => {
+  it('builds the PR’s and an issue’s addresses, the issue’s in its own repository', () => {
     expect(prUrl('ceph/ceph', 66500)).toBe('https://github.com/ceph/ceph/pull/66500');
-    expect(ticketUrl(72001)).toBe('https://tracker.ceph.com/issues/72001');
+    expect(issueUrl('ceph/ceph', 72001)).toBe('https://github.com/ceph/ceph/issues/72001');
+    expect(issueUrl('ceph/ceph-csi', 4001)).toBe('https://github.com/ceph/ceph-csi/issues/4001');
+  });
+
+  it('names an issue by number in the PR’s repository, and with its repository in another', () => {
+    expect(issueName('ceph/ceph', [72001, 'ceph/ceph'])).toBe('#72001');
+    expect(issueName('ceph/ceph', [4001, 'ceph/ceph-csi'])).toBe('ceph/ceph-csi#4001');
   });
 });
 

@@ -29,7 +29,7 @@ function table(rows: number, refs: string[], commits: (readonly Commit[])[] = []
     authors: Array.from({ length: rows }, () => 'someone'),
     commits: Array.from({ length: rows }, (_, r) => commits[r] ?? []),
     refs,
-    tickets: Array.from({ length: rows }, () => []),
+    issues: Array.from({ length: rows }, () => []),
     backport_of: Array.from({ length: rows }, () => 0),
     kind_source: Array.from({ length: rows }, () => ''),
   };

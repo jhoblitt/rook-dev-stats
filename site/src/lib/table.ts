@@ -2,7 +2,7 @@
 // and how it orders them by a `Sort` (sort.ts). The ordering is a pure
 // function so another view can list the same PRs in the same order.
 
-import { type Dataset, type KindSource, type Named, PR_STATE, type TableYear, locateRow } from './data';
+import { type Dataset, type Issue, type KindSource, type Named, PR_STATE, type TableYear, locateRow } from './data';
 import { AGE_BANDS, DAY, dayOf, dayStart, periodRange } from './filters';
 import { bucketPhrase, formatCount, formatDays } from './format';
 import { type Handle, personHandle } from './handles';
@@ -242,9 +242,8 @@ export function cellText(data: Dataset, r: number, column: SortColumn, text: Row
 }
 
 const SOURCE_TEXT: Record<Exclude<KindSource, ''>, string> = {
-  checklist: 'from the PR’s checklist',
-  tracker: 'from its tracker ticket',
   labels: 'from its labels',
+  issues: 'from the labels of an issue it closes',
   original: 'from the PR it backports',
 };
 
@@ -298,6 +297,12 @@ export function prUrl(repo: string, n: number): string {
   return `https://github.com/${repo}/pull/${n}`;
 }
 
-export function ticketUrl(n: number): string {
-  return `https://tracker.ceph.com/issues/${n}`;
+export function issueUrl(repo: string, n: number): string {
+  return `https://github.com/${repo}/issues/${n}`;
+}
+
+/** An issue's name: `#n` in `repo`, `owner/name#n` in another repository. */
+export function issueName(repo: string, issue: Issue): string {
+  const [n, of] = issue;
+  return of === repo ? `#${n}` : `${of}#${n}`;
 }

@@ -210,9 +210,8 @@ describe('commentCounts', () => {
 describe('kindSources', () => {
   it('counts the PRs each source of kind decided, and the unknown, by target', () => {
     expect(kindSources(data, fixtureTables(), rows)).toEqual({
-      checklist: { main: 4, other: 0 },
-      tracker: { main: 2, other: 0 },
-      labels: { main: 3, other: 1 },
+      labels: { main: 7, other: 1 },
+      issues: { main: 2, other: 0 },
       original: { main: 0, other: 1 },
       unknown: { main: 0, other: 1 },
     });
@@ -269,7 +268,7 @@ describe('eventRefs', () => {
       authors: ['a'],
       commits: [[]],
       refs: ['', '', '0123456789012345678901234567890123456789'],
-      tickets: [[]],
+      issues: [[]],
       backport_of: [0],
       kind_source: [''],
     };

@@ -285,19 +285,35 @@ describe('parseTable', () => {
     expect(table.refs[41]).toBe(''); // bot_account without an id
   });
 
-  it('reads the tickets, the PR a backport is of, and where each kind came from', () => {
-    expect(table.tickets).toEqual([[71234], [], [], [72001], [], [], [72510], [72140], [72377, 72378], [], [], []]);
+  it('reads the closing issues, the PR a backport is of, and where each kind came from', () => {
+    expect(table.issues).toEqual([
+      [[71234, 'ceph/ceph']],
+      [],
+      [],
+      [[72001, 'ceph/ceph']],
+      [],
+      [],
+      [[72510, 'ceph/ceph']],
+      [[72140, 'ceph/ceph']],
+      [
+        [72377, 'ceph/ceph'],
+        [4001, 'ceph/ceph-csi'],
+      ],
+      [],
+      [],
+      [],
+    ]);
     expect(table.backport_of).toEqual([0, 63980, 0, 0, 0, 0, 0, 66500, 0, 0, 0, 67010]);
     expect(table.kind_source).toEqual([
-      'tracker',
+      'issues',
       '',
       'labels',
-      'checklist',
-      'checklist',
-      'checklist',
-      'checklist',
+      'labels',
+      'labels',
+      'labels',
+      'labels',
       'original',
-      'tracker',
+      'issues',
       'labels',
       'labels',
       'labels',
@@ -321,8 +337,13 @@ describe('parseTable', () => {
     ['a merge ref that is not a sha', 'refs', { refs: at(table2026.refs, 14, '3412345678') }],
     ['a comment ref that is a sha', 'refs', { refs: at(table2026.refs, 0, sha) }],
     ['a ref that is not an id', 'refs', { refs: at(table2026.refs, 0, 'issuecomment-1') }],
-    ['tickets one short', 'tickets', { tickets: table2026.tickets.slice(1) }],
-    ['a ticket that is not a positive number', 'tickets', { tickets: at(table2026.tickets, 1, [0]) }],
+    ['issues one short', 'issues', { issues: table2026.issues.slice(1) }],
+    ['an issue that is not a positive number', 'issues', { issues: at(table2026.issues, 1, [[0, 'ceph/ceph']]) }],
+    ['an issue without its repository', 'issues', { issues: at(table2026.issues, 1, [[72001]]) }],
+    ['an issue whose repository is not owner/name', 'issues', { issues: at(table2026.issues, 1, [[72001, 'ceph']]) }],
+    ['an issue as a bare number', 'issues', { issues: at(table2026.issues, 1, [72001] as unknown as (string | number)[][]) }],
+    ['the tracker as a kind source', 'kind_source', { kind_source: at(table2026.kind_source, 0, 'tracker') }],
+    ['the checklist as a kind source', 'kind_source', { kind_source: at(table2026.kind_source, 0, 'checklist') }],
     ['backport_of one short', 'backport_of', { backport_of: table2026.backport_of.slice(1) }],
     ['a negative backport_of', 'backport_of', { backport_of: at(table2026.backport_of, 5, -1) }],
     ['kind_source one short', 'kind_source', { kind_source: table2026.kind_source.slice(1) }],

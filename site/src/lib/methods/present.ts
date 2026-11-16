@@ -210,9 +210,8 @@ const ofActive = (m: Meta, d: DataFigures, what: string, note?: string) =>
   `${what}, of the ${formatCount(d.coverage.active)} pull requests open at some point in ${periodOf(d)}, as of ${dayOf(m.fetched_through)}${note === undefined ? '' : `. ${note}`}`;
 
 const KIND_SOURCE_LABELS: Record<KindSourceRow, string> = {
-  checklist: 'the PR’s checklist',
-  tracker: 'a tracker ticket’s type',
   labels: 'a kind label',
+  issues: 'a kind label of an issue it closes',
   original: 'the PR it backports',
   unknown: 'unknown: no source decided',
 };

@@ -169,7 +169,7 @@ describe('the methods page', () => {
     expect(text).toContain('0 of the 7 force-pushes in the last 6 months (0%) and 0 of the 6 merges in it have no commit to link to');
     expect(text.replace(/\s+/g, ' ')).toContain('as of 2026-11-15, over the last 6 months of it, 2026-05-15 to 2026-11-15; the report itself opens on the whole window.');
     const kinds = screen.getByRole('table', { name: /Where each pull request’s kind came from/ });
-    expect(within(kinds).getByRole('row', { name: /the PR’s checklist/ }).textContent).toMatch(/the PR’s checklist\s*4\s*0\s*4/);
+    expect(within(kinds).getByRole('row', { name: /an issue it closes/ }).textContent).toMatch(/an issue it closes\s*2\s*0\s*2/);
   });
 
   it("loads only the years from the last six months' start onward, and only their tables", async () => {

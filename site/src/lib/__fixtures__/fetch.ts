@@ -101,7 +101,7 @@ export function withEarlierYear(): Record<string, unknown> {
       authors: [table2026.authors[0]],
       commits: [commits],
       refs: pick(table2026.refs),
-      tickets: [table2026.tickets[0]],
+      issues: [table2026.issues[0]],
       backport_of: [table2026.backport_of[0]],
       kind_source: [table2026.kind_source[0]],
     },
@@ -161,7 +161,7 @@ export function withYears(first: number, perYear: number): Record<string, unknow
       authors: copies.map(() => table2026.authors[0]),
       commits: copies.map(() => commits),
       refs: each(table2026.refs),
-      tickets: copies.map(() => table2026.tickets[0]),
+      issues: copies.map(() => table2026.issues[0]),
       backport_of: copies.map(() => table2026.backport_of[0]),
       kind_source: copies.map(() => table2026.kind_source[0]),
     };

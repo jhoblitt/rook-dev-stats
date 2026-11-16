@@ -212,9 +212,8 @@ describe('table figures on the fixture', () => {
         'Where each pull request’s kind came from, of the 12 pull requests open at some point in the last 6 months, 2026-05-15 to 2026-11-15, as of 2026-11-15',
       head: ['decided by', 'development branch', 'other branches', 'all'],
       rows: [
-        ['the PR’s checklist', '4', '0', '4'],
-        ['a tracker ticket’s type', '2', '0', '2'],
-        ['a kind label', '3', '1', '4'],
+        ['a kind label', '7', '1', '8'],
+        ['a kind label of an issue it closes', '2', '0', '2'],
         ['the PR it backports', '0', '1', '1'],
         ['unknown: no source decided', '0', '1', '1'],
       ],
