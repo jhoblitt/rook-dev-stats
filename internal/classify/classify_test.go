@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/jhoblitt/rook-dev-stats/internal/classify"
+	"github.com/jhoblitt/rook-dev-stats/internal/extract"
 	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 	"github.com/jhoblitt/rook-dev-stats/internal/record"
 	"github.com/jhoblitt/rook-dev-stats/internal/tables"
@@ -199,7 +200,59 @@ var _ = Describe("Records", func() {
 			Entry("one line naming two tools gives the first family only",
 				record.Disclosure{Trailers: []string{"Assisted-by: Cursor (Claude 4)"}},
 				classify.DisclosureTrailer, []string{"cursor"}),
+			Entry("the AI-guidelines box alone, naming no tool",
+				record.Disclosure{Checklist: true},
+				classify.DisclosureChecklist, []string{"unspecified"}),
+			Entry("the box under a co-author, which names the tool",
+				record.Disclosure{Checklist: true, Trailers: []string{"Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"}},
+				classify.DisclosureCoauthor, []string{"claude"}),
+			Entry("the box under a description",
+				record.Disclosure{Checklist: true, Description: []string{"Generated with Gemini"}},
+				classify.DisclosureDescription, []string{"gemini"}),
+			Entry("the box under a trailer",
+				record.Disclosure{Checklist: true, Trailers: []string{"Assisted-by: Claude Code"}},
+				classify.DisclosureTrailer, []string{"claude"}),
+			Entry("the box beside a tool's name alone, which does not count",
+				record.Disclosure{Checklist: true, Description: []string{"Address Claude review comments"}},
+				classify.DisclosureChecklist, []string{"unspecified"}),
 		)
+
+		It("ranks the classes none, checklist, description, coauthor, trailer", func() {
+			Expect(classify.DisclosureClasses()).To(Equal([]string{
+				classify.DisclosureNone, classify.DisclosureChecklist, classify.DisclosureDescription,
+				classify.DisclosureCoauthor, classify.DisclosureTrailer,
+			}))
+			Expect(classify.DisclosureChecklist).To(Equal("checklist"))
+		})
+
+		It("counts Generated-by as a trailer under the data's tables", func() {
+			b, err := os.ReadFile(filepath.Join("..", "..", "data", tables.ToolsFile))
+			Expect(err).NotTo(HaveOccurred())
+			t = loadTables(map[string]string{tables.ToolsFile: string(b)})
+			r := pr(1)
+			r.Disclosure.Trailers = []string{"Generated-by: Claude Code"}
+			got := one(r)
+			Expect(got.Disclosure).To(Equal(classify.DisclosureTrailer))
+			Expect(got.Families).To(Equal([]string{"claude"}))
+		})
+
+		It("gives a Mergify backport that carries its original's description, box ticked, the original's disclosure", func() {
+			const original = "**Description of your changes:**\r\n\r\nFix the leak.\r\n\r\n**Checklist:**\r\n\r\n" +
+				"- [x] Unit tests have been added, if necessary.\r\n" +
+				"- [x] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR."
+			backport := original + "<hr>This is an automatic backport of pull request #1 done by [Mergify](https://mergify.com)."
+			recs := []record.Record{pr(1), pr(2)}
+			recs[0].Disclosure, _ = extract.Candidates([]string{"osd: fix a leak\n"}, original)
+			recs[1].Disclosure, _ = extract.Candidates([]string{"osd: fix a leak\n\n(cherry picked from commit 0123456)\n"}, backport)
+			recs[1].KindHints = &record.KindHints{BackportOf: 1}
+
+			prs := classify.Records(t, recs)
+
+			Expect(prs[0].Disclosure).To(Equal(classify.DisclosureChecklist))
+			Expect(prs[0].Families).To(Equal([]string{"unspecified"}))
+			Expect(prs[1].Disclosure).To(Equal(prs[0].Disclosure))
+			Expect(prs[1].Families).To(Equal(prs[0].Families))
+		})
 
 		DescribeTable("comes from single lines only, never from neighboring lines that match a phrase when joined",
 			func(d record.Disclosure, class string, families []string) {

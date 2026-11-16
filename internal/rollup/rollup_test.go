@@ -333,8 +333,8 @@ var _ = Describe("Build", func() {
 				CommitProse: []string{},
 			}
 			o := build(r)
-			Expect(o.meta().Disclosure).To(Equal([]string{"none", "description", "coauthor", "trailer"}))
-			Expect(o.one("disclosure")).To(Equal(int64(3)))
+			Expect(o.meta().Disclosure).To(Equal([]string{"none", "checklist", "description", "coauthor", "trailer"}))
+			Expect(o.one("disclosure")).To(Equal(int64(4)))
 			Expect(o.lists(2026, "families")).To(Equal([][]int{{0, 1}}))
 			Expect(o.lists(2026, "components")).To(Equal([][]int{{0, 2}}))
 		})

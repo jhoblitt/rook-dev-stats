@@ -39,7 +39,7 @@ describe('parseMeta', () => {
     expect(meta.window_start).toBe(Date.UTC(2026, 4, 15) / 1000);
     expect(meta.years).toEqual([2026]);
     expect(meta.components.map((c) => c.id)).toEqual(['cephfs', 'mgr', 'rbd', 'rgw']);
-    expect(meta.disclosure).toEqual(['none', 'description', 'coauthor', 'trailer']);
+    expect(meta.disclosure).toEqual(['none', 'checklist', 'description', 'coauthor', 'trailer']);
     expect(meta.kinds).toEqual([
       { id: 'bugfix', name: 'Bug fix' },
       { id: 'feature', name: 'Feature' },
@@ -188,7 +188,7 @@ describe('parsePrs', () => {
     ['kind below -1', 'kind', { kind: at3(prs2026.kind, -2) }],
     ['base past the last base', 'base', { base: at3(prs2026.base, 4) }],
     ['base of -1', 'base', { base: at3(prs2026.base, -1) }],
-    ['disclosure past the last form', 'disclosure', { disclosure: at3(prs2026.disclosure, 4) }],
+    ['disclosure past the last form', 'disclosure', { disclosure: at3(prs2026.disclosure, 5) }],
     ['family past the last family', 'families', { families: at3(prs2026.families, [0, 3]) }],
     ['component past the last component', 'components', { components: at3(prs2026.components, [4]) }],
   ])('rejects a %s, naming the file and the column', (_name, column, patch) => {

@@ -220,8 +220,10 @@ const BY_AUTHOR = ['comment_author', 'command_author', 'review_author'];
 /** The event kinds made by a bot account, which carry no actor either. */
 const BY_BOT = ['bot_account', 'bot_review'];
 
-const DISCLOSURE_WORDS: Readonly<Record<string, string>> = {
+/** The words for each disclosure class meta lists, as a PR's timeline heads it. */
+export const DISCLOSURE_WORDS: Readonly<Record<string, string>> = {
   none: NOT_DISCLOSED,
+  checklist: `${DISCLOSED} by the PR template's AI-guidelines box`,
   description: `${DISCLOSED} in the description`,
   coauthor: `${DISCLOSED} as a co-author`,
   trailer: `${DISCLOSED} in a trailer`,

@@ -144,6 +144,9 @@ type Disclosure struct {
 	Trailers    []string `json:"trailers"`
 	Description []string `json:"description"`
 	CommitProse []string `json:"commit_prose"`
+	// Checklist is whether the description ticks the PR template's
+	// AI-guidelines box.
+	Checklist bool `json:"checklist,omitempty"`
 }
 
 // Meta is data/meta.json.
