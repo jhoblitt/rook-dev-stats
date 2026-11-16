@@ -13,7 +13,7 @@ The page's data is built from records under `data/` in [the site's repository](h
 - each account's login and whether GitHub types it as a bot; for a pull request's author, GitHub's author association, such as member or contributor; and in `data/authors.json`, each author's count of pull requests opened before the window's start, {{windowStart}};
 - for a pull request opened by an account since deleted, the one name it is credited to from its commits, as [Deleted accounts](#people-deleted-accounts) says. The other names on its commits are read too, but kept only in the fetch's local cache, and a name that holds an `@` is not kept among them. The cache also keeps every commit message whole, whose `Signed-off-by:` lines give each signer's name and address;
 - each pull request's title, and the lines of its description and commit messages that might disclose AI use, quoted as written and cut at 200 characters;
-- the text of every comment that is a single line of at most 80 characters with no `@` in it, whatever it says; this is how a bot command is recognised. The records keep the text of no other comment. The raw responses from GitHub, which keep every comment's text whole, are not published.
+- the text of every comment that is a single line of at most 80 characters with no `@` in it, whatever it says, except that it may start with a mention of Mergify or Dependabot, which names no person; this is how a bot command is recognised. The records keep the text of no other comment. The raw responses from GitHub, which keep every comment's text whole, are not published.
 
 ## What is withheld
 

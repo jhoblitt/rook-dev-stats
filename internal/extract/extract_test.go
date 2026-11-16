@@ -168,7 +168,28 @@ var _ = Describe("FromEntry", func() {
 			Entry("a mention after a command", "jenkins test make check @alice"),
 			Entry("an e-mail address", "Reviewed-by: Ana Smith <ana@example.com>"),
 			Entry("an @ alone", "ping @"),
+			Entry("a second @ after a command bot's mention", "@mergifyio backport release-1.21 @someone"),
+			Entry("a leading mention of a person", "@someone please review"),
+			Entry("an address in a sentence", "ping me at a@b.example"),
+			Entry("a command bot's mention that is not leading", "thanks @dependabot"),
+			Entry("a command bot's handle with no space after it", "@dependabot"),
+			Entry("a longer handle that starts with a command bot's", "@dependabotx rebase"),
 		)
+
+		DescribeTable("is kept for a short line whose only @ is a leading mention of a command bot",
+			func(body string) {
+				Expect(text(body)).To(Equal(strings.TrimSpace(body)), "comment %q", body)
+			},
+			Entry("Mergify", "@mergifyio backport release-1.21"),
+			Entry("Mergify, capitalised", "@Mergifyio rebase"),
+			Entry("Mergify's other handle", "@mergify rebase"),
+			Entry("Dependabot", "@dependabot rebase"),
+			Entry("after leading whitespace", "  @dependabot rebase\n"),
+		)
+
+		It("is not kept for a command bot's mention over more than one line", func() {
+			Expect(text("@mergifyio\nbackport release-1.21")).To(BeEmpty())
+		})
 	})
 
 	It("truncates every time to the second in UTC", func() {

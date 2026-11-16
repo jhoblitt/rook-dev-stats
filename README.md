@@ -126,8 +126,9 @@ dropped, or cleaned to nothing, still rules the authors out: when no
 other committer is named, the pull request gets no name and stays
 `ghost`'s, rather than take the name of an author whose commits it
 copied. A record keeps a comment's text only when the
-comment is one line of at most 80 characters with no `@`, which is what a
-bot command looks like and what a mention or an e-mail address never is,
+comment is one line of at most 80 characters with no `@` but a leading
+mention of Mergify or Dependabot, which is what a bot command looks like
+and what a person's mention or an e-mail address never is,
 and it never keeps a commit trailer that names a person (`Signed-off-by:`,
 `Reviewed-by:`, a `Co-authored-by:` naming a person, …). The lines it keeps
 as possible disclosures are quoted as written. The raw GitHub responses

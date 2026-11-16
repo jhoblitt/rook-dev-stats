@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 	"time"
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
@@ -16,6 +17,11 @@ import (
 // maxCommentText is the most characters a comment may have, on one line
 // after trimming, for its text to be kept: enough for any bot command.
 const maxCommentText = 80
+
+// commandBots are the handles a kept text may start by mentioning: a
+// mention of a bot account names no person, and any second `@` (an address
+// or a person's mention) still drops the text.
+var commandBots = []string{"mergifyio", "mergify", "dependabot"}
 
 var states = map[string]string{
 	"OPEN":   record.StateOpen,
@@ -166,11 +172,30 @@ func comments(cs []fetch.Comment) []record.Comment {
 
 // commentText is the comment's text when it is short enough to be a bot
 // command, and empty otherwise. A text with an `@` is not kept: a mention
-// or an e-mail address names a person, and a bot command has neither.
+// or an e-mail address names a person, and a bot command has neither,
+// unless it is addressed to one of commandBots.
 func commentText(body string) string {
 	t := strings.TrimSpace(body)
-	if strings.ContainsAny(t, "\r\n@") || utf8.RuneCountInString(t) > maxCommentText {
+	if strings.ContainsAny(t, "\r\n") || utf8.RuneCountInString(t) > maxCommentText {
+		return ""
+	}
+	if strings.Contains(withoutCommandBot(t), "@") {
 		return ""
 	}
 	return t
+}
+
+// withoutCommandBot is t without its leading mention of one of
+// commandBots, or t itself when it does not start with one followed by
+// whitespace.
+func withoutCommandBot(t string) string {
+	i := strings.IndexFunc(t, unicode.IsSpace)
+	if i < 0 || !strings.HasPrefix(t, "@") {
+		return t
+	}
+	handle := t[1:i]
+	if !slices.ContainsFunc(commandBots, func(b string) bool { return strings.EqualFold(handle, b) }) {
+		return t
+	}
+	return t[i:]
 }
