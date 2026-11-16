@@ -82,20 +82,6 @@ families:
 
 # Candidate lines judged not to be a disclosure, each matched exactly.
 ignore:
-  # rook/rook's pull request template carries this box, and the template
-  # does not say whether AI was used, ticked or not. A later change counts
-  # a ticked box as its own, weakest form of disclosure; until then the
-  # template's line counts as nothing.
-  - line: '- [ ] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR.'
-    why: the PR template's box, unticked; replaced when a ticked box is counted on its own
-  - line: '- [x] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR.'
-    why: the PR template's box, ticked; replaced when a ticked box is counted on its own
-  - line: '- [X] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR.'
-    why: the PR template's box, ticked; replaced when a ticked box is counted on its own
-  - line: '- [X ] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR.'
-    why: the PR template's box, ticked; replaced when a ticked box is counted on its own
-  - line: '- [x] Reviewed AI guidelines, if AI assisted with the PR.'
-    why: the PR template's box without its link, ticked; replaced when a ticked box is counted on its own
   - line: '### AI assistance disclosure (keep this, adapt the wording)'
     why: an instruction to whoever opens the pull request, left in its description
   - line: "AI-assistance disclosure (required by Rook's AI guidelines): add a short sentence"
