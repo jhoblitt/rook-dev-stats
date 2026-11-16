@@ -21,7 +21,7 @@
     shownPeople,
     sortPeople,
   } from '../lib/people';
-  import { MAIN_TARGET_NOTE, periodRange } from '../lib/filters';
+  import { periodRange } from '../lib/filters';
   import { openedIn } from '../lib/select';
   import { keepEqual } from '../lib/memo';
   import { type AuthorColumn, type ReviewerColumn, type Sort, nextSort, sameSort } from '../lib/sort';
@@ -108,7 +108,7 @@
         <p>
           Commits and lines are those of the pull requests a person opened, because the data does not record who wrote
           each commit. A backport’s commits and lines count for whoever opened the backport, so the Target filter
-          separates original work on main from backports ({MAIN_TARGET_NOTE}). Lines are a pull request’s whole
+          separates original work on master from backports. Lines are a pull request’s whole
           diff, lines added plus lines deleted, so one large import can dominate a total.
         </p>
         <p>

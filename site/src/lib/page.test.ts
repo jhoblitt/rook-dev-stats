@@ -297,9 +297,9 @@ describe('the view while the years a period needs load', () => {
     await vi.waitFor(() => expect(get(data).loading).toBe(false));
 
     expect(seen).toEqual([
-      { from: '2026-05-15', target: 'main', years: [2026], size: 12, selected: seen[0]?.selected, pending: false },
-      { from: '2026-05-15', target: 'main', years: [2026], size: 12, selected: seen[0]?.selected, pending: true },
-      { from: '2025-03-01', target: 'main', years: [2025, 2026], size: 13, selected: seen[2]?.selected, pending: false },
+      { from: '2026-05-15', target: 'master', years: [2026], size: 12, selected: seen[0]?.selected, pending: false },
+      { from: '2026-05-15', target: 'master', years: [2026], size: 12, selected: seen[0]?.selected, pending: true },
+      { from: '2025-03-01', target: 'master', years: [2025, 2026], size: 13, selected: seen[2]?.selected, pending: false },
     ]);
     // #60010, merged 2025-06-10, is in the new selection and was in no earlier one.
     expect(seen[2]?.selected).toBe((seen[0]?.selected ?? 0) + 1);
@@ -329,7 +329,7 @@ describe('the view while the years a period needs load', () => {
     const before = requested.length;
     selection.set({ ...recent, filters: { ...recent.filters, from: '2026-07-01', target: 'all' } });
     expect(seen.map((s) => [s.from, s.target, s.pending])).toEqual([
-      ['2026-05-15', 'main', false],
+      ['2026-05-15', 'master', false],
       ['2026-07-01', 'all', false],
     ]);
     expect(requested.length).toBe(before);
@@ -606,8 +606,8 @@ describe('the view while a change recomputes over a large dataset', () => {
     const { selection, data, seen, jobs, run } = await large();
     selection.set(target(recent, 'all'));
     expect(seen.map(summary)).toEqual([
-      { target: 'main', pending: false, recomputing: false },
-      { target: 'main', pending: false, recomputing: true },
+      { target: 'master', pending: false, recomputing: false },
+      { target: 'master', pending: false, recomputing: true },
     ]);
     const busy = seen[1] as View;
     expect(busy.rows).toBe(seen[0]?.rows);
@@ -631,8 +631,8 @@ describe('the view while a change recomputes over a large dataset', () => {
     expect(jobs).toHaveLength(1);
     run();
     expect(seen.map(summary)).toEqual([
-      { target: 'main', pending: false, recomputing: false },
-      { target: 'main', pending: false, recomputing: true },
+      { target: 'master', pending: false, recomputing: false },
+      { target: 'master', pending: false, recomputing: true },
       { target: 'backports', pending: false, recomputing: false },
     ]);
   });
@@ -640,12 +640,12 @@ describe('the view while a change recomputes over a large dataset', () => {
   it('goes back to the figures shown, computing nothing, when the change is undone before the recompute ran', async () => {
     const { selection, seen, jobs } = await large();
     selection.set(target(recent, 'all'));
-    selection.set(target(recent, 'main'));
+    selection.set(target(recent, 'master'));
     expect(jobs).toHaveLength(0);
     expect(seen.map(summary)).toEqual([
-      { target: 'main', pending: false, recomputing: false },
-      { target: 'main', pending: false, recomputing: true },
-      { target: 'main', pending: false, recomputing: false },
+      { target: 'master', pending: false, recomputing: false },
+      { target: 'master', pending: false, recomputing: true },
+      { target: 'master', pending: false, recomputing: false },
     ]);
     expect(seen[2]?.rows).toBe(seen[0]?.rows);
   });
@@ -653,7 +653,7 @@ describe('the view while a change recomputes over a large dataset', () => {
   it('waits for a year it needs as before, then marks the recompute over the landed years busy first', async () => {
     const { selection, data, seen, run } = await large();
     selection.set(back);
-    expect(seen.map(summary).at(-1)).toEqual({ target: 'main', pending: true, recomputing: false });
+    expect(seen.map(summary).at(-1)).toEqual({ target: 'master', pending: true, recomputing: false });
     await vi.waitFor(() => expect(get(data).loading).toBe(false));
     expect(seen.at(-1)).toMatchObject({ pending: true, recomputing: true });
     expect(sectionsBusy(seen.at(-1) as View, get(data))).toBe(true);
@@ -667,7 +667,7 @@ describe('the view while a change recomputes over a large dataset', () => {
     selection.set(target(recent, 'all'));
     selection.set(back);
     expect(jobs).toHaveLength(0);
-    expect(seen.map(summary).at(-1)).toEqual({ target: 'main', pending: true, recomputing: false });
+    expect(seen.map(summary).at(-1)).toEqual({ target: 'master', pending: true, recomputing: false });
     expect(get(data).loading).toBe(true);
   });
 
@@ -676,7 +676,7 @@ describe('the view while a change recomputes over a large dataset', () => {
     selection.set(target(recent, 'all'));
     expect(jobs).toHaveLength(0);
     expect(seen.map(summary)).toEqual([
-      { target: 'main', pending: false, recomputing: false },
+      { target: 'master', pending: false, recomputing: false },
       { target: 'all', pending: false, recomputing: false },
     ]);
   });
@@ -777,7 +777,7 @@ describe('the years a period loads hold its whole selection', () => {
         ...defaultFilters(m),
         from: dayOf(start),
         to: dayOf(end),
-        target: (['main', 'backports', 'all'] as const)[k % 3] as Filters['target'],
+        target: (['master', 'backports', 'all'] as const)[k % 3] as Filters['target'],
         reviewer: k % 4 === 0 ? (m.people[k % 8] ?? null) : null,
       };
       const wanted = yearsFor(m, periodRange(filters).start);

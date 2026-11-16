@@ -89,9 +89,6 @@
     <span class="title">{tl.title}</span>
     <span class="facts">{tl.base} · {tl.commitCount} commit{tl.commitCount === 1 ? '' : 's'} · {tl.disclosure}</span>
   </p>
-  {#if tl.baseNote !== null}
-    <p class="note">{tl.baseNote}</p>
-  {/if}
   <p class="note">
     Time runs evenly along the line{#if layout.cuts.length > 0}, except where a long quiet stretch is cut out (shaded,
       with its length beneath){/if}{#if layout.stretches.length > 0}{layout.cuts.length > 0 ? ' and' : ', except'} where

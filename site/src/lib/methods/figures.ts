@@ -1,7 +1,7 @@
 // The figures the methods page gives about the data, computed from what the
 // site loads when the page is shown. Each is over the PRs open at some point
 // in the period it is given, the last six months on the page, on
-// every branch, split into the development branch, main or master, and the
+// every branch, split into the development branch, master, and the
 // rest where the two differ in kind;
 // event counts take only the events inside that period.
 
@@ -15,7 +15,7 @@ import type { Period } from '../stats/buckets';
 import { nearestRank } from '../stats/measures';
 import { authorRows, reviewerRows } from '../stats/people';
 
-/** A count of PRs on the development branch, under either name, and on every other branch. */
+/** A count of PRs on the development branch and on every other branch. */
 export interface Split {
   main: number;
   other: number;

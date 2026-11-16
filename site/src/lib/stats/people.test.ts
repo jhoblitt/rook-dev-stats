@@ -12,7 +12,7 @@ const rows = select(data, filters);
 const opened = openedIn(data, rows, period);
 const person = (login: string) => META.people.indexOf(login);
 
-// The default selection: main, the whole window. Of its rows, those opened in
+// The default selection: master, the whole window. Of its rows, those opened in
 // the period are 3 #66500, 4 #66510, 5 #66600, 6 #66700, 8 #66900, 9 #67000
 // and 10 #67100.
 describe('authorRows over the fixture', () => {

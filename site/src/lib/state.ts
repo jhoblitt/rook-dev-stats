@@ -6,8 +6,8 @@
 //     &size=11-100&standing=first&disclosure=disclosed&drafts=exclude&reopened=only
 //     &author=<login>&reviewer=<login>&week=2026-06-01&band=lt7&pr=66600&sort=-size
 //     &authorsort=-lines&reviewersort=first&bots=show
-//   #/?target=main&section=review
-//   #/methods?target=main&section=disclosure
+//   #/?target=master&section=review
+//   #/methods?target=master&section=disclosure
 //
 // <route> is empty for the report or `methods`. The target is always written;
 // the period only when it differs from the default, the whole window, so a
@@ -154,7 +154,7 @@ export function defaultFilters(meta: Meta): Filters {
   return {
     from: first,
     to: last,
-    target: 'main',
+    target: 'master',
     base: null,
     backportLink: null,
     component: null,

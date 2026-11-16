@@ -26,7 +26,7 @@ import {
 
 // The fixture's rows: 0 #64010 and 1 #65220 opened in 2025, before the
 // window; 2 #66100 opened in 2026 before the window; 3–11 opened in it.
-// Rows 1 (reef), 7 (squid) and 11 (tentacle) are not on main. Its window
+// Rows 1 (reef), 7 (squid) and 11 (tentacle) are not on master. Its window
 // is 2026-05-15 to 2026-11-15, the day fetched_through falls on, and
 // the specs take that as the period too, unless they say otherwise.
 const data = fixture();
@@ -100,20 +100,19 @@ describe('neverReady', () => {
 });
 
 describe('the split by target', () => {
-  // master is the development branch's name before its rename to main.
-  const OLD = { bases: ['main', 'master', 'nautilus'], window_start: at('2019-01-01T00:00:00Z') };
+  const OLD = { bases: ['master', 'release-1.21'], window_start: at('2019-01-01T00:00:00Z') };
   const OLD_DAYS = { from: '2019-01-01', to: '2026-11-15' };
   const d = dataset(
     [
+      { created: at('2019-03-01T00:00:00Z'), commits: 0, base: 0, state: 1, closed: at('2019-03-02T00:00:00Z') },
       { created: at('2019-03-01T00:00:00Z'), commits: 0, base: 1, state: 1, closed: at('2019-03-02T00:00:00Z') },
-      { created: at('2019-03-01T00:00:00Z'), commits: 0, base: 2, state: 1, closed: at('2019-03-02T00:00:00Z') },
       { created: at('2023-03-01T00:00:00Z'), commits: 0, base: 0 },
     ],
     [],
     OLD,
   );
 
-  it('counts a PR on master with those on main, and a release branch with the other branches', () => {
+  it('counts a PR on master with the development branch, and a release branch with the other branches', () => {
     expect(noCommits(d, baseRows(d, OLD_DAYS))).toEqual({ main: 2, other: 1 });
   });
 
@@ -283,14 +282,14 @@ describe('eventRefs', () => {
 });
 
 describe('defaultRows', () => {
-  it("keeps what the report's default filters select: PRs on main open at some point in the period", () => {
+  it("keeps what the report's default filters select: PRs on master open at some point in the period", () => {
     expect([...defaultRows(data, DAYS)]).toEqual([0, 2, 3, 4, 5, 6, 8, 9, 10]);
   });
 });
 
 describe('peopleFigures', () => {
   // Under the default filters the People tables count the PRs opened in the period
-  // on main (rows 3, 4, 5, 6, 8, 9, 10) for the Authors table, and every
+  // on master (rows 3, 4, 5, 6, 8, 9, 10) for the Authors table, and every
   // event in the period on rows 0, 2–6 and 8–10 for the Reviewers table.
   it('counts the authors, the bot accounts hidden among them and the reviewers, as the People tables do', () => {
     const f = peopleFigures(data, defaultRows(data, DAYS), PERIOD);
@@ -341,7 +340,7 @@ describe('peopleFigures', () => {
   });
 
   describe('with deleted accounts', () => {
-    // On main in the period: Ada opened two, Åsa one, the pooled entry two
+    // On master in the period: Ada opened two, Åsa one, the pooled entry two
     // and person 0 one; Ada's third is on a release branch, and the pooled
     // entry's third was opened before the period. The pooled entry commented
     // on Ada's first.

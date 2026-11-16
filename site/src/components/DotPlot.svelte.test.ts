@@ -73,7 +73,7 @@ describe('DotPlot', () => {
     render(App, props);
     const canvas = figure().querySelector('canvas') as HTMLCanvasElement;
     await fireEvent.click(canvas, at(67100));
-    expect(loc.hash()).toBe('#/?target=main&pr=67100');
+    expect(loc.hash()).toBe('#/?target=master&pr=67100');
     expect(figure().querySelector('.selected-ring')).not.toBeNull();
   });
 
@@ -114,7 +114,7 @@ describe('DotPlot', () => {
     render(App, props);
     const canvas = figure().querySelector('canvas') as HTMLCanvasElement;
     await fireEvent.click(canvas, { clientX: 2, clientY: 2 });
-    expect(loc.hash()).toBe('#/?target=main');
+    expect(loc.hash()).toBe('#/?target=master');
   });
 
   it('says "no PRs match" for an empty selection, and what is missing when none was opened in the period', async () => {

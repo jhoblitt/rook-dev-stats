@@ -11,7 +11,7 @@ beforeAll(() => {
     ({ matches: false, media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList;
 });
 
-/** 2026's PRs replaced by `n` open ones on main, an hour apart from 1 June, with no events. */
+/** 2026's PRs replaced by `n` open ones on master, an hour apart from 1 June, with no events. */
 function manyPrs(n: number): Record<string, unknown> {
   const columns = Object.keys(rawPrs2026);
   const value = (column: string, i: number): unknown => {
@@ -53,8 +53,8 @@ async function lanes(hash: string, files: Record<string, unknown> = {}) {
 
 describe('Lanes', () => {
   it('draws at most 200 lanes, the most recently opened in the default order, and says how many of how many', async () => {
-    const { section } = await lanes('#/?target=main', manyPrs(250));
-    // 250 opened in 2026, all on main, in place of the fixture's 2026 file.
+    const { section } = await lanes('#/?target=master', manyPrs(250));
+    // 250 opened in 2026, all on master, in place of the fixture's 2026 file.
     expect(
       section.getByText('The 200 most recently opened of 250 PRs open at some point in the period, in the PR table’s order, by Opened, descending.'),
     ).toBeTruthy();
@@ -102,7 +102,7 @@ describe('Lanes', () => {
   });
 
   it('lists the PR table’s first 200 rows in the order the table is sorted, and says so', async () => {
-    const { section, loc } = await lanes('#/?target=main&sort=number', manyPrs(250));
+    const { section, loc } = await lanes('#/?target=master&sort=number', manyPrs(250));
     expect(section.getByText('The first 200 in the PR table’s order, by PR, ascending, of 250 PRs open at some point in the period.')).toBeTruthy();
     const links = () => within(section.getByRole('list', { name: /PRs in the lanes/ })).getAllByRole('link');
     expect(links()[0]?.textContent).toBe('#70000');
@@ -110,7 +110,7 @@ describe('Lanes', () => {
     expect(links().at(-1)?.textContent).toBe('#70199');
     const table = within(screen.getByRole('region', { name: 'Pull requests' }));
     await fireEvent.click(table.getByRole('button', { name: /^PR/ }));
-    expect(loc.hash()).toBe('#/?target=main&sort=-number');
+    expect(loc.hash()).toBe('#/?target=master&sort=-number');
     expect(links()[0]?.textContent).toBe('#70249');
     expect(section.getByText('The first 200 in the PR table’s order, by PR, descending, of 250 PRs open at some point in the period.')).toBeTruthy();
   });
@@ -129,7 +129,7 @@ describe('Lanes', () => {
   });
 
   it('says so when an age band chosen in a chart narrows them', async () => {
-    const { section } = await lanes('#/?target=main&week=2026-06-01&band=30-90');
+    const { section } = await lanes('#/?target=master&week=2026-06-01&band=30-90');
     expect(
       section.getByText(
         /^1 PR open at the end of the week of 2026-06-01, aged 30–90 days, in the PR table’s order, by Opened, descending\.$/,

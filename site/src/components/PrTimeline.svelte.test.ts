@@ -265,7 +265,7 @@ describe('PrTimeline', () => {
     const section = await timeline('#/?target=all&pr=67300', withEveryKind());
     const line = await within(section).findByText('mgr: a PR with every event');
     expect(line.parentElement?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
-      'mgr: a PR with every event main · 1 commit · AI use not disclosed',
+      'mgr: a PR with every event master · 1 commit · AI use not disclosed',
     );
   });
 
@@ -449,8 +449,8 @@ describe('the chosen PR’s section', () => {
 
   it('says in one line when the filters leave the chosen PR out of the selection', async () => {
     const line = /^This pull request is not in the current selection/;
-    // #66800 is a backport, to squid: outside the default target, main.
-    let section = await timeline('#/?target=main&pr=66800');
+    // #66800 is a backport, to squid: outside the default target, master.
+    let section = await timeline('#/?target=master&pr=66800');
     expect(within(section).getByText(line)).toBeTruthy();
     cleanup();
     section = await timeline('#/?target=all&pr=66800');

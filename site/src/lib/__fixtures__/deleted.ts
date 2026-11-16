@@ -36,7 +36,7 @@ export const PR_POOLED = 67000;
 
 /**
  * The fixture's files for `fixturePage` with deleted accounts: #66510 is
- * Ada's, #66700 Åsa's and #67000 the pooled entry's, all on main and opened
+ * Ada's, #66700 Åsa's and #67000 the pooled entry's, all on master and opened
  * in the window, and the comment on #66700 by another person is by a deleted
  * account, so the pooled entry's.
  */

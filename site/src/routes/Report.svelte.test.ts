@@ -53,7 +53,7 @@ describe('a link to a section of the report', () => {
   );
 
   it('opens at the section its address names, scrolled to and focused', async () => {
-    await report('#/?target=main&section=review');
+    await report('#/?target=master&section=review');
     await waitFor(() => expect(document.activeElement?.id).toBe('review'));
     expect(scrolled).toContain('review');
   });
@@ -74,40 +74,40 @@ describe('a link to a section of the report', () => {
   });
 
   it('moves to the section from its heading link, naming it in the address', async () => {
-    const { loc } = await report('#/?target=main');
+    const { loc } = await report('#/?target=master');
     const link = screen.getByRole('link', { name: 'Link to the People section' });
     await fireEvent.click(link);
-    expect(loc.hash()).toBe('#/?target=main&section=people');
+    expect(loc.hash()).toBe('#/?target=master&section=people');
     await waitFor(() => expect(document.activeElement?.id).toBe('people'));
     expect(scrolled.at(-1)).toBe('people');
   });
 
   it('moves again to the section the address already names when its link is followed', async () => {
-    const { loc } = await report('#/?target=main&section=people');
+    const { loc } = await report('#/?target=master&section=people');
     await waitFor(() => expect(document.activeElement?.id).toBe('people'));
     (document.activeElement as HTMLElement).blur();
     scrolled = [];
     await fireEvent.click(screen.getByRole('link', { name: 'Link to the People section' }));
-    expect(loc.hash()).toBe('#/?target=main&section=people');
+    expect(loc.hash()).toBe('#/?target=master&section=people');
     expect(document.activeElement?.id).toBe('people');
     expect(scrolled).toEqual(['people']);
   });
 
   it('keeps the section in the address when a filter changes, and does not move there again', async () => {
-    const { page, loc } = await report('#/?target=main&section=review');
+    const { page, loc } = await report('#/?target=master&section=review');
     await waitFor(() => expect(document.activeElement?.id).toBe('review'));
     scrolled = [];
     page.selection.update((s) => ({ ...s, filters: { ...s.filters, kind: 'docs' } }));
     await new Promise((r) => setTimeout(r, 10));
-    expect(loc.hash()).toBe('#/?target=main&kind=docs&section=review');
+    expect(loc.hash()).toBe('#/?target=master&kind=docs&section=review');
     expect(scrolled).toEqual([]);
   });
 
   it('leaves the scroll alone when the address stops naming a section', async () => {
-    const { page } = await report('#/?target=main&section=review');
+    const { page } = await report('#/?target=master&section=review');
     await waitFor(() => expect(document.activeElement?.id).toBe('review'));
     scrolled = [];
-    page.selection.set(stateFromHash('#/?target=main', page.meta));
+    page.selection.set(stateFromHash('#/?target=master', page.meta));
     await new Promise((r) => setTimeout(r, 10));
     expect(scrolled).toEqual([]);
   });

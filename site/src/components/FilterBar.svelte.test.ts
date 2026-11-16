@@ -25,7 +25,7 @@ beforeEach(() => {
 const period = () => screen.getByRole('group', { name: 'Period' });
 const back = () => screen.queryByRole('button', { name: 'Filters' });
 
-async function report(hash = '#/?target=main') {
+async function report(hash = '#/?target=master') {
   const { props, loc } = await fixturePage(hash);
   render(App, props);
   // The Period row's place in the filter bar: its top, where the viewport puts it, and its size.

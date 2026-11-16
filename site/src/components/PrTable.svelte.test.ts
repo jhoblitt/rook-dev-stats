@@ -167,7 +167,7 @@ describe('PrTable', () => {
     expect(listed()).toEqual([66510, 66500]);
     expect(region().getByText(/2 PRs opened in the week of 2026-05-18/)).toBeTruthy();
     await fireEvent.click(region().getByRole('button', { name: 'Show every selected PR' }));
-    expect(loc.hash()).toBe('#/?target=main');
+    expect(loc.hash()).toBe('#/?target=master');
   });
 
   it('loads the table file of each year the selection needs, and no other', async () => {
@@ -198,11 +198,11 @@ describe('PrTable', () => {
     render(App, props);
     const size = () => within(table()).getByRole('button', { name: /^Size/ });
     await fireEvent.click(size());
-    expect(loc.hash()).toBe('#/?target=main&sort=size');
+    expect(loc.hash()).toBe('#/?target=master&sort=size');
     expect(listed()).toEqual(expected('#/?sort=size'));
     expect(size().closest('th')?.getAttribute('aria-sort')).toBe('ascending');
     await fireEvent.click(size());
-    expect(loc.hash()).toBe('#/?target=main&sort=-size');
+    expect(loc.hash()).toBe('#/?target=master&sort=-size');
     expect(listed()).toEqual(expected('#/?sort=-size'));
     expect(listed()[0]).toBe(67000);
     expect(within(table()).getByRole('button', { name: /^Opened/ }).closest('th')?.getAttribute('aria-sort')).toBe('none');
@@ -251,12 +251,12 @@ describe('PrTable', () => {
     const toggle = () => within(table()).getAllByRole('button', { name: 'Filter by fixture-author-d as author' })[0]!;
     expect(toggle().getAttribute('aria-pressed')).toBe('false');
     await fireEvent.click(toggle());
-    expect(loc.hash()).toBe('#/?target=main&author=fixture-author-d');
+    expect(loc.hash()).toBe('#/?target=master&author=fixture-author-d');
     expect(listed()).toEqual([67100, 66500]);
     expect(toggle().getAttribute('aria-pressed')).toBe('true');
     expect((screen.getByLabelText('Author') as HTMLInputElement).value).toBe('fixture-author-d');
     await fireEvent.click(toggle());
-    expect(loc.hash()).toBe('#/?target=main');
+    expect(loc.hash()).toBe('#/?target=master');
   });
 
   it('writes the PR chosen from a row to the URL, and marks the row', async () => {
@@ -264,7 +264,7 @@ describe('PrTable', () => {
     render(App, props);
     await waitFor(() => expect(within(table()).getByText('doc: fix a typo')).toBeTruthy());
     await fireEvent.click(within(table()).getByRole('button', { name: 'doc: fix a typo' }));
-    expect(loc.hash()).toBe('#/?target=main&pr=66510');
+    expect(loc.hash()).toBe('#/?target=master&pr=66510');
     const row = within(table()).getByRole('button', { name: 'doc: fix a typo' }).closest('tr');
     expect(row?.getAttribute('aria-current')).toBe('true');
   });

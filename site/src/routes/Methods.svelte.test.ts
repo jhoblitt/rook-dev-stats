@@ -68,7 +68,7 @@ describe('the methods page', () => {
     const link = within(screen.getByRole('navigation', { name: 'Contents' })).getByRole('link', {
       name: 'Disclosure of AI use',
     });
-    expect(link.getAttribute('href')).toBe('#/methods?target=main&section=disclosure');
+    expect(link.getAttribute('href')).toBe('#/methods?target=master&section=disclosure');
   });
 
   it('moves to a section from its contents link, naming it in the address', async () => {
@@ -77,7 +77,7 @@ describe('the methods page', () => {
       name: 'Disclosure of AI use',
     });
     await fireEvent.click(link);
-    expect(loc.hash()).toBe('#/methods?target=main&section=disclosure');
+    expect(loc.hash()).toBe('#/methods?target=master&section=disclosure');
     await waitFor(() => expect(document.activeElement?.id).toBe('disclosure'));
     expect(scrolled.at(-1)).toBe('disclosure');
   });
@@ -90,7 +90,7 @@ describe('the methods page', () => {
       name: 'Disclosure of AI use',
     });
     await fireEvent.click(link);
-    expect(loc.hash()).toBe('#/methods?target=main&section=disclosure');
+    expect(loc.hash()).toBe('#/methods?target=master&section=disclosure');
     expect(document.activeElement?.id).toBe('disclosure');
   });
 
@@ -98,14 +98,14 @@ describe('the methods page', () => {
     const { loc } = await methods();
     const section = document.getElementById('responses') as HTMLElement;
     const link = within(section).getByRole('link', { name: 'bot command' });
-    expect(link.getAttribute('href')).toBe('#/methods?target=main&section=commands');
+    expect(link.getAttribute('href')).toBe('#/methods?target=master&section=commands');
     await fireEvent.click(link);
-    expect(loc.hash()).toBe('#/methods?target=main&section=commands');
+    expect(loc.hash()).toBe('#/methods?target=master&section=commands');
     await waitFor(() => expect(document.activeElement?.id).toBe('commands'));
   });
 
   it('opens at the section its address names', async () => {
-    await methods({}, '#/methods?target=main&section=commands');
+    await methods({}, '#/methods?target=master&section=commands');
     await waitFor(() => expect(document.activeElement?.id).toBe('commands'));
     expect(scrolled).toContain('commands');
   });
@@ -119,14 +119,14 @@ describe('the methods page', () => {
     const { loc } = await methods({}, '#/methods?section=nowhere');
     await new Promise((r) => setTimeout(r, 10));
     expect(scrolled).toEqual([]);
-    expect(loc.hash()).toBe('#/methods?target=main');
+    expect(loc.hash()).toBe('#/methods?target=master');
   });
 
   it("lands on the disclosure section from the AI-use section's link", async () => {
     const { page } = await methods({}, '#/');
     const link = screen.getByRole('link', { name: 'How disclosure is detected, and what it cannot show' });
     const href = link.getAttribute('href') as string;
-    expect(href).toBe('#/methods?target=main&section=disclosure');
+    expect(href).toBe('#/methods?target=master&section=disclosure');
     page.selection.set(stateFromHash(href, page.meta));
     await waitFor(() => expect(document.activeElement?.id).toBe('disclosure'));
     expect(scrolled.at(-1)).toBe('disclosure');
@@ -135,24 +135,24 @@ describe('the methods page', () => {
   });
 
   it('goes back to the top when the address stops naming a section, as a fresh page would', async () => {
-    const { page } = await methods({}, '#/methods?target=main&section=commands');
+    const { page } = await methods({}, '#/methods?target=master&section=commands');
     await waitFor(() => expect(document.activeElement?.id).toBe('commands'));
-    page.selection.set(stateFromHash('#/methods?target=main', page.meta));
+    page.selection.set(stateFromHash('#/methods?target=master', page.meta));
     await waitFor(() => expect(document.activeElement?.textContent).toBe('Methods'));
     expect(toTop).toBe(1);
   });
 
   it('stays at the top when the page opens with no section, and moves nowhere', async () => {
-    await methods({}, '#/methods?target=main');
+    await methods({}, '#/methods?target=master');
     await new Promise((r) => setTimeout(r, 10));
     expect(toTop).toBe(0);
     expect(scrolled).toEqual([]);
   });
 
   it('starts the report at the top when coming back from a section of the methods page', async () => {
-    const { page } = await methods({}, '#/methods?target=main&section=commands');
+    const { page } = await methods({}, '#/methods?target=master&section=commands');
     await waitFor(() => expect(document.activeElement?.id).toBe('commands'));
-    page.selection.set(stateFromHash('#/?target=main', page.meta));
+    page.selection.set(stateFromHash('#/?target=master', page.meta));
     await waitFor(() => expect(toTop).toBe(1));
     expect(document.activeElement?.tagName).toBe('MAIN');
   });
