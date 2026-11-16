@@ -5,7 +5,10 @@ one repository and not another, found while porting
 [jhoblitt/ceph-dev-stats](https://github.com/jhoblitt/ceph-dev-stats) to
 rook/rook. It is the input to a possible generic tool configured per
 repository: each entry is something such a tool would have to take as
-configuration, or detect, rather than hard-code.
+configuration, or detect, rather than hard-code. ceph-dev-stats keeps the
+same registry from Ceph's side, in its
+[`docs/repo-specifics.md`](https://github.com/jhoblitt/ceph-dev-stats/blob/main/docs/repo-specifics.md);
+the Ceph lines here follow it.
 
 Each entry says what varies, how ceph/ceph and rook/rook differ, where the
 rule lives in this tree, and how it was found. "Where" names a file, not a
@@ -15,86 +18,114 @@ Rook where it had fit Ceph.
 ## Identity and history
 
 ### Repository identity and window start
-- **Varies:** owner, name, and the first day of the data window.
+- **Varies:** the owner, the name, and the first day of the data window.
 - **ceph:** `ceph/ceph`, 2011-09-01. **rook:** `rook/rook`, 2016-07-08.
-- **Where:** `internal/fetch/fetch.go` (`Owner`, `Name`, `WindowStart`); the
-  site takes the repository from the data's `meta.repo`.
-- **Found:** porting. The sibling's session reported the identity is these
-  three constants plus about ten site strings.
+  Each window starts on the day GitHub says the repository was created, so
+  it covers the whole history.
+- **Where:** `internal/fetch/fetch.go` (`Owner`, `Name`, `WindowStart`). The
+  site builds every GitHub address from the data's `meta.repo`. The name is
+  spelled again in the commands' help text (`internal/cli`).
+- **Found:** porting. The sibling reported that the identity is these three
+  constants plus about ten site strings.
 
 ### Names of the tool and the page
-- **Varies:** binary, environment prefix, module path, Pages base path, page
-  title, theme storage key, package name.
+- **Varies:** the binary, environment prefix, module path, Pages base path,
+  page title, theme storage key, footer repository link and package name.
 - **ceph:** `cephstats`, `CEPHSTATS_`, `/ceph-dev-stats/`, "Ceph pull
   requests". **rook:** `rookstats`, `ROOKSTATS_`, `/rook-dev-stats/`, "Rook
   pull requests".
-- **Where:** the rename commit touches them all.
+- **Where:** the rename commit touches all of them.
 - **Found:** porting.
 
 ### Size of the history
 - **Varies:** how many pull requests the whole history holds, and so whether
   a first release can carry all of it.
-- **ceph:** about 74,000; the whole-history walk took about 4.9 hours.
-  **rook:** 11,876; a cold whole-history walk took about 35 minutes.
+- **ceph:** 73,918. A whole-history walk fetched about 63,500 of them in
+  4.9 hours, resuming from a partial cache. The cache is 673 MB and the
+  records 138 MB.
+- **rook:** 11,876. A cold whole-history walk took about 35 minutes. The
+  cache is 100 MB and the records 20 MB.
 - **Where:** a deployment decision, not code.
 - **Found:** measured on both.
 
 ### Count source for the completeness check
 - **Varies:** whether GitHub's listing total or its search count is the
-  reference, depending on whether the window starts at the repository's
-  creation.
-- **ceph/rook:** both windows start at creation, so both use the listing.
-  The search undercounts on ceph.
-- **Where:** `internal/fetch`, the count at the end of a walk.
+  reference. The listing serves only a window that starts at or before the
+  repository's creation.
+- **ceph/rook:** both use the listing. On ceph the search undercounts:
+  72,447 against the listing's 73,914.
+- **Where:** `internal/fetch/fetch.go`, `internal/classify/check.go`, and
+  `data/meta.json` (`opened_in_window_source`).
 - **Found:** the sibling.
 
 ### Reviews recorded from
-- **Varies:** nothing per repository: GitHub holds no reviews before
-  2016-09-14. A repository created earlier has an early stretch with
-  comments but no reviews.
-- **ceph:** five years without reviews. **rook:** two months (2016-07-08 to
-  2016-09-14). Rook's earliest review is 2016-09-14.
+- **Varies:** nothing per repository. GitHub announced pull-request reviews
+  on 2016-09-14 and holds none before then, so a repository created earlier
+  has an early stretch with comments but no reviews.
+- **ceph:** five years of it; the earliest review is on 2016-09-29.
+- **rook:** two months, 2016-07-08 to 2016-09-14; the earliest review is on
+  2016-09-14.
 - **Where:** `site/src/lib/review.ts` (`REVIEWS_RECORDED_FROM`).
-- **Found:** the sibling; confirmed on Rook's data.
+- **Found:** the sibling, then confirmed on Rook's data.
+
+### Deleted accounts
+- **Varies:** how many pull requests belong to accounts GitHub has deleted.
+- **ceph:** 1,353 pull requests have no author. 1,351 of them are credited
+  to the name on their commits, 33 names in all. The rule itself is
+  generic: the most common committer name, with GitHub's own web committer
+  set aside, and never an address.
+- **rook:** see the records. The same rule applies.
+- **Where:** `internal/fetch/names.go`, `internal/record/record.go`,
+  `internal/rollup/rollup.go`, `site/src/lib/handles.ts`.
+- **Found:** the sibling's whole-history data.
 
 ## Branches
 
 ### Development branch names
 - **Varies:** the name or names of the development branch over time.
-- **ceph:** `master` until 2022, then `main`; both count. **rook:** `master`,
-  never renamed.
-- **Where:** `site/src/lib/filters.ts` (`DEVELOPMENT_BRANCHES`, `TARGETS`),
-  `site/src/lib/state.ts` (default target). The target id appears in shared
-  links.
-- **Found:** porting. The sibling had a rename note (`baseNote`), which became
-  dead code with one name and was deleted.
+- **ceph:** `master` until 2022, then `main`, and both count. The records
+  hold 33,057 pull requests on `master` and 17,229 on `main`.
+- **rook:** `master`, never renamed.
+- **Where:** `site/src/lib/filters.ts` (`DEVELOPMENT_BRANCHES`, `TARGETS`)
+  and `site/src/lib/state.ts` (the default target). The target id appears in
+  shared links. The sibling's rename note (`baseNote`) became dead code with
+  one name and was deleted.
+- **Found:** porting.
 
-### Release branch naming
-- **Varies:** what release and backport branches are called.
-- **ceph:** release code names (`squid`, `tentacle`, `umbrella`). **rook:**
-  `release-1.x`.
-- **Where:** nothing matches on the name: any branch other than the
-  development branch is "backports and other branches".
-- **Found:** sampling 200 Rook pull requests.
+### Release and other branches
+- **Varies:** what branches other than the development branch are called.
+- **ceph:** 153 base branches, among them release code names (`reef`,
+  `squid`, …), feature branches and `wip-*` branches.
+- **rook:** `release-1.x`.
+- **Where:** nothing matches on the name. Any branch other than the
+  development branch is "backports and other branches", and the Branch
+  filter offers whatever the data holds.
+- **Found:** sampling, and counting base branches.
 
 ## Backports
 
 ### How a backport names its original
 - **Varies:** where a backport says which pull request it copies.
-- **ceph:** the description says "backport of" and the original's URL or
-  `#N`. **rook:** Mergify opens most backports. The description ends "This
-  is an automatic backport of pull request #N done by Mergify", and the title
+- **ceph:** the description says "backport of" followed by the original's
+  address or `#N`. 10,219 of the 23,632 pull requests off the development
+  branch carry it.
+- **rook:** Mergify opens most backports. Its description ends "This is an
+  automatic backport of pull request #N done by Mergify", and its title
   ends `(backport #N)`.
 - **Where:** `internal/extract/hints.go` (`backportOf`).
-- **Found:** sampling (76 of the 200 newest Rook pull requests were Mergify
-  backports).
+- **Found:** sampling. 76 of the 200 newest Rook pull requests were Mergify
+  backports.
 
-### Who authors backports
-- **Varies:** whether backports are opened by people or by a bot.
-- **ceph:** people. **rook:** mostly `mergify[bot]`, so a third or more of
-  pull requests have a bot author.
-- **Where:** a presentation decision. The owner chose no author-type filter;
+### Who makes a backport, and what its commits carry
+- **Varies:** whether people or a bot open backports, and whether the copied
+  commits keep their dates and authors.
+- **ceph:** people, by cherry-pick. The commits keep their author dates, so a
+  backport's first commit is the original work's.
+- **rook:** mostly `mergify[bot]`, by cherry-pick, so a third or more of
+  pull requests have a bot author. The owner chose no author-type filter;
   the target filter separates backports.
+- **Where:** `internal/extract/disclosure.go` (cherry-pick lines),
+  `internal/fetch/names.go` (committers before authors).
 - **Found:** sampling.
 
 ## Kind of change
@@ -102,87 +133,150 @@ Rook where it had fit Ceph.
 ### Where a pull request's kind comes from
 - **Varies:** the sources that say whether a pull request is a bug fix,
   feature, cleanup or documentation, and their order.
-- **ceph:** ticked kind boxes in the PR template, then the type of the
-  tracker.ceph.com ticket it references, then kind labels. **rook:** kind
-  labels, then the labels of the issues GitHub links as closed by the pull
-  request.
+- **ceph:** a backport takes the kind of the pull request it names.
+  Otherwise, in order:
+  - the ticked boxes of the PR template's Tracker section;
+  - the type of the first tracker.ceph.com ticket it references;
+  - the labels `bug-fix`, `feature` and `cleanup`.
+- **rook:** a backport takes its original's kind. Otherwise:
+  - kind labels;
+  - then the labels of the issues GitHub links as closed by the pull
+    request.
+
+  Rook's template has no kind boxes.
 - **Where:** `internal/extract/hints.go`, `internal/classify/kind.go`,
   `internal/tables/kinds.go`, `data/kinds.yaml`.
-- **Found:** reading Rook's PR template (no kind boxes) and labels.
+- **Found:** the two projects' PR templates and labels.
 
 ### External issue tracker
-- **Varies:** whether a second host is asked anything.
-- **ceph:** tracker.ceph.com (Redmine), asked for ticket types. **rook:**
-  none; GitHub issues only.
+- **Varies:** whether issues live on GitHub or on another host that the tool
+  must ask.
+- **ceph:** issues are switched off on GitHub. Work is tracked on
+  tracker.ceph.com, a Redmine, referenced by a `Fixes:` trailer or the
+  ticket's address. A Backport ticket stands for its parent's type: 15,116
+  of 34,457 saved tickets are of that type.
+- **rook:** GitHub issues only. No second host is asked.
 - **Where:** `internal/tracker` and the `tickets` command, removed for Rook.
 - **Found:** porting.
 
-### Closing issues and their repository
-- **Varies:** GitHub's closing references exist only for pull requests to
-  the default branch, and an issue may belong to another repository.
-- **rook:** each cached closing issue keeps its repository. A backport gets
-  its kind through its original.
+### Closing issues
+- **Varies:** whether GitHub's closing references exist to read, and where
+  the issues live.
+- **ceph:** none; the repository has no GitHub issues.
+- **rook:** read for every pull request. GitHub fills them only for pull
+  requests to the default branch, so a backport gets its kind through its
+  original. An issue may belong to another repository, so each cached issue
+  keeps its repository. A null entry in the list is skipped where it is
+  read.
 - **Where:** `internal/ghapi/queries.go`, `internal/fetch/cache.go`.
-- **Found:** Task 2's implementer and reviewer. A null node in the list is
-  skipped where it is read.
+- **Found:** Task 2's implementer and reviewer.
 
 ## AI disclosure
 
-### Disclosure policy and trailers
+### Disclosure policy and trailer keys
 - **Varies:** what the project asks for, and which trailer keys mean a
   disclosure.
-- **ceph:** an `Assisted-by:` trailer, from a draft rule. **rook:** a
-  statement in the PR description is required. `Co-authored-by`,
-  `Assisted-by` and `Generated-by` trailers are permitted.
-- **Where:** `data/tools.yaml` (trailer keys, phrases, families).
-- **Found:** Rook's `Documentation/Contributing/ai-guidelines.md`.
+- **ceph:** no rule in the tree; pull requests quote a documented format
+  for an `Assisted-by:` trailer. The keys counted are `assisted-by`,
+  `assistant-by`, `assited-by`, `ai-assisted-by`, `claude-session` and
+  `generated-by`.
+- **rook:** `Documentation/Contributing/ai-guidelines.md` requires a
+  statement in the PR description. It permits `Co-authored-by`,
+  `Assisted-by` and `Generated-by` trailers.
+- **Where:** `data/tools.yaml`, `internal/extract/disclosure.go`,
+  `internal/classify/classify.go`.
+- **Found:** each project's documents and `check --report`.
 
-### A PR-template line that mentions AI
-- **Varies:** template text that the disclosure word list matches.
-- **rook:** the checklist line "Reviewed AI guidelines, if AI assisted with
-  the PR" matches `\bAI\b`. It would have made about 830 templated pull
-  requests disclose. The owner chose to count a ticked box as its own
-  weakest class, "checklist".
-- **Where:** `data/tools.yaml` (ignored until the box rule lands),
+### Tool families
+- **Varies:** which tools contributors name, and the spellings that need a
+  ruling.
+- **ceph:** Copilot, Cursor, IBM Bob, Claude, OpenAI, Gemini, and
+  "unspecified"; a bare "Bob" is IBM Bob.
+- **rook:** the same families. An "opencode / GLM" disclosure stays
+  unspecified.
+- **Where:** `data/tools.yaml` (`families`), `site/src/lib/colours.ts`
+  (`FAMILY_LINES`, a colour, marker and dash for each family id).
+- **Found:** `check`, which fails on a counted disclosure that matches no
+  family.
+
+### Template and policy text that mentions AI
+- **Varies:** text that the project's own templates and rules put into many
+  pull requests, which the disclosure word list matches.
+- **ceph:** the template does not mention AI. Lines quoting the trailer
+  rule are listed in `ignore`.
+- **rook:** the template line "Reviewed AI guidelines, if AI assisted with
+  the PR" matches `\bAI\b`. It is in about 830 pull requests. The owner
+  chose to count a ticked box as its own, weakest class, "checklist".
+- **Where:** `data/tools.yaml` (`ignore`, until the box rule lands),
   `internal/extract/disclosure.go`, `internal/classify/classify.go`.
-- **Found:** sampling (99 of 200 ticked it); confirmed by Task 4's report.
+- **Found:** sampling (99 of 200 ticked it), confirmed by `check --report`.
+
+### Trailers that name people
+- **Varies:** which commit trailers carry a person's name and address.
+- **ceph/rook:** both require `Signed-off-by:` (DCO). A line with that key
+  or another key on the never-kept list is never kept, and a candidate line
+  holding an address is withheld.
+- **Where:** `internal/extract/disclosure.go` (`neverKept`, `withhold`).
+- **Found:** the sibling.
 
 ## Automation
 
-### Bot commands, and the privacy rule on `@`
+### Bot commands, and the rule on `@`
 - **Varies:** how people trigger automation from a comment.
-- **ceph:** Jenkins phrases (`jenkins test make check`, `/audit retest`).
-  **rook:** mentions of bot accounts (`@mergifyio backport release-1.21`,
-  `@dependabot rebase`). CI suites are triggered by label (`debug-*`,
-  `skip-ci`). One Rook command has a no-break space after
-  the mention, so the command patterns accept it.
-- **Where:** `data/commands.yaml`; and `internal/extract`, whose privacy rule
-  dropped the text of any comment containing `@`. For Rook, a leading
-  mention of a command bot (`commandBots`: `mergifyio`, `mergify`,
-  `dependabot`) is let through when no other `@` follows.
+- **ceph:** whole-comment phrases, none with an `@`:
+  - to Jenkins: `jenkins test make check`, `jenkins test windows`,
+    `jenkins test api`, `jenkins retest this please`, "retest this please",
+    "test this please", "ok to test";
+  - to the release-engineering audit bot: `/audit retest`,
+    `/audit override`;
+  - also `/config check ok` and `unstale`.
+- **rook:** mentions of bot accounts (`@mergifyio backport release-1.21`,
+  `@dependabot rebase`). One has a no-break space after the mention, so the
+  command patterns accept it. CI suites are triggered by label (`debug-*`,
+  `skip-ci`), not by comment.
+- **Where:** `data/commands.yaml`, and `internal/extract/extract.go`
+  (`commentText`). That rule keeps a comment's text only when it is one line
+  of at most 80 characters with no `@`. For Rook, a leading mention of a
+  command bot (`commandBots`: `mergifyio`, `mergify`, `dependabot`) is let
+  through when no other `@` follows.
 - **Found:** Task 4's spot check. 206 commands on 158 pull requests counted
   as human responses until extract kept the bot-mention form.
 
 ### Automation accounts GitHub types as users
 - **Varies:** which accounts post automated comments without GitHub's bot
   type.
-- **ceph:** `ceph-jenkins`, `loic-bot`. **rook:** `jenkins-rook`, `fossabot`,
-  `snyk-bot`, `step-security-bot`, `WSandboxedOCCodeBot`.
+- **ceph:** `ceph-jenkins`, which also opens the release-version pull
+  requests, and `loic-bot`, a make-check bot of 2014 and 2015.
+- **rook:** `jenkins-rook`, `fossabot`, `snyk-bot`, `step-security-bot`,
+  `WSandboxedOCCodeBot`.
 - **Where:** `data/bots.yaml`.
-- **Found:** `rookstats check --report`.
+- **Found:** `check --report`.
 
 ### Labels
-- **Varies:** which labels are components and which are process states.
-- **rook:** component labels (`operator`, `block`, `filesystem`, `object`,
-  `csi`, `ceph-*`, …), process labels (`backport-release-*`, `do-not-merge`,
-  `debug-*`, `skip-ci`, …).
+- **Varies:** which labels are components and which are process states, and
+  who sets them.
+- **ceph:** 31 components, most set by a labeler from the paths a pull
+  request touches. Process labels are `needs-*`, `wip-*`, `releng-audit-*`
+  and `backport*`.
+- **rook:** components such as `operator`, `block`, `filesystem`, `object`,
+  `csi` and `ceph-*`. Process labels such as `backport-release-*`,
+  `do-not-merge`, `debug-*` and `skip-ci`.
 - **Where:** `data/labels.yaml`.
-- **Found:** `rookstats check --report`.
+- **Found:** `check --report`.
 
-## Prose
+## Prose and tests
 
 ### Methods pages and README
 - **Varies:** every sentence that describes the project's conventions.
 - **Where:** `site/src/content/methods/*.md`, `README.md`. Figures are
   placeholders computed from the data; sentences are not.
 - **Found:** porting.
+
+### Test data
+- **Varies:** the examples the tests are built from.
+- **ceph:** recorded responses and fixtures carry Ceph's tracker addresses,
+  backport descriptions and dates.
+- **rook:** they are replaced task by task.
+- **Where:** `internal/extract/testdata`, `site/src/lib/__fixtures__`,
+  `site/e2e/smoke.spec.ts`.
+- **Found:** the sibling.
