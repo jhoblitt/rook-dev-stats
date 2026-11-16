@@ -1,16 +1,26 @@
 # Accounts GitHub types as users whose comments and reviews are automated.
 # Accounts GitHub types as bots need no entry. Logins match in any case.
 accounts:
-  - login: ceph-jenkins
+  - login: jenkins-rook
     why: >-
-      ceph/ceph's Jenkins. Every one of its comments in the window is one of
-      three templates: a "Thank you for your contribution" note, "Can one of
-      the admins verify this patch?", and a doc-render link. The pull
-      requests it opens are the release-version bumps (v19.2.5, v20.2.3, …).
-  - login: loic-bot
+      rook/rook's Jenkins CI. Its one comment in the window is a "Test
+      Status" note.
+  - login: fossabot
     why: >-
-      A make check bot, active from November 2014 to December 2015. The
-      comments whose text is kept are run results ("SUCCESS", "FAILED" or
-      "ABORTED" with a link to the log); the others are not short single
-      lines, so their text is not kept. One kept comment says a person
-      posted it from this account by mistake.
+      FOSSA's license-scan integration. It opened one pull request, in
+      January 2018, adding a license-scan badge, and commented on it with
+      the scan's result; both are FOSSA's templates.
+  - login: snyk-bot
+    why: >-
+      Snyk's dependency scanner. It opened two "[Snyk] Security upgrade"
+      pull requests in November 2021 for a container base image.
+  - login: step-security-bot
+    why: >-
+      StepSecurity's workflow-hardening app. It opened one pull request, in
+      October 2023, at a maintainer's request, from its template: "ci:
+      Harden GitHub Actions permissions".
+  - login: WSandboxedOCCodeBot
+    why: >-
+      An automated coding agent. It opened one pull request, in February
+      2026, a Go version bump citing a scanner's CVE findings, signed off
+      with a bot address.

@@ -44,8 +44,13 @@ tracker:
 # A label. It decides only when every kind label the pull request carries
 # names the same kind.
 labels:
-  bug-fix: bugfix
+  bug: bugfix
   feature: feature
-  cleanup: cleanup
+  code enhancement: feature
+  docs: docs
+  code cleanup: cleanup
+  technical debt: cleanup
+  # Dependabot's label on every update it opens.
+  dependencies: other
 
 order: [checklist, tracker, labels]
