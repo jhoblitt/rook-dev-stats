@@ -120,7 +120,7 @@
 
   const linksHint = $derived(
     [
-      'The “backport of #N” line in a PR’s description; older backports seldom carry it.',
+      'Mergify’s “automatic backport of pull request #N”, a “backport of #N” line, or a “(backport #N)” or “(bp #N)” title; most release-branch PRs before 2020 have none.',
       ...($view.dataset.linksUnrecorded.length > 0
         ? [`The data for ${$view.dataset.linksUnrecorded.join(', ')} does not record it, so every PR there counts as no link.`]
         : []),
