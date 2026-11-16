@@ -1,0 +1,75 @@
+branches:
+  - main
+
+plugins:
+  - - "@semantic-release/commit-analyzer"
+    - preset: conventionalcommits
+      # A release is what deploys the site. A commit marked breaking, by `!`
+      # or by a BREAKING CHANGE footer, cuts a major release whatever its
+      # type. Otherwise feat cuts a minor; fix, perf, refactor, docs and
+      # revert cut a patch, and so does chore(data): a data refresh is
+      # user-visible content and must cut a release even when typed chore.
+      # Every other chore (Dependabot's chore(deps) among them), build, ci,
+      # test and style cut none, even when they change the built page; they
+      # ship with the next release. A rule that matches replaces the default
+      # rules for that commit, and of the rules that match the highest
+      # release wins: so the breaking rule is listed here rather than left to
+      # the defaults, and the data rule names chore alone, since a scope-only
+      # rule would cut feat(data) to a patch. The built-in revert rule fires
+      # only on a "This reverts commit <sha>." body line, which a
+      # hand-written `revert:` squash may lack; the type rule covers it.
+      releaseRules:
+        - breaking: true
+          release: major
+        - type: chore
+          scope: data
+          release: patch
+        - type: docs
+          release: patch
+        - type: refactor
+          release: patch
+        - type: perf
+          release: patch
+        - type: revert
+          release: patch
+  - - "@semantic-release/release-notes-generator"
+    - preset: conventionalcommits
+      # presetConfig.types replaces the preset's default list, which hides
+      # docs/refactor/perf. Every type releaseRules above can cut a release
+      # from has to be visible here, or a release built only from those types
+      # ships notes with nothing under the header; a data refresh typed chore
+      # is listed under Data for the same reason. The first matching entry
+      # wins, so the scoped one comes before the hidden chore.
+      presetConfig:
+        types:
+          - type: feat
+            section: Features
+          - type: fix
+            section: Bug Fixes
+          - type: perf
+            section: Performance Improvements
+          - type: refactor
+            section: Refactoring
+          - type: docs
+            section: Documentation
+          - type: revert
+            section: Reverts
+          - type: chore
+            scope: data
+            section: Data
+          - type: chore
+            hidden: true
+          - type: ci
+            hidden: true
+          - type: build
+            hidden: true
+          - type: test
+            hidden: true
+          - type: style
+            hidden: true
+  # Publish the GitHub Release and nothing else: no comment or label on the
+  # pull requests and issues a release resolves, and no issue opened or
+  # closed for a failed release.
+  - - "@semantic-release/github"
+    - successCommentCondition: false
+      failCommentCondition: false

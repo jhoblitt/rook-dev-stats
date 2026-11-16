@@ -230,11 +230,12 @@ HEAD:data/prs/<month>.jsonl`) with the new one for the records whose
 
 ## Publishing
 
-A merged refresh reaches the published site through a release. Each push to
-`main` runs CI and then semantic-release, which cuts a version when a commit
-since the last tag calls for one: a `feat`, `fix`, `perf`, `refactor`,
-`docs` or `revert` commit, a `chore(data)` commit such as a data refresh, or
-any commit marked breaking. The release tags the version and deploys the
+The site is published at <https://jhoblitt.github.io/rook-dev-stats/>, and
+a merged refresh reaches it through a release. Each push to `main` runs the
+`release` workflow, which runs CI and then semantic-release. That cuts a
+version when a commit since the last tag calls for one: a `feat`, `fix`,
+`perf`, `refactor`, `docs` or `revert` commit, a `chore(data)` commit such as
+a data refresh, or any commit marked breaking. The release tags the version and deploys the
 site built from that tag to GitHub Pages, with the version in the footer.
 Any other commit (`build`, `ci`, `test`, `style`, or another `chore`,
 Dependabot's included) cuts no release unless marked breaking, and reaches

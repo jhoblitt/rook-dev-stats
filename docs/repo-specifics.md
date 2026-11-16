@@ -28,7 +28,12 @@ Rook where it had fit Ceph.
 - **ceph:** `cephstats`, `CEPHSTATS_`, `/ceph-dev-stats/`, "Ceph pull
   requests". **rook:** `rookstats`, `ROOKSTATS_`, `/rook-dev-stats/`, "Rook
   pull requests".
-- **Where:** the rename commit touches them all.
+- **Where:** the rename commit touches them all. The release files
+  (`.github/workflows/release.yml`, `.github/workflows/deploy.yml`,
+  `.releaserc.yml`) name neither repository; semantic-release takes the
+  repository from the checkout's remote. The published address,
+  `https://jhoblitt.github.io/rook-dev-stats/`, follows from the repository
+  name and is in `README.md`.
 - **Found:** porting.
 
 ### Size of the history
