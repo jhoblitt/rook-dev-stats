@@ -143,9 +143,12 @@ Rook where it had fit Ceph.
   - kind labels: `bug`, `feature`, `code enhancement`, `docs`,
     `code cleanup`, `technical debt`, and Dependabot's `dependencies` as
     other;
-  - then the first closing issue whose `issue_labels` (`bug`, `feature`,
-    `docs`) agree on a kind. Only issues of rook/rook count: another
-    project's labels mean other things.
+  - then the first closing issue whose `issue_labels` agree on a kind.
+    Issues and pull requests share the repository's labels, so
+    `issue_labels` lists the same kind labels as `labels` but
+    `dependencies`. Area labels such as `test`, `build` and `ci` name no
+    kind. Only issues of rook/rook count: another project's labels mean
+    other things.
 
   Rook's template has no kind boxes, so the checklist source, the
   `Check*` hints and the `checklist` table are gone.

@@ -28,10 +28,16 @@ labels:
 # first issue whose kind labels all name the same kind decides. Only the
 # issues of rook/rook count: another project's labels mean other things.
 # GitHub links closing issues only for pull requests to the default branch,
-# so a backport takes its kind from its original.
+# so a backport takes its kind from its original. Issues and pull requests
+# share the repository's labels, so this lists the same kind labels as
+# `labels` above; labels that name an area, such as `test`, `build` or
+# `ci`, say nothing about the kind of change.
 issue_labels:
   bug: bugfix
   feature: feature
+  code enhancement: feature
   docs: docs
+  code cleanup: cleanup
+  technical debt: cleanup
 
 order: [labels, issues]
