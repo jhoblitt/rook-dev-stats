@@ -1,0 +1,103 @@
+# What counts as a disclosure of LLM use, and which tool it names.
+#
+# Phrases and family patterns are regular expressions matched anywhere in
+# a candidate line, in any case. `cephstats check` lists the candidates
+# that match no phrase, and fails on a counted disclosure that matches no
+# family or a trailer whose key is not covered here.
+
+# A commit trailer with one of these keys discloses by itself. A kept
+# Co-authored-by: is a co-author disclosure without being listed here.
+trailer_keys:
+  - assisted-by
+  - assistant-by
+  - claude-session
+  # A misspelt Assisted-by, and Assisted-by with an AI- prefix.
+  - assited-by
+  - ai-assisted-by
+  # Generated-by, naming the model that generated the commit.
+  - generated-by
+
+# A description or commit-prose line counts only when it matches one of
+# these: a tool's name alone is not a disclosure, and neither is talk
+# about a tool (a review it gave, a policy on using it, a file for it).
+phrases:
+  # An Assisted-by trailer pasted into prose, or the same words in a sentence.
+  - 'assist(ed|ant)[ -]by'
+  # Made, written, found, … with, by, using, via or from a tool or an AI.
+  - '\b(generated|raised|written|drafted|developed|prepared|created|made|coded|done|discovered|found|identified|fixed|patched)\b[^.]{0,30}?\b(with|by|using|via|from)\W+(github )?(claude|codex|copilot|cursor|gemini|chatgpt|gpt|ibm[ -]bob|(an? )?(llm|ai)\b|([\w-]+ ){1,2}ai\b)'
+  # With the help, aid or assistance of a tool or an AI.
+  - '\b(help|aid|assistance|support) (of|from)\W+(github )?(claude|codex|copilot|cursor|gemini|chatgpt|gpt|ibm[ -]bob|(an? )?(llm|ai)\b)'
+  # AI-assisted, AI assistance, AI-generated, LLM-drafted, AI assistants, …
+  - '\b(ai|llm)s?[ -](assisted|assistance|assistants?|generated|drafted|written|aided)\b'
+  # AI was used, AI tools assisted, …
+  - '\b(ai|llm)s?( tools?| agents?)? (was used|were used|is used|assisted|helped)\b'
+  # GitHub Copilot was used, Claude was used, …
+  - '\b(github )?(claude|copilot|codex|cursor|gemini|chatgpt|ibm[ -]bob)( code)? (was|were) used\b'
+  # I used Claude Code, used AI to …
+  - '\bused (github )?(claude|copilot|codex|cursor|gemini|chatgpt|ibm[ -]bob|ai|an? llm)\b'
+  # Claude helped, an LLM that wrote this test, …
+  - '\b(claude|copilot|codex|cursor|gemini|chatgpt|llm|ai)\b[\w -]{0,12}?\b(wrote|helped)\b'
+  - '\bwith an? (llm|ai)\b'
+  # Fix suggested by Claude Code, I have followed Claude/Sonnet in …
+  - '\bsuggested by claude\b'
+  - '\bfollowed claude\b'
+  # The link Claude Code on the web adds to what it writes.
+  - 'claude\.ai/code/session_'
+  # The markers the Copilot coding agent leaves in the pull requests it opens.
+  - '<!-- start copilot (coding agent|original prompt)'
+  # A Co-authored-by trailer pasted into prose; extract keeps one only when
+  # it names a tool.
+  - '^co-authored-by:'
+  # The second half of a disclosure wrapped across two lines in pull request
+  # 66817, whose first half, "… generated with assistance from", says no tool.
+  - '^an LLM \(Large Language Model\) and subsequently validated and refined\.$'
+
+# The first family, top to bottom, that matches a counted disclosure is the
+# tool it names. Tools that run another vendor's model come before the
+# models, and unspecified comes last.
+families:
+  - id: copilot
+    name: Copilot
+    patterns: ['co-?pilot']
+  - id: cursor
+    name: Cursor
+    patterns: ['\bcursor\b', 'cursoragent']
+  # A bare "Bob" in an Assisted-by trailer is IBM Bob: every author who
+  # writes it also writes "IBM Bob" or bob@ibm.com elsewhere.
+  - id: ibm-bob
+    name: IBM Bob
+    patterns: ['ibm[ -]bob', '\bbob\b']
+  # Fable is a Claude model: "Claude Fable 5.1 <noreply@anthropic.com>".
+  - id: claude
+    name: Claude
+    patterns: ['claude', 'anthropic', '\bfable\b']
+  - id: openai
+    name: OpenAI
+    patterns: ['codex', 'chatgpt', '\bgpt', 'openai']
+  - id: gemini
+    name: Gemini
+    patterns: ['gemini']
+  - id: unspecified
+    name: Unspecified
+    patterns: ['\bllms?\b', '\bai\b']
+
+# Candidate lines judged not to be a disclosure, each matched exactly.
+ignore:
+  - line: 'I place the Assisted-by tag.'
+    why: says why the commit carries the trailer, which it does; names no tool
+  - line: 'Assisted-by tag required, never clean the build dir)'
+    why: an AGENTS.md rule about the tag, not a use of a tool
+  - line: '- Non-standard rules that are easy to get wrong (e.g. no Signed-off-by, Assisted-by tag required, never clean the build dir)'
+    why: an AGENTS.md rule about the tag, not a use of a tool
+  - line: 'doc: Simplify the Assisted-by tag to match the Linux kernel'
+    why: a documentation change about the tag
+  - line: '"Assisted-by: LLM [TOOL1] [TOOL2]", recording only that an LLM was'
+    why: quotes the tag's documented format
+  - line: 'Assisted-by: LLM [TOOL1] [TOOL2]'
+    why: quotes the tag's documented format
+  - line: 'also covers disclosure of AI assistance.'
+    why: a sentence of the contribution policy, not a use of a tool
+  - line: 'As a separate note, PR #71457 contains a lot of technical description and possible solution which I claim is AI generated.'
+    why: says another pull request is AI-generated; discloses nothing of its own
+  - line: 'copilot: add GitHub Copilot instructions'
+    why: a commit subject whose area is "copilot", about a file for the tool

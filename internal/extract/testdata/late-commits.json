@@ -1,0 +1,47 @@
+{
+  "number": 70005,
+  "title": "common: tidy the option table",
+  "body": "Tidy only.\n\nAssisted-by: Gemini\n",
+  "state": "CLOSED",
+  "isDraft": true,
+  "createdAt": "2026-10-01T10:00:00Z",
+  "updatedAt": "2026-10-09T10:00:00.250Z",
+  "closedAt": "2026-10-09T10:00:00Z",
+  "mergedAt": null,
+  "baseRefName": "main",
+  "additions": 15,
+  "deletions": 15,
+  "changedFiles": 2,
+  "authorAssociation": "NONE",
+  "author": {
+    "login": "judy-example",
+    "__typename": "User"
+  },
+  "labels": [],
+  "commits": [
+    {
+      "authoredDate": "2026-10-03T08:00:00Z",
+      "committedDate": "2026-10-04T08:00:00Z",
+      "message": "common: tidy the option table\n"
+    },
+    {
+      "authoredDate": "2026-10-02T14:30:00+05:30",
+      "committedDate": "2026-10-07T20:00:00-04:00",
+      "message": "common: sort the options\n"
+    },
+    {
+      "authoredDate": "2026-10-05T08:00:00Z",
+      "committedDate": "2026-10-06T08:00:00Z",
+      "message": "common: fix a typo\n"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "timelineItems": [
+    {
+      "__typename": "ClosedEvent",
+      "createdAt": "2026-10-09T10:00:00Z"
+    }
+  ],
+  "fetchedAt": "2026-11-15T12:00:00Z"
+}

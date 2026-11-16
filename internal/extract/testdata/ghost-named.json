@@ -1,0 +1,92 @@
+{
+  "number": 12007,
+  "title": "jewel: osd: fix a leak",
+  "body": "backport of #11900",
+  "state": "MERGED",
+  "isDraft": false,
+  "createdAt": "2016-11-20T10:00:00Z",
+  "updatedAt": "2016-11-22T10:00:00Z",
+  "closedAt": "2016-11-22T09:00:00Z",
+  "mergedAt": "2016-11-22T09:00:00Z",
+  "baseRefName": "jewel",
+  "additions": 4,
+  "deletions": 1,
+  "changedFiles": 1,
+  "authorAssociation": "CONTRIBUTOR",
+  "author": {
+    "login": "ghost",
+    "__typename": "User"
+  },
+  "labels": [],
+  "commits": [
+    {
+      "oid": "1111111111111111111111111111111111111111",
+      "authoredDate": "2016-10-01T09:00:00Z",
+      "committedDate": "2016-11-20T09:00:00Z",
+      "message": "osd: fix a leak\n"
+    },
+    {
+      "oid": "2222222222222222222222222222222222222222",
+      "authoredDate": "2016-10-02T09:00:00Z",
+      "committedDate": "2016-11-20T09:05:00Z",
+      "message": "osd: test the leak\n"
+    },
+    {
+      "oid": "3333333333333333333333333333333333333333",
+      "authoredDate": "2016-11-21T09:00:00Z",
+      "committedDate": "2016-11-21T09:00:00Z",
+      "message": "Merge branch 'jewel'\n"
+    }
+  ],
+  "comments": [
+    {
+      "createdAt": "2016-11-21T10:00:00Z",
+      "body": "thanks!",
+      "author": {
+        "login": "ghost",
+        "__typename": "User"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "submittedAt": "2016-11-21T11:00:00Z",
+      "state": "APPROVED",
+      "author": {
+        "login": "ghost",
+        "__typename": "User"
+      }
+    }
+  ],
+  "timelineItems": [
+    {
+      "__typename": "MergedEvent",
+      "createdAt": "2016-11-22T09:00:00Z"
+    },
+    {
+      "__typename": "ClosedEvent",
+      "createdAt": "2016-11-22T09:00:00Z"
+    }
+  ],
+  "commitNames": {
+    "commits": [
+      {
+        "oid": "1111111111111111111111111111111111111111",
+        "author": "Kim Example",
+        "committer": "  Ivy   Example "
+      },
+      {
+        "oid": "2222222222222222222222222222222222222222",
+        "author": "Kim Example",
+        "committer": "Ivy Example"
+      },
+      {
+        "oid": "3333333333333333333333333333333333333333",
+        "author": "Ivy Example",
+        "committer": "GitHub"
+      }
+    ]
+  },
+  "fetchedAt": "2026-11-15T12:00:00Z",
+  "formatVersion": 1
+}

@@ -1,0 +1,22 @@
+/bin/
+/dist/
+coverage.out
+
+# Raw GitHub API responses: a local cache, rebuilt by `cephstats fetch`.
+/.cache/
+
+# The temporary file, .<name>.<random>.tmp, that a write killed before its
+# rename leaves beside its target.
+/data/**/.*.tmp
+
+# The site: dependencies, build output, and the data `cephstats rollup` writes.
+/site/node_modules/
+/site/dist/
+/site/public/data/
+/site/test-results/
+# The transpiled components svelte-check --tsgo writes for tsgo to read.
+/site/.svelte-check/
+
+# Local agent scratch and harness state.
+/.superpowers/
+/.claude/

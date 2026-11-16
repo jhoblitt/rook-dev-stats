@@ -1,0 +1,28 @@
+{
+  "number": 70004,
+  "updated": "2026-09-09T12:00:00Z",
+  "title": "mgr/dashboard: page the host list",
+  "author": {"login": "ivan-example", "bot": false},
+  "association": "member",
+  "base": "main",
+  "created": "2026-09-01T12:00:00Z",
+  "state": "open",
+  "draft": false,
+  "additions": 220,
+  "deletions": 35,
+  "files": 9,
+  "labels": ["dashboard"],
+  "commits": {"count": 2, "first_authored": "2026-08-30T08:00:00Z", "last_committed": "2026-09-08T16:00:01Z", "list": [
+    {"authored": "2026-08-30T08:00:00Z", "committed": "2026-09-08T16:00:00Z"},
+    {"authored": "2026-09-03T08:00:00Z", "committed": "2026-09-08T16:00:01Z"}
+  ]},
+  "prior_prs": null,
+  "events": [
+    {"at": "2026-09-02T08:00:00Z", "kind": "force_push"},
+    {"at": "2026-09-03T08:10:00Z", "kind": "force_push"},
+    {"at": "2026-09-08T16:01:00Z", "kind": "force_push"}
+  ],
+  "reviews": [],
+  "comments": [],
+  "disclosure": {"trailers": [], "description": [], "commit_prose": ["mgr/dashboard: Address Copilot review comments"]}
+}

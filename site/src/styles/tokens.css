@@ -1,0 +1,115 @@
+/*
+ * Design tokens. Each colour is one light-dark() pair, so the theme toggle
+ * only sets color-scheme. Values are the dataviz reference palette's
+ * surfaces, inks and blue ramp; text pairs clear WCAG AA on both surfaces.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Surfaces */
+  --page: light-dark(#f9f9f7, #0d0d0d);
+  --surface: light-dark(#fcfcfb, #1a1a19);
+
+  /* Ink. --text-faint is for axis ticks and large text only (3.4:1 on light). */
+  --text: light-dark(#0b0b0b, #f0efec);
+  --text-muted: light-dark(#52514e, #c3c2b7);
+  --text-faint: #898781;
+
+  /* Lines. --border-strong outlines controls: >= 3:1 on both surfaces. */
+  --border: light-dark(rgb(11 11 11 / 0.1), rgb(255 255 255 / 0.1));
+  --border-strong: #898781;
+  --grid: light-dark(#e1e0d9, #2c2c2a);
+  --baseline: light-dark(#c3c2b7, #383835);
+
+  /* Accent: links, the selected control, focus. Text-safe on both surfaces. */
+  --accent: light-dark(#256abf, #6da7ec);
+  --accent-ink: light-dark(#ffffff, #0b0b0b);
+  --accent-wash: light-dark(rgb(37 106 191 / 0.1), rgb(109 167 236 / 0.14));
+  --focus: var(--accent);
+
+  /*
+   * Sequential scale, low → high. One hue; light mode runs
+   * light → dark and dark mode flips the anchor, so low values recede into
+   * the surface in both.
+   */
+  --seq-1: light-dark(#cde2fb, #0d366b);
+  --seq-2: light-dark(#9ec5f4, #184f95);
+  --seq-3: light-dark(#6da7ec, #256abf);
+  --seq-4: light-dark(#3987e5, #3987e5);
+  --seq-5: light-dark(#256abf, #6da7ec);
+  --seq-6: light-dark(#184f95, #9ec5f4);
+  --seq-7: light-dark(#0d366b, #cde2fb);
+
+  /*
+   * Ink for a figure printed on --seq-N: whichever of the two inks has the
+   * higher contrast on that step, >= 4.6:1 everywhere.
+   */
+  --seq-ink-1: light-dark(#0b0b0b, #f0efec);
+  --seq-ink-2: light-dark(#0b0b0b, #f0efec);
+  --seq-ink-3: light-dark(#0b0b0b, #f0efec);
+  --seq-ink-4: #0b0b0b;
+  --seq-ink-5: light-dark(#ffffff, #0b0b0b);
+  --seq-ink-6: light-dark(#ffffff, #0b0b0b);
+  --seq-ink-7: light-dark(#ffffff, #0b0b0b);
+
+  /*
+   * Categorical series, in the palette's validated order (adjacent pairs pass
+   * the CVD and normal-vision checks in both modes). Slots 3, 4 and 5 are
+   * under 3:1 on the light surface, so every chart that uses them labels its
+   * marks and has a table view. What each slot stands for on the page is
+   * lib/colours.ts. --on-series is the ink for a label inside slots 1–4:
+   * near-black out-contrasts white on all four in both modes.
+   */
+  --series-1: light-dark(#2a78d6, #3987e5);
+  --series-2: light-dark(#eb6834, #d95926);
+  --series-3: light-dark(#1baf7a, #199e70);
+  --series-4: light-dark(#eda100, #c98500);
+  --series-5: light-dark(#e87ba4, #d55181);
+  --series-6: light-dark(#008300, #0ca30c);
+  --series-7: light-dark(#6250d6, #9085e9);
+  --series-8: light-dark(#e34948, #e66767);
+  --on-series: #0b0b0b;
+
+  /*
+   * An ordinal ramp of the palette's neutrals, low → high, for ordered bands
+   * that must not borrow a series hue. Passes the ordinal checks in both
+   * themes; dark mode flips the anchor as the sequential scale does.
+   */
+  --ordinal-1: light-dark(#898781, #52514e);
+  --ordinal-2: light-dark(#52514e, #898781);
+  --ordinal-3: light-dark(#383835, #c3c2b7);
+  --ordinal-4: light-dark(#0b0b0b, #f0efec);
+
+  /* Type */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-num: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.25rem;
+  --text-hero: clamp(3rem, 8vw, 4.5rem);
+  --leading: 1.6;
+
+  /* Space and shape */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --radius-sm: 4px;
+  --radius: 8px;
+  --content-max: 72rem;
+  --measure: 68ch;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}

@@ -1,0 +1,83 @@
+# Managed by github-conventions (references/commits.md); converge rewrites it.
+name: commitlint
+
+on:
+  pull_request:
+    # edited: a retitled PR must be linted again, or the check stays green
+    # for a title that no longer exists.
+    types: [opened, synchronize, reopened, edited]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Lint PR commit messages
+        uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed # v6.2.1
+        with:
+          configFile: .commitlintrc.yml
+
+      # Squash merges land on main under the PR title (the repository's
+      # squash_merge_commit_title is PR_TITLE), and semantic-release skips a
+      # subject it cannot parse, so the title meets the same rules as a
+      # commit. The commitlint major matches the one the action above
+      # bundles; the install is not lockfile-pinned, so install scripts stay
+      # off. commitlint resolves the config's `extends` from the config
+      # file's directory, so the config is linted from beside the install.
+      - name: Lint the PR title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          npm_config_ignore_scripts: "true"
+          # Nothing here calls the API; keep the token from the unlocked install.
+          GITHUB_TOKEN: ""
+        run: |
+          case $PR_TITLE in
+            '' | *$'\n'* | *$'\r'*)
+              echo "::error::the PR title must be a single non-empty line"
+              exit 1
+              ;;
+          esac
+          lint=$RUNNER_TEMP/commitlint
+          npm install --prefix "$lint" --no-save --no-package-lock --no-audit --no-fund \
+            @commitlint/cli@19.8.1 @commitlint/config-conventional@19.8.1
+          # A relative extends: or plugins: path in .commitlintrc.yml would
+          # resolve against $lint and break this step.
+          cp .commitlintrc.yml "$lint/"
+          # commitlint's default ignores pass merge, fixup!, Revert "…" and
+          # bare-version subjects, none of which semantic-release parses. A
+          # defaultIgnores key already in the config makes this a duplicate
+          # key, which fails the YAML parse rather than overriding it.
+          printf '\ndefaultIgnores: false\n' >>"$lint/.commitlintrc.yml"
+          if ! printf '%s\n' "$PR_TITLE" | "$lint/node_modules/.bin/commitlint" --config "$lint/.commitlintrc.yml"; then
+            case $PR_TITLE in
+              'Revert "'*)
+                echo "::error::retitle a revert as: revert: <subject of the reverted change>"
+                ;;
+            esac
+            exit 1
+          fi
+
+      - name: Reject undeclared breaking-change footers
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # GitHub runners ship Go, so no setup-go step is needed.
+        run: go run ./.github/tools/breaking-footer/main.go "$BASE_SHA" "$HEAD_SHA"

@@ -1,0 +1,3 @@
+commands:
+  - {id: make-check, name: jenkins test make check, pattern: 'jenkins test make check'}
+  - {id: retest, name: jenkins retest this please, pattern: 'jenkins retest this please'}

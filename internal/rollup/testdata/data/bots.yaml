@@ -1,0 +1,2 @@
+accounts:
+  - {login: ci-runner, why: posts test results as a user}

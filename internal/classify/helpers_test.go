@@ -1,0 +1,92 @@
+package classify_test
+
+import (
+	"os"
+	"path/filepath"
+	"time"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
+	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/ceph-dev-stats/internal/tables"
+)
+
+var specTables = map[string]string{
+	tables.ToolsFile: `
+trailer_keys: [assisted-by]
+phrases: ['generated with', 'assisted by']
+families:
+  - {id: cursor, name: Cursor, patterns: ['\bcursor\b']}
+  - {id: claude, name: Claude, patterns: [claude]}
+  - {id: gemini, name: Gemini, patterns: [gemini]}
+  - {id: unspecified, name: Unspecified, patterns: ['\bllm\b']}
+ignore:
+  - {line: 'Co-authored-by: Claude Dupont <c@example.com>', why: a person named Claude}
+  - {line: 'Assisted-by: nobody', why: a joke}
+  - {line: 'Generated with care', why: not a tool}
+  - {line: 'Made-with: Claude Dupont', why: a person named Claude}
+  - {line: 'by Gemini, said nobody', why: a joke}
+`,
+	tables.BotsFile: `
+accounts:
+  - {login: CI-User, why: posts test results}
+`,
+	tables.CommandsFile: `
+commands:
+  - {id: make-check, name: jenkins test make check, pattern: 'jenkins test make check'}
+  - {id: retest, name: jenkins retest this please, pattern: 'jenkins retest this please'}
+`,
+	tables.LabelsFile: `
+components:
+  - {id: rgw, name: RGW, labels: [rgw, 'rgw-*']}
+  - {id: cephfs, name: CephFS, labels: [cephfs]}
+process: [needs-review]
+other: [squid]
+`,
+	tables.KindsFile: `
+kinds:
+  - {id: bugfix, name: Bug fix}
+  - {id: feature, name: Feature}
+  - {id: docs, name: Documentation}
+  - {id: other, name: Other}
+checklist: {new_feature: feature, very_recent_bug: bugfix, doc_update: docs}
+tracker: {Bug: bugfix, Feature: feature, Backport: parent, Tasks: other}
+labels: {bug-fix: bugfix, feature: feature}
+order: [checklist, tracker, labels]
+`,
+}
+
+// loadTables loads specTables with any file replaced by its entry in
+// override.
+func loadTables(override map[string]string) *tables.Tables {
+	GinkgoHelper()
+	dir := GinkgoT().TempDir()
+	for name, content := range specTables {
+		if o, ok := override[name]; ok {
+			content = o
+		}
+		Expect(os.WriteFile(filepath.Join(dir, name), []byte(content), 0o600)).To(Succeed())
+	}
+	t, err := tables.Load(dir)
+	Expect(err).NotTo(HaveOccurred())
+	return t
+}
+
+var opened = time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC)
+
+// pr is a minimal open pull request by alice to main.
+func pr(number int) record.Record {
+	return record.Record{
+		Number:     number,
+		Author:     record.Actor{Login: "alice"},
+		Base:       "main",
+		Created:    opened,
+		State:      record.StateOpen,
+		Labels:     []string{},
+		Events:     []record.Event{},
+		Reviews:    []record.Review{},
+		Comments:   []record.Comment{},
+		Disclosure: record.Disclosure{Trailers: []string{}, Description: []string{}, CommitProse: []string{}},
+	}
+}
