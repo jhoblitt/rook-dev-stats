@@ -262,12 +262,12 @@ describe('prTimeline', () => {
       ['openedToLastCommit', 0, OPENED, OPENED],
       ['afterLastCommit', 6, OPENED - 86400, OPENED + 5 * 86400],
     ]);
-    // On a branch other than main, but linking no original: not worded as a backport.
+    // On a branch other than master, but linking no original: not worded as a backport.
     expect(tl.spans[0]?.text).toBe('First commit to opened: 30 days');
   });
 
   describe('the backport wording, only for a PR that links the original it backports', () => {
-    const bases = { bases: ['main', 'squid', 'wip-feature-x'] };
+    const bases = { bases: ['master', 'squid', 'wip-feature-x'] };
     const row = (base: number): Row => ({ number: 26000, created: OPENED, first_commit: OPENED - 30 * DAY, state: 1, closed: OPENED + DAY, base });
     const linking = (original: number): TableYear => ({ ...table(1, []), backport_of: [original] });
     const titles = (base: number, original: number) =>
@@ -294,25 +294,17 @@ describe('prTimeline', () => {
     });
   });
 
-  describe('a PR on master, the development branch before its rename to main', () => {
-    const bases = { bases: ['main', 'master', 'nautilus'] };
+  describe('a PR on master, the development branch', () => {
+    const bases = { bases: ['master', 'release-1.21'] };
     const row = (base: number): Row => ({ number: 26000, created: OPENED, first_commit: OPENED - 30 * DAY, state: 1, closed: OPENED + DAY, base });
 
-    it('is original work, its first span the time from its first commit, as on main', () => {
-      const tl = prTimeline(dataset([row(1)], [], bases), 0, table(1, []));
-      expect(tl.spans[0]?.text).toBe('First commit to opened: 30 days');
+    it('is original work, its first span the time from its first commit, as on a release branch', () => {
       expect(prTimeline(dataset([row(0)], [], bases), 0, table(1, [])).spans[0]?.text).toBe('First commit to opened: 30 days');
-      expect(prTimeline(dataset([row(2)], [], bases), 0, table(1, [])).spans[0]?.text).toBe('First commit to opened: 30 days');
+      expect(prTimeline(dataset([row(1)], [], bases), 0, table(1, [])).spans[0]?.text).toBe('First commit to opened: 30 days');
     });
 
-    it('keeps its branch’s name and says that it is the development branch', () => {
-      const tl = prTimeline(dataset([row(1)], [], bases), 0, table(1, []));
-      expect([tl.base, tl.baseNote]).toEqual([
-        'master',
-        'On master, so under the main target: main is the development branch, named master until its rename.',
-      ]);
-      expect(prTimeline(dataset([row(0)], [], bases), 0, table(1, [])).baseNote).toBeNull();
-      expect(prTimeline(dataset([row(2)], [], bases), 0, table(1, [])).baseNote).toBeNull();
+    it('keeps its branch’s name', () => {
+      expect(prTimeline(dataset([row(0)], [], bases), 0, table(1, [])).base).toBe('master');
     });
   });
 

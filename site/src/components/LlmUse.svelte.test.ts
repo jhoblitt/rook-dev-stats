@@ -110,7 +110,7 @@ describe('LlmUse', () => {
     expect(region.textContent).toMatch(/kind, size and author/);
     expect(region.textContent).toMatch(/Disclosed PRs are newer on average, so the share merged at a long horizon is about fewer of them,\s+and only their earliest ones, opened when disclosure was rarer\. To compare PRs of like size, use the Size filter\./);
     const link = within(region).getByRole('link', { name: /How disclosure is detected/ });
-    expect(link.getAttribute('href')).toBe('#/methods?target=main&section=disclosure');
+    expect(link.getAttribute('href')).toBe('#/methods?target=master&section=disclosure');
   });
 
   it('says "no PRs match" in every chart when the selection is empty', async () => {

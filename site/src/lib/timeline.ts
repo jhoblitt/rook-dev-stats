@@ -6,7 +6,7 @@
 
 import { TIMELINE_COLOURS as C } from './colours';
 import { type Commit, type Dataset, PR_STATE, type TableYear, locateEvent, locateRow } from './data';
-import { DAY, DISCLOSED, NOT_DISCLOSED, baseNote } from './filters';
+import { DAY, DISCLOSED, NOT_DISCLOSED } from './filters';
 import { formatCount, formatDays } from './format';
 import { type Handle, isBot, personHandle } from './handles';
 import { commitUrl, eventUrl, prUrl } from './links';
@@ -158,8 +158,6 @@ export interface PrTimeline {
   repo: string;
   url: string;
   base: string;
-  /** What the base is, when the `main` target holds it under another name; else null. */
-  baseNote: string | null;
   created: number;
   /** Merged or closed unmerged at the last such event, or open as of the last fetch. */
   disposition: Disposition;
@@ -386,7 +384,6 @@ export function prTimeline(data: Dataset, row: number, table: TableYear): PrTime
     repo: meta.repo,
     url,
     base,
-    baseNote: baseNote(base),
     created,
     disposition,
     firstCommit: first >= 0 ? first : null,

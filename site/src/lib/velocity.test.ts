@@ -8,7 +8,7 @@ import { weekly } from './stats/weekly';
 import { COLOURS } from './colours';
 import { backlogModel, prsModel } from './velocity';
 
-// The default view: PRs on main, 2026-05-15 to 2026-11-15, 27 weeks from 2026-05-11.
+// The default view: PRs on master, 2026-05-15 to 2026-11-15, 27 weeks from 2026-05-11.
 const data = fixture();
 const filters = defaultFilters(META);
 const period = periodRange(filters);

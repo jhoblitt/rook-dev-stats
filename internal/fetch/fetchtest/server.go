@@ -380,6 +380,18 @@ func node(pr *fetch.Entry, nested int) map[string]any {
 	for _, c := range ghapi.Connections {
 		n[string(c)] = page(connectionNodes(pr, c), 0, nested)
 	}
+	issues := []any{}
+	for _, is := range pr.ClosingIssues {
+		labels := []any{}
+		for _, l := range is.Labels {
+			labels = append(labels, l)
+		}
+		issues = append(issues, map[string]any{
+			"number": is.Number, "repository": map[string]any{"nameWithOwner": is.Repository},
+			"labels": map[string]any{"nodes": labels},
+		})
+	}
+	n["closingIssuesReferences"] = map[string]any{"nodes": issues}
 	return n
 }
 

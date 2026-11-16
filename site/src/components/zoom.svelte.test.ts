@@ -47,7 +47,7 @@ describe('zooming the report from a chart', () => {
     const from = screen.getByLabelText('From') as HTMLInputElement;
     expect(from.value).toBe('2026-05-15');
     await drag(brushOf(/^PRs opened, merged and closed unmerged, per /), cols.centre(column('2026-06-29')), cols.centre(column('2026-07-20')));
-    expect(loc.hash()).toBe('#/?target=main&from=2026-06-29&to=2026-07-26');
+    expect(loc.hash()).toBe('#/?target=master&from=2026-06-29&to=2026-07-26');
     expect(from.value).toBe('2026-06-29');
     expect((screen.getByLabelText('To') as HTMLInputElement).value).toBe('2026-07-26');
     // The week chosen before is outside the new period, so it is cleared, as any change of the period clears it.

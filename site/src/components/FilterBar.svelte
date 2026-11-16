@@ -5,7 +5,6 @@
     type Choice,
     DISCLOSURES,
     type Filters,
-    MAIN_TARGET_NOTE,
     SIZE_BANDS,
     STANDING_BANDS,
     TARGETS,
@@ -322,7 +321,7 @@
     </div>
   </div>
 
-  <fieldset aria-describedby="{uid}-target-hint">
+  <fieldset>
     <legend>Target</legend>
     <div class="segmented">
       {#each TARGETS as t (t.id)}
@@ -338,7 +337,6 @@
         </label>
       {/each}
     </div>
-    <p class="hint target-hint" id="{uid}-target-hint">{MAIN_TARGET_NOTE}</p>
   </fieldset>
 
   <div class="field">
@@ -591,10 +589,6 @@
 
   .hint {
     max-width: 16rem;
-  }
-
-  .target-hint {
-    margin-top: var(--space-1);
   }
 
   /* Out of the flow while empty, but still rendered, so the live region announces. */

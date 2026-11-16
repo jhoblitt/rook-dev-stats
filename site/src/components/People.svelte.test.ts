@@ -150,7 +150,7 @@ describe('People', () => {
     render(App, props);
     const lines = () => within(table('Authors')).getByRole('button', { name: /^Lines changed/ });
     await fireEvent.click(lines());
-    expect(loc.hash()).toBe('#/?target=main&authorsort=-lines');
+    expect(loc.hash()).toBe('#/?target=master&authorsort=-lines');
     expect(lines().closest('th')?.getAttribute('aria-sort')).toBe('descending');
     expect(cells('Authors').map((r) => [r[0], r[1], r[9]])).toEqual([
       ['1', 'fixture-author-i', '2,200'],
@@ -161,7 +161,7 @@ describe('People', () => {
       ['6', 'fixture-author-e', '4'],
     ]);
     await fireEvent.click(lines());
-    expect(loc.hash()).toBe('#/?target=main&authorsort=lines');
+    expect(loc.hash()).toBe('#/?target=master&authorsort=lines');
     expect(cells('Authors')[0]?.slice(0, 2)).toEqual(['1', 'fixture-author-e']);
   });
 
@@ -169,7 +169,7 @@ describe('People', () => {
     const { props, loc } = await fixturePage('');
     render(App, props);
     await fireEvent.click(within(table('Reviewers')).getByRole('button', { name: /^Reviewer/ }));
-    expect(loc.hash()).toBe('#/?target=main&reviewersort=reviewer');
+    expect(loc.hash()).toBe('#/?target=master&reviewersort=reviewer');
     expect(people('Reviewers')[0]).toBe('fixture-author-a');
   });
 
@@ -206,7 +206,7 @@ describe('People', () => {
     const { props, loc } = await fixturePage('');
     render(App, props);
     await fireEvent.click(within(table('Reviewers')).getByRole('button', { name: 'Filter by fixture-author-f as reviewer' }));
-    expect(loc.hash()).toBe('#/?target=main&reviewer=fixture-author-f');
+    expect(loc.hash()).toBe('#/?target=master&reviewer=fixture-author-f');
     // The PRs f reviewed in the period: #64010, #66500 and #67100.
     const prs = within(screen.getByRole('region', { name: 'Pull requests' }));
     expect(prs.getByRole('status').textContent).toBe('3 PRs open at some point in the period, 2 of them opened in it');
@@ -287,7 +287,7 @@ describe('People with deleted accounts', () => {
     const { props, loc } = await fixturePage('', deletedFiles());
     render(App, props);
     await fireEvent.click(within(table('Authors')).getByRole('button', { name: `Filter by (deleted) ${NAME_B} as author` }));
-    expect(loc.hash()).toBe(`#/?target=main&author=${encodeURIComponent(`ghost:${NAME_B}`)}`);
+    expect(loc.hash()).toBe(`#/?target=master&author=${encodeURIComponent(`ghost:${NAME_B}`)}`);
     expect(people('Authors')).toEqual([`(deleted) ${NAME_B}`]);
   });
 });

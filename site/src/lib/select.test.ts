@@ -4,9 +4,9 @@ import rawMeta from './__fixtures__/data/meta.json';
 import prs2026 from './__fixtures__/data/prs-2026.json';
 import { NAMED_A, NAMED_B, NAME_A, NAME_B, POOLED, deletedMeta } from './__fixtures__/deleted';
 import { combine, parseMeta, parseYear } from './data';
-import { type BackportLink, type Filters, type Target, dayOf, dayStart, isDevelopmentBranch, periodRange } from './filters';
+import { type BackportLink, type Filters, type Target, dayOf, dayStart, periodRange } from './filters';
 import { branchChoices, openedIn, openedInBucket, select } from './select';
-import { defaultFilters, hashFromState, stateFromHash } from './state';
+import { defaultFilters } from './state';
 import { META, all, at, dataset } from './stats/testing';
 import { weekly } from './stats/weekly';
 
@@ -30,7 +30,7 @@ describe('select', () => {
   });
 
   it.each([
-    ['target main', { target: 'main' }, [0, 2, 3, 4, 5, 6, 8, 9, 10]],
+    ['target master', { target: 'master' }, [0, 2, 3, 4, 5, 6, 8, 9, 10]],
     ['target backports and other branches', { target: 'backports' }, [1, 7, 11]],
     ['component rgw', { component: 'rgw' }, [0, 3, 7, 9]],
     ['component mgr, one of two on #66900', { component: 'mgr' }, [5, 8, 10]],
@@ -60,7 +60,7 @@ describe('select', () => {
   });
 
   it('combines filters', () => {
-    expect(rows({ target: 'main', disclosure: 'disclosed', size: 'gt1000' })).toEqual([9]);
+    expect(rows({ target: 'master', disclosure: 'disclosed', size: 'gt1000' })).toEqual([9]);
   });
 
   it('selects nothing for a component meta does not name', () => {
@@ -72,7 +72,7 @@ describe('select', () => {
   });
 
   it('combines the kind with the other filters', () => {
-    expect(rows({ target: 'main', kind: 'bugfix' })).toEqual([0, 3]);
+    expect(rows({ target: 'master', kind: 'bugfix' })).toEqual([0, 3]);
   });
 });
 
@@ -122,7 +122,7 @@ describe('the Author and Reviewer filters', () => {
   it('combine with each other and with the other filters', () => {
     expect(rows({ author: 'fixture-author-d', reviewer: 'fixture-author-f' })).toEqual([3, 10]);
     expect(rows({ author: 'fixture-author-d', reviewer: 'fixture-author-e' })).toEqual([10]);
-    expect(rows({ target: 'main', reviewer: 'fixture-author-e' })).toEqual([2, 10]);
+    expect(rows({ target: 'master', reviewer: 'fixture-author-e' })).toEqual([2, 10]);
   });
 
   it('keep a PR a deleted account commented on though another deleted account opened it, as the Reviewers table counts it', () => {
@@ -176,22 +176,19 @@ describe('the Author and Reviewer filters', () => {
   });
 });
 
-describe('the development branch under both its names', () => {
-  // ceph/ceph's development branch was `master` until its rename to `main`.
-  // Bases sorted as the rollup sorts them; nautilus is a release branch and
-  // wip-feature a feature branch, both "other".
-  const meta = { ...META, bases: ['main', 'master', 'nautilus', 'wip-feature'], window_start: at('2019-01-01T00:00:00Z') };
-  const MAIN = 0;
-  const MASTER = 1;
-  const NAUTILUS = 2;
-  const FEATURE = 3;
+describe('the development branch', () => {
+  // Bases sorted as the rollup sorts them; release-1.21 is a release branch
+  // and wip-feature a feature branch, both "other".
+  const meta = { ...META, bases: ['master', 'release-1.21', 'wip-feature'], window_start: at('2019-01-01T00:00:00Z') };
+  const MASTER = 0;
+  const RELEASE = 1;
+  const FEATURE = 2;
   const d = dataset(
     [
       { number: 26000, created: at('2019-03-01T00:00:00Z'), closed: at('2019-03-10T00:00:00Z'), state: 1, base: MASTER },
-      { number: 26100, created: at('2019-04-01T00:00:00Z'), closed: at('2019-04-10T00:00:00Z'), state: 1, base: NAUTILUS },
-      // Opened on master and moved to main by the rename while still open.
-      { number: 27000, created: at('2019-05-01T00:00:00Z'), closed: at('2023-01-10T00:00:00Z'), state: 1, base: MAIN },
-      { number: 50000, created: at('2023-03-01T00:00:00Z'), closed: at('2023-03-05T00:00:00Z'), state: 1, base: MAIN },
+      { number: 26100, created: at('2019-04-01T00:00:00Z'), closed: at('2019-04-10T00:00:00Z'), state: 1, base: RELEASE },
+      { number: 27000, created: at('2019-05-01T00:00:00Z'), closed: at('2023-01-10T00:00:00Z'), state: 1, base: MASTER },
+      { number: 50000, created: at('2023-03-01T00:00:00Z'), closed: at('2023-03-05T00:00:00Z'), state: 1, base: MASTER },
       { number: 50100, created: at('2023-04-01T00:00:00Z'), closed: at('2023-04-05T00:00:00Z'), state: 2, base: FEATURE },
     ],
     [],
@@ -199,29 +196,16 @@ describe('the development branch under both its names', () => {
   );
   const of = (patch: Partial<Filters>) => [...select(d, { ...defaultFilters(d.meta), from: '2019-01-01', to: '2023-12-31', ...patch })];
 
-  it('names main and master the development branch, and no other branch', () => {
-    expect(['main', 'master', 'nautilus', 'reef', 'wip-feature', 'Main', 'master-old'].filter(isDevelopmentBranch)).toEqual(['main', 'master']);
-  });
-
-  it('keeps a PR on master from 2019 under the main target, and not under backports', () => {
-    expect(of({ target: 'main' })).toEqual([0, 2, 3]);
+  it('keeps a PR on master under the master target, and not under backports', () => {
+    expect(of({ target: 'master' })).toEqual([0, 2, 3]);
     expect(of({ target: 'backports' })).toEqual([1, 4]);
     expect(of({ target: 'all' })).toEqual([0, 1, 2, 3, 4]);
   });
 
-  it('keeps a release branch from the same year under backports, and not under main', () => {
-    expect(of({ target: 'main', from: '2019-01-01', to: '2019-12-31' })).toEqual([0, 2]);
+  it('keeps a release branch from the same year under backports, and not under master', () => {
+    expect(of({ target: 'master', from: '2019-01-01', to: '2019-12-31' })).toEqual([0, 2]);
     expect(of({ target: 'backports', from: '2019-01-01', to: '2019-12-31' })).toEqual([1]);
     expect(of({ target: 'all', from: '2019-01-01', to: '2019-12-31' })).toEqual([0, 1, 2]);
-  });
-
-  it('reads an address made before master counted with the same target, which now keeps master', () => {
-    const hash = '#/?target=main&from=2019-01-01&to=2019-12-31';
-    const state = stateFromHash(hash, d.meta);
-    expect(state.filters.target).toBe('main');
-    expect(hashFromState(state, d.meta)).toBe(hash);
-    expect([...select(d, state.filters)]).toEqual([0, 2]);
-    expect(stateFromHash('#/?target=backports&from=2019-01-01&to=2019-12-31', d.meta).filters.target).toBe('backports');
   });
 });
 
@@ -281,21 +265,21 @@ describe('openedIn', () => {
 describe('the Branch and Backport link filters', () => {
   // Bases sorted as the rollup sorts them, names with each character a branch
   // name holds beside letters.
-  const bases = ['feature/ptl-ci-test', 'main', 'master', 'pacific-16.2.7_RC1', 'reef', 'squid'];
-  const [FEATURE, MAIN, MASTER, PACIFIC_RC, REEF, SQUID] = [0, 1, 2, 3, 4, 5];
+  const bases = ['feature/ptl-ci-test', 'master', 'pacific-16.2.7_RC1', 'reef', 'squid'];
+  const [FEATURE, MASTER, PACIFIC_RC, REEF, SQUID] = [0, 1, 2, 3, 4];
   const meta = { ...META, bases, window_start: at('2019-01-01T00:00:00Z') };
   const t = (day: string) => at(`${day}T00:00:00Z`);
   const d = dataset(
     [
       { number: 100, created: t('2019-03-01'), closed: t('2019-03-10'), state: 1, base: MASTER },
-      { number: 101, created: t('2023-03-01'), closed: t('2023-03-05'), state: 1, base: MAIN, backport_link: 1 },
+      { number: 101, created: t('2023-03-01'), closed: t('2023-03-05'), state: 1, base: MASTER, backport_link: 1 },
       { number: 102, created: t('2023-04-01'), closed: t('2023-04-05'), state: 1, base: REEF, backport_link: 1 },
       { number: 103, created: t('2023-05-01'), closed: t('2023-05-05'), state: 1, base: REEF },
       { number: 104, created: t('2024-05-01'), closed: t('2024-05-05'), state: 1, base: REEF, backport_link: 1 },
       { number: 105, created: t('2024-06-01'), closed: t('2024-06-05'), state: 2, base: SQUID, backport_link: 1 },
       { number: 106, created: t('2024-07-01'), closed: t('2024-07-05'), state: 1, base: FEATURE },
       { number: 107, created: t('2021-12-01'), closed: t('2021-12-05'), state: 1, base: PACIFIC_RC, backport_link: 1 },
-      { number: 108, created: t('2024-08-01'), closed: t('2024-08-05'), state: 1, base: MAIN },
+      { number: 108, created: t('2024-08-01'), closed: t('2024-08-05'), state: 1, base: MASTER },
     ],
     [],
     meta,
@@ -304,12 +288,11 @@ describe('the Branch and Backport link filters', () => {
   const of = (patch: Partial<Filters>) => [...select(d, { ...whole, ...patch })];
 
   it.each([
-    ['main: main', 'main', 'main', [1, 8]],
-    ['main: master', 'main', 'master', [0]],
+    ['master: master', 'master', 'master', [0, 1, 8]],
     ['backports and other branches: reef', 'backports', 'reef', [2, 3, 4]],
     ['backports and other branches: a name with a slash', 'backports', 'feature/ptl-ci-test', [6]],
     ['backports and other branches: a name with dots and an underscore', 'backports', 'pacific-16.2.7_RC1', [7]],
-    ['all: master', 'all', 'master', [0]],
+    ['all: master', 'all', 'master', [0, 1, 8]],
     ['all: squid', 'all', 'squid', [5]],
   ] satisfies [string, Target, string, number[]][])('a branch under the target %s', (_name, target, base, expected) => {
     expect(of({ target, base })).toEqual(expected);
@@ -335,17 +318,14 @@ describe('the Branch and Backport link filters', () => {
     expect(of({ target: 'backports', base: 'reef', backportLink: 'unlinked' })).toEqual([3]);
     expect(of({ target: 'backports', base: 'reef', backportLink: 'linked' })).toEqual([2, 4]);
     expect(of({ target: 'backports', base: 'reef', backportLink: 'linked', from: '2024-01-01' })).toEqual([4]);
-    expect(of({ target: 'main', backportLink: 'linked' })).toEqual([1]);
+    expect(of({ target: 'master', backportLink: 'linked' })).toEqual([1]);
   });
 
   describe('branchChoices', () => {
     const choices = (patch: Partial<Filters>) => branchChoices(d, { ...whole, ...patch });
 
-    it('lists the branches of the main target, most PRs in the period first', () => {
-      expect(choices({ target: 'main' })).toEqual([
-        { base: 'main', count: 2 },
-        { base: 'master', count: 1 },
-      ]);
+    it('lists the branch of the master target with its count', () => {
+      expect(choices({ target: 'master' })).toEqual([{ base: 'master', count: 3 }]);
     });
 
     it('lists every other branch under backports and other branches, ties by name', () => {
@@ -359,10 +339,9 @@ describe('the Branch and Backport link filters', () => {
 
     it('lists every branch under all', () => {
       expect(choices({ target: 'all' }).map((c) => c.base)).toEqual([
-        'reef',
-        'main',
-        'feature/ptl-ci-test',
         'master',
+        'reef',
+        'feature/ptl-ci-test',
         'pacific-16.2.7_RC1',
         'squid',
       ]);

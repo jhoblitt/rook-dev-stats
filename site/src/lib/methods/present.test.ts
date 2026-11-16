@@ -98,7 +98,7 @@ describe('inline figures on the fixture', () => {
 });
 
 describe('the deleted accounts’ figures', () => {
-  // Ada two PRs, Åsa one, the pooled entry one, on main in the period.
+  // Ada two PRs, Åsa one, the pooled entry one, on master in the period.
   const t = at('2026-06-01T00:00:00Z');
   const named = dataset(
     [NAMED_A, NAMED_A, NAMED_B, POOLED].map((author) => ({ created: t, author })),
@@ -242,7 +242,7 @@ describe('table figures on the fixture', () => {
   });
 
   it('sets side by side the two groups the AI-use section compares over the last six months', () => {
-    // Rows 3, 4, 5, 6, 8, 9 and 10: main, opened in the period.
+    // Rows 3, 4, 5, 6, 8, 9 and 10: master, opened in the period.
     expect(model('table.disclosureGroups')).toEqual({
       caption:
         'The 7 pull requests on the development branch opened in the last 6 months, 2026-05-15 to 2026-11-15, those the AI-use section compares over those months with every other filter as the report opens, by disclosure, as of 2026-11-15',

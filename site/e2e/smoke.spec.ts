@@ -8,7 +8,7 @@
 import { type Locator, type Page, expect, test } from '@playwright/test';
 
 const REPO = 'https://github.com/jhoblitt/rook-dev-stats';
-const DATA_REPO = 'https://github.com/ceph/ceph';
+const DATA_REPO = 'https://github.com/rook/rook';
 /** GitHub's form of a login (`site/src/lib/handles.ts`), as a user page's address. */
 const USER_PAGE = /^https:\/\/github\.com\/[A-Za-z0-9][A-Za-z0-9-]{0,38}$/;
 
@@ -126,7 +126,7 @@ test('an address naming a section opens there once the page settles, and each se
   }
   await expect(page.getByRole('link', { name: 'Link to the Review section', exact: true })).toHaveAttribute(
     'href',
-    /#\/\?target=main&section=review$/,
+    /#\/\?target=master&section=review$/,
   );
 });
 
@@ -141,7 +141,7 @@ test('the page opens on the whole history, the last six months one choice away a
   // The whole window: the first day the start may take, and no period in the address.
   await expect(from).toHaveValue((await from.getAttribute('min')) ?? '');
   await expect(page).not.toHaveURL(/[#&?](from|to)=/);
-  await expect(page.getByRole('group', { name: 'Target' }).getByRole('radio', { name: 'main' })).toBeChecked();
+  await expect(page.getByRole('group', { name: 'Target' }).getByRole('radio', { name: 'master' })).toBeChecked();
   const whole = await headline(page);
 
   await recent.click();
@@ -158,7 +158,7 @@ test('the page opens on the whole history, the last six months one choice away a
 test('changing the Target filter changes the headline figures', async ({ page }) => {
   await open(page);
   const target = page.getByRole('group', { name: 'Target' });
-  await expect(target.getByRole('radio', { name: 'main' })).toBeChecked();
+  await expect(target.getByRole('radio', { name: 'master' })).toBeChecked();
   const before = await headline(page);
   expect(before).not.toBe('');
 
@@ -291,7 +291,7 @@ test('an address with an unknown filter value loads the defaults', async ({ page
   const fresh = await context.newPage();
   await open(fresh, '#/?target=no-such-target&size=no-such-size&component=no-such-component&drafts=no-such-choice');
   await expect(fresh).toHaveURL(address);
-  await expect(fresh.getByRole('group', { name: 'Target' }).getByRole('radio', { name: 'main' })).toBeChecked();
+  await expect(fresh.getByRole('group', { name: 'Target' }).getByRole('radio', { name: 'master' })).toBeChecked();
   await expect(countsChart(fresh)).toHaveAccessibleDescription(defaults);
   await fresh.close();
 });
@@ -411,7 +411,7 @@ test('on the whole history the Timelines’ calendar covers only the stretch its
   const last = Date.parse(`${to}T00:00:00Z`);
   const figure = lanesChart(page);
   await figure.scrollIntoViewIfNeeded();
-  // Every label naming a day or a month names one in the half-year before the period's last day, not 2011.
+  // Every label naming a day or a month names one in the half-year before the period's last day, not 2016.
   const dated = (await figure.locator('.axis-x text').allTextContents()).filter((l) => /[A-Z][a-z]{2}/.test(l));
   expect(dated.length).toBeGreaterThan(0);
   for (const label of dated) {

@@ -127,7 +127,7 @@ describe('the note on reviews before GitHub recorded them', () => {
     expect(note.textContent).toContain('In the Review, AI use and People sections');
     expect(note.textContent).toContain('its first responses count only comments then, not reviews');
     expect(within(note).getByRole('link').getAttribute('href')).toBe(
-      '#/methods?target=main&section=limits-reviews-before-github-recorded-them',
+      '#/methods?target=master&section=limits-reviews-before-github-recorded-them',
     );
     for (const name of ['Review', 'AI use', 'People']) {
       const region = screen.getByRole('region', { name });
@@ -279,7 +279,7 @@ describe('Review', () => {
   });
 
   it('names the first span for backports when only PRs that link their originals are selected, whatever the target', async () => {
-    for (const hash of ['#/?target=backports&backport=linked', '#/?target=main&backport=linked']) {
+    for (const hash of ['#/?target=backports&backport=linked', '#/?target=master&backport=linked']) {
       render(App, (await fixturePage(hash)).props);
       expect(figure('Original work to backport opened').textContent, hash).not.toContain('For a backport');
       expect(figure('Original work to backport opened, by week opened')).toBeTruthy();
@@ -359,6 +359,6 @@ describe('Review', () => {
     render(App, props);
     const f = figure('Wait to merge, by week opened');
     await fireEvent.click(within(f).getByRole('button', { name: /^week of 2026-07-06:/ }));
-    expect(loc.hash()).toBe('#/?target=main&week=2026-07-06');
+    expect(loc.hash()).toBe('#/?target=master&week=2026-07-06');
   });
 });

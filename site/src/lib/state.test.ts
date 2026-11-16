@@ -28,7 +28,7 @@ const defaults: AppState = {
   filters: {
     from: '2026-05-15',
     to: '2026-11-15',
-    target: 'main',
+    target: 'master',
     base: null,
     backportLink: null,
     component: null,
@@ -103,7 +103,7 @@ describe('round trip through the hash', () => {
     ['period', { filters: { ...defaults.filters, from: '2026-07-01', to: '2026-07-31' } }],
     ['target all', { filters: { ...defaults.filters, target: 'all' } }],
     ['target backports', { filters: { ...defaults.filters, target: 'backports' } }],
-    ['branch under main', { filters: { ...defaults.filters, base: 'main' } }],
+    ['branch under master', { filters: { ...defaults.filters, base: 'master' } }],
     ['branch under backports', { filters: { ...defaults.filters, target: 'backports', base: 'reef' } }],
     ['branch under all', { filters: { ...defaults.filters, target: 'all', base: 'tentacle' } }],
     ['backport link', { filters: { ...defaults.filters, backportLink: 'linked' } }],
@@ -139,7 +139,7 @@ describe('round trip through the hash', () => {
   });
 
   it('writes only the target for the defaults, so the default period follows the data', () => {
-    expect(hashFromState(defaults, meta)).toBe('#/?target=main');
+    expect(hashFromState(defaults, meta)).toBe('#/?target=master');
   });
 
   it('writes a period that differs from the default', () => {
@@ -149,35 +149,35 @@ describe('round trip through the hash', () => {
   });
 
   it('writes the start beside an end of its own, even the default start', () => {
-    expect(hashFromState(withFilters({ to: '2026-08-31' }), meta)).toBe('#/?target=main&from=2026-05-15&to=2026-08-31');
+    expect(hashFromState(withFilters({ to: '2026-08-31' }), meta)).toBe('#/?target=master&from=2026-05-15&to=2026-08-31');
   });
 
   it('writes the kind as its id after the component, or unknown', () => {
     expect(hashFromState(withFilters({ component: 'rgw', kind: 'feature' }), meta)).toBe(
-      '#/?target=main&component=rgw&kind=feature',
+      '#/?target=master&component=rgw&kind=feature',
     );
-    expect(hashFromState(withFilters({ kind: 'unknown' }), meta)).toBe('#/?target=main&kind=unknown');
+    expect(hashFromState(withFilters({ kind: 'unknown' }), meta)).toBe('#/?target=master&kind=unknown');
   });
 
   it('writes the branch and the backport link right after the target', () => {
     expect(
       hashFromState(withFilters({ target: 'backports', base: 'reef', backportLink: 'unlinked', component: 'rgw' }), meta),
     ).toBe('#/?target=backports&base=reef&backport=unlinked&component=rgw');
-    expect(hashFromState(withFilters({ backportLink: 'linked' }), meta)).toBe('#/?target=main&backport=linked');
+    expect(hashFromState(withFilters({ backportLink: 'linked' }), meta)).toBe('#/?target=master&backport=linked');
   });
 
   it('writes the author and the reviewer as logins, after the other filters', () => {
     expect(hashFromState(withFilters({ reopenedOnly: true, author: 'fixture-author-a', reviewer: 'fixture-author-e' }), meta)).toBe(
-      '#/?target=main&reopened=only&author=fixture-author-a&reviewer=fixture-author-e',
+      '#/?target=master&reopened=only&author=fixture-author-a&reviewer=fixture-author-e',
     );
   });
 
   it('writes the table sort last, as a column or a minus and a column, and leaves out the default', () => {
     expect(hashFromState({ ...defaults, pr: 66600, sort: { column: 'size', descending: false } }, meta)).toBe(
-      '#/?target=main&pr=66600&sort=size',
+      '#/?target=master&pr=66600&sort=size',
     );
-    expect(hashFromState({ ...defaults, sort: { column: 'title', descending: true } }, meta)).toBe('#/?target=main&sort=-title');
-    expect(hashFromState({ ...defaults, sort: { column: 'opened', descending: true } }, meta)).toBe('#/?target=main');
+    expect(hashFromState({ ...defaults, sort: { column: 'title', descending: true } }, meta)).toBe('#/?target=master&sort=-title');
+    expect(hashFromState({ ...defaults, sort: { column: 'opened', descending: true } }, meta)).toBe('#/?target=master');
   });
 
   it("writes the People tables' orders and the bots after the PR table's order, leaving out the defaults", () => {
@@ -192,8 +192,8 @@ describe('round trip through the hash', () => {
         },
         meta,
       ),
-    ).toBe('#/?target=main&sort=-size&authorsort=-lines&reviewersort=first&bots=show');
-    expect(hashFromState({ ...defaults, authorSort: { column: 'opened', descending: true } }, meta)).toBe('#/?target=main');
+    ).toBe('#/?target=master&sort=-size&authorsort=-lines&reviewersort=first&bots=show');
+    expect(hashFromState({ ...defaults, authorSort: { column: 'opened', descending: true } }, meta)).toBe('#/?target=master');
   });
 
   it('puts the route in the hash path', () => {
@@ -214,7 +214,7 @@ describe('unknown values fall back to their defaults', () => {
     ['branch named in another case', '#/?base=MAIN'],
     ['branch that is empty', '#/?base='],
     ['branch named like a prototype key', '#/?base=__proto__'],
-    ['branch outside the target', '#/?target=main&base=reef'],
+    ['branch outside the target', '#/?target=master&base=reef'],
     ['backport link', '#/?backport=maybe'],
     ['component', '#/?component=no-such-component'],
     ['component named like a prototype key', '#/?component=__proto__'],
@@ -279,13 +279,13 @@ describe('the author filter in the address, with deleted accounts', () => {
     const state = { ...defaultState(named), filters: { ...defaultFilters(named), author: `ghost:${name}` } };
     const hash = hashFromState(state, named);
     // The name is encoded, so nothing in it ends the parameter or starts another.
-    expect(hash).toBe(`#/?target=main&author=${encodeURIComponent(`ghost:${name}`)}`);
+    expect(hash).toBe(`#/?target=master&author=${encodeURIComponent(`ghost:${name}`)}`);
     expect(stateFromHash(hash, named)).toEqual(state);
   });
 
   it('writes a name with characters the address would read otherwise as escapes', () => {
     expect(hashFromState({ ...defaultState(named), filters: { ...defaultFilters(named), author: `ghost:${NAME_B}` } }, named)).toBe(
-      '#/?target=main&author=ghost%3A%C3%85sa%20Prov%20%26%20S%C3%B6ner%20100%25',
+      '#/?target=master&author=ghost%3A%C3%85sa%20Prov%20%26%20S%C3%B6ner%20100%25',
     );
   });
 
@@ -298,7 +298,7 @@ describe('the author filter in the address, with deleted accounts', () => {
   it('takes a name as the page writes it, and writes it back as the data gives it', () => {
     const state = stateFromHash(`#/?author=${encodeURIComponent(`(deleted) ${NAME_A}`)}`, named);
     expect(state.filters.author).toBe(`ghost:${NAME_A}`);
-    expect(hashFromState(state, named)).toBe(`#/?target=main&author=${encodeURIComponent(`ghost:${NAME_A}`)}`);
+    expect(hashFromState(state, named)).toBe(`#/?target=master&author=${encodeURIComponent(`ghost:${NAME_A}`)}`);
   });
 
   it('takes a name the data does not hold as no filter', () => {
@@ -373,7 +373,7 @@ describe('monthsBefore', () => {
 describe('the default period', () => {
   it('is the whole window, on the development branch, on fifteen years of data', () => {
     const m = metaWith('2011-03-04T00:00:00Z', '2026-11-16T07:36:00Z');
-    expect(defaultFilters(m)).toEqual({ ...defaults.filters, from: '2011-03-04', to: '2026-11-16', target: 'main' });
+    expect(defaultFilters(m)).toEqual({ ...defaults.filters, from: '2011-03-04', to: '2026-11-16', target: 'master' });
   });
 
   it('is the whole window on three months of data', () => {
@@ -436,14 +436,14 @@ describe('the address of a period on fifteen years of data', () => {
 
   it('names no period for the whole history, and reads an address naming none as the whole history', () => {
     expect(period('#/')).toEqual({ from: '2011-03-04', to: '2026-11-15' });
-    expect(hashFromState(defaultState(long), long)).toBe('#/?target=main');
-    expect(round('#/?from=2011-03-04&to=2026-11-15')).toBe('#/?target=main');
+    expect(hashFromState(defaultState(long), long)).toBe('#/?target=master');
+    expect(round('#/?from=2011-03-04&to=2026-11-15')).toBe('#/?target=master');
   });
 
   it('keeps an explicit six-month period through a round trip', () => {
     expect(period('#/?from=2026-05-15&to=2026-11-15')).toEqual({ from: '2026-05-15', to: '2026-11-15' });
-    expect(round('#/?from=2026-05-15&to=2026-11-15')).toBe('#/?target=main&from=2026-05-15');
-    expect(period('#/?target=main&from=2026-05-15')).toEqual({ from: '2026-05-15', to: '2026-11-15' });
+    expect(round('#/?from=2026-05-15&to=2026-11-15')).toBe('#/?target=master&from=2026-05-15');
+    expect(period('#/?target=master&from=2026-05-15')).toEqual({ from: '2026-05-15', to: '2026-11-15' });
     const recent = { ...defaultState(long), filters: recentFilters(long) };
     expect(stateFromHash(hashFromState(recent, long), long)).toEqual(recent);
   });
@@ -451,12 +451,12 @@ describe('the address of a period on fifteen years of data', () => {
   it('keeps a start between the window and the last fetch', () => {
     expect(period('#/?from=2015-06-01')).toEqual({ from: '2015-06-01', to: '2026-11-15' });
     expect(period('#/?from=2011-03-04&to=2012-01-31')).toEqual({ from: '2011-03-04', to: '2012-01-31' });
-    expect(round('#/?from=2011-03-04&to=2012-01-31')).toBe('#/?target=main&from=2011-03-04&to=2012-01-31');
+    expect(round('#/?from=2011-03-04&to=2012-01-31')).toBe('#/?target=master&from=2011-03-04&to=2012-01-31');
   });
 
   it('reads an end named alone, as the report wrote it when it opened on six months, from the start of the last six months', () => {
     expect(period('#/?to=2026-08-31')).toEqual({ from: '2026-05-15', to: '2026-08-31' });
-    expect(round('#/?to=2026-08-31')).toBe('#/?target=main&from=2026-05-15&to=2026-08-31');
+    expect(round('#/?to=2026-08-31')).toBe('#/?target=master&from=2026-05-15&to=2026-08-31');
     // An end before that start was read as the last six months, and still is.
     expect(period('#/?to=2020-01-01')).toEqual({ from: '2026-05-15', to: '2026-11-15' });
   });
@@ -576,7 +576,7 @@ describe('createStateStore', () => {
   });
 
   it('leaves a canonical hash alone on load', () => {
-    const f = fakeLocation('#/?target=main');
+    const f = fakeLocation('#/?target=master');
     createStateStore(meta, f.loc);
     expect(f.writes).toEqual([]);
   });
@@ -587,7 +587,7 @@ describe('createStateStore', () => {
     store.update((s) => ({ ...s, filters: { ...s.filters, target: 'all' } }));
     store.update((s) => ({ ...s, pr: 66500 }), { replace: true });
     expect(f.writes).toEqual([
-      'replace #/?target=main',
+      'replace #/?target=master',
       'push #/?target=all',
       'replace #/?target=all&pr=66500',
     ]);
@@ -600,21 +600,20 @@ describe('createStateStore', () => {
     expect(get(store).filters.base).toBe('reef');
     store.update((s) => ({ ...s, filters: { ...s.filters, target: 'all' } }));
     expect(get(store).filters.base).toBe('reef');
-    store.update((s) => ({ ...s, filters: { ...s.filters, target: 'main' } }));
-    expect(get(store).filters).toMatchObject({ target: 'main', base: null, backportLink: 'unlinked' });
+    store.update((s) => ({ ...s, filters: { ...s.filters, target: 'master' } }));
+    expect(get(store).filters).toMatchObject({ target: 'master', base: null, backportLink: 'unlinked' });
     store.update((s) => ({ ...s, filters: { ...s.filters, target: 'backports' } }));
     expect(get(store).filters.base).toBeNull();
     expect(f.writes).toEqual([
       'push #/?target=all&base=reef&backport=unlinked',
-      'push #/?target=main&backport=unlinked',
+      'push #/?target=master&backport=unlinked',
       'push #/?target=backports&backport=unlinked',
     ]);
   });
 
-  it('keeps master as the branch when the target goes from main to all, and drops it going to backports', () => {
-    const master = parseMeta({ ...rawMeta, bases: ['main', 'master', 'reef'] });
-    const f = fakeLocation('#/?target=main&base=master');
-    const store = createStateStore(master, f.loc);
+  it('keeps master as the branch when the target goes from master to all, and drops it going to backports', () => {
+    const f = fakeLocation('#/?target=master&base=master');
+    const store = createStateStore(meta, f.loc);
     store.update((s) => ({ ...s, filters: { ...s.filters, target: 'all' } }));
     expect(get(store).filters.base).toBe('master');
     store.update((s) => ({ ...s, filters: { ...s.filters, target: 'backports' } }));
@@ -627,7 +626,7 @@ describe('createStateStore', () => {
     const store = createStateStore(meta, f.loc);
     store.set(withFilters({ component: 'no-such-component', from: '1999-01-01' }));
     expect(get(store)).toEqual(defaults);
-    expect(f.writes).toEqual(['replace #/?target=main']);
+    expect(f.writes).toEqual(['replace #/?target=master']);
   });
 
   it('notifies only when the state changes', () => {
@@ -652,9 +651,9 @@ describe('createStateStore', () => {
 
 describe('a section of the methods page', () => {
   it('reads a section of the methods page and writes it back last', () => {
-    const state = stateFromHash('#/methods?target=main&section=disclosure', meta);
+    const state = stateFromHash('#/methods?target=master&section=disclosure', meta);
     expect(state).toEqual({ ...defaults, route: 'methods', section: 'disclosure' });
-    expect(hashFromState(state, meta)).toBe('#/methods?target=main&section=disclosure');
+    expect(hashFromState(state, meta)).toBe('#/methods?target=master&section=disclosure');
   });
 
   it('reads a subheading of a section too', () => {
@@ -673,7 +672,7 @@ describe('a section of the methods page', () => {
   });
 
   it('never writes a section of the methods page on the report', () => {
-    expect(hashFromState({ ...defaults, section: 'disclosure' }, meta)).toBe('#/?target=main');
+    expect(hashFromState({ ...defaults, section: 'disclosure' }, meta)).toBe('#/?target=master');
   });
 
   it('builds the address of a section, keeping the filters', () => {
@@ -683,8 +682,8 @@ describe('a section of the methods page', () => {
   });
 
   it.each([
-    '#/?target=main',
-    '#/methods?target=main',
+    '#/?target=master',
+    '#/methods?target=master',
     '#/?target=backports&from=2026-06-01&kind=docs&pr=66600&sort=size',
     '#/methods?target=all&author=fixture-author-a&bots=show',
   ])('reads the address %s as it did before there were sections', (hash) => {
@@ -700,11 +699,11 @@ describe('a section of the report', () => {
   it.each(names)('reads and writes back section=%s alone', (name) => {
     const state = stateFromHash(`#/?section=${name}`, meta);
     expect(state).toEqual({ ...defaults, section: name });
-    expect(hashFromState(state, meta)).toBe(`#/?target=main&section=${name}`);
+    expect(hashFromState(state, meta)).toBe(`#/?target=master&section=${name}`);
   });
 
   it.each(names)('reads and writes back section=%s among filters', (name) => {
-    const hash = `#/?target=main&from=2026-06-01&to=2026-08-31&kind=docs&section=${name}`;
+    const hash = `#/?target=master&from=2026-06-01&to=2026-08-31&kind=docs&section=${name}`;
     const state = stateFromHash(hash, meta);
     expect(state).toEqual({
       ...withFilters({ from: '2026-06-01', to: '2026-08-31', kind: 'docs' }),
@@ -722,7 +721,7 @@ describe('a section of the report', () => {
     const f = fakeLocation(hash);
     const store = createStateStore(meta, f.loc);
     expect(get(store).section).toBeNull();
-    expect(f.loc.read()).toBe('#/?target=main');
+    expect(f.loc.read()).toBe('#/?target=master');
     store.destroy();
   });
 
@@ -740,7 +739,7 @@ describe('a section of the report', () => {
 
   it('leaves the section behind when changing page', () => {
     const onReport = { ...defaults, section: 'people' };
-    expect(routeHash(onReport, 'methods', meta)).toBe('#/methods?target=main');
-    expect(routeHash(onReport, 'report', meta)).toBe('#/?target=main');
+    expect(routeHash(onReport, 'methods', meta)).toBe('#/methods?target=master');
+    expect(routeHash(onReport, 'report', meta)).toBe('#/?target=master');
   });
 });

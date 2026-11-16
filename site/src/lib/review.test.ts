@@ -42,7 +42,7 @@ const PARTIAL_NOTE =
   "each ratio divides two partial counts; the PRs waiting are counted at the week's end, " +
   "or at the period's end or the data's last fetch if sooner";
 
-// The default view: PRs on main, 2026-05-15 to 2026-11-15, 27 weeks from 2026-05-11.
+// The default view: PRs on master, 2026-05-15 to 2026-11-15, 27 weeks from 2026-05-11.
 const data = fixture();
 const filters = defaultFilters(META);
 const period = periodRange(filters);
@@ -388,13 +388,13 @@ describe('spanTitle and spanNote', () => {
   });
 
   it.each([
-    ['main', 'linked', true],
+    ['master', 'linked', true],
     ['backports', 'linked', true],
     ['all', 'linked', true],
     ['backports', null, false],
     ['backports', 'unlinked', false],
     ['all', null, false],
-    ['main', null, false],
+    ['master', null, false],
   ] satisfies [Target, BackportLink | null, boolean][])(
     'takes the selection under %s with the backport link %s for backports alone: %s',
     (target, link, expected) => {
@@ -402,15 +402,15 @@ describe('spanTitle and spanNote', () => {
     },
   );
 
-  it('notes what a backport’s first commit is wherever backports may be among others, never under main', () => {
+  it('notes what a backport’s first commit is wherever backports may be among others, never under master', () => {
     const note = 'For a backport, the first commit is the original work’s, so this is how long after it the backport was opened.';
     expect(spanNote('firstCommitToOpened', only('all', null))).toBe(note);
     expect(spanNote('firstCommitToOpened', only('backports', null))).toBe(note);
     expect(spanNote('firstCommitToOpened', only('backports', 'unlinked'))).toBe(note);
-    expect(spanNote('firstCommitToOpened', only('main', null))).toBeUndefined();
-    expect(spanNote('firstCommitToOpened', only('main', 'unlinked'))).toBeUndefined();
+    expect(spanNote('firstCommitToOpened', only('master', null))).toBeUndefined();
+    expect(spanNote('firstCommitToOpened', only('master', 'unlinked'))).toBeUndefined();
     expect(spanNote('firstCommitToOpened', only('backports', 'linked'))).toBeUndefined();
-    expect(spanNote('firstCommitToOpened', only('main', 'linked'))).toBeUndefined();
+    expect(spanNote('firstCommitToOpened', only('master', 'linked'))).toBeUndefined();
     expect(spanNote('openedToLastCommit', only('all', null))).toBeUndefined();
   });
 });

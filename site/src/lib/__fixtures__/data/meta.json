@@ -6,7 +6,7 @@
     2026
   ],
   "bases": [
-    "main",
+    "master",
     "reef",
     "squid",
     "tentacle"

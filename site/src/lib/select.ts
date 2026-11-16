@@ -45,7 +45,7 @@ export function select(data: Dataset, filters: Filters): Uint32Array {
     if (!((p.created[r] as number) < end)) continue;
     const closed = p.closed[r] as number;
     if (closed >= 0 && closed < start) continue;
-    if (filters.target === 'main' && development[p.base[r] as number] !== 1) continue;
+    if (filters.target === 'master' && development[p.base[r] as number] !== 1) continue;
     if (filters.target === 'backports' && development[p.base[r] as number] === 1) continue;
     if (filters.base !== null && p.base[r] !== base) continue;
     if (linked !== -1 && p.backport_link[r] !== linked) continue;

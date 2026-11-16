@@ -123,7 +123,7 @@ describe('periodZoom', () => {
     const { loc, selection, zoom } = setup();
     zoom.to({ from: '2026-06-01', to: '2026-06-28' });
     expect(get(selection).filters).toMatchObject({ from: '2026-06-01', to: '2026-06-28' });
-    expect(loc.writes).toEqual([{ hash: '#/?target=main&from=2026-06-01&to=2026-06-28', push: true }]);
+    expect(loc.writes).toEqual([{ hash: '#/?target=master&from=2026-06-01&to=2026-06-28', push: true }]);
   });
 
   it('announces the period it set until the state next changes', () => {

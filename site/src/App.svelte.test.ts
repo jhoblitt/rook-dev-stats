@@ -367,19 +367,18 @@ describe('the first load of the whole history', () => {
 describe('filter bar', () => {
   it('shows the defaults for a hash with unknown values', async () => {
     render(App, (await page('#/?target=nope&component=nope&disclosure=ai')).props);
-    expect((screen.getByRole('radio', { name: 'main' }) as HTMLInputElement).checked).toBe(true);
+    expect((screen.getByRole('radio', { name: 'master' }) as HTMLInputElement).checked).toBe(true);
     expect((screen.getByLabelText('Component') as HTMLSelectElement).value).toBe('');
     expect((screen.getByLabelText('AI use disclosure') as HTMLSelectElement).value).toBe('');
     expect((screen.getByLabelText('From') as HTMLInputElement).value).toBe('2026-05-15');
     expect((screen.getByLabelText('To') as HTMLInputElement).value).toBe('2026-11-15');
   });
 
-  it('says what the main target is: the development branch under both its names', async () => {
+  it('names the targets with no note on the development branch, which has one name', async () => {
     render(App, (await page('')).props);
     const target = screen.getByRole('group', { name: 'Target' });
-    expect(target.getAttribute('aria-describedby')).toBeTruthy();
-    const hint = document.getElementById(target.getAttribute('aria-describedby') as string);
-    expect(hint?.textContent).toBe('main is the development branch, named master until its rename');
+    expect(target.getAttribute('aria-describedby')).toBeNull();
+    expect(target.textContent).not.toContain('rename');
   });
 
   it('shows the filters a hash restores', async () => {
@@ -413,12 +412,12 @@ describe('filter bar', () => {
     it("offers the target's branches, most PRs in the period first, each with its count", async () => {
       const { props } = await page('#/?target=all');
       render(App, props);
-      // The fixture's whole window: rows 0, 2–6 and 8–10 on main, one each on reef, squid and tentacle.
-      expect(offered()).toEqual(['main: 9 PRs', 'reef: 1 PR', 'squid: 1 PR', 'tentacle: 1 PR']);
+      // The fixture's whole window: rows 0, 2–6 and 8–10 on master, one each on reef, squid and tentacle.
+      expect(offered()).toEqual(['master: 9 PRs', 'reef: 1 PR', 'squid: 1 PR', 'tentacle: 1 PR']);
       await fireEvent.click(screen.getByRole('radio', { name: 'backports and other branches' }));
       expect(offered()).toEqual(['reef: 1 PR', 'squid: 1 PR', 'tentacle: 1 PR']);
-      await fireEvent.click(screen.getByRole('radio', { name: 'main' }));
-      expect(offered()).toEqual(['main: 9 PRs']);
+      await fireEvent.click(screen.getByRole('radio', { name: 'master' }));
+      expect(offered()).toEqual(['master: 9 PRs']);
     });
 
     it('writes a branch typed to the address, and returns it to any when the target leaves it out', async () => {
@@ -430,19 +429,19 @@ describe('filter bar', () => {
       expect(branch().value).toBe('squid');
       await fireEvent.click(screen.getByRole('radio', { name: 'all' }));
       expect(loc.hash()).toBe('#/?target=all&base=squid');
-      await fireEvent.click(screen.getByRole('radio', { name: 'main' }));
-      expect(loc.hash()).toBe('#/?target=main');
+      await fireEvent.click(screen.getByRole('radio', { name: 'master' }));
+      expect(loc.hash()).toBe('#/?target=master');
       expect(branch().value).toBe('');
     });
 
     it('keeps the branch and says so when a name typed is not a branch of the target', async () => {
       const { props, loc } = await page('#/?target=backports&base=reef');
       render(App, props);
-      branch().value = 'main';
+      branch().value = 'master';
       await fireEvent.change(branch());
       expect(loc.hash()).toBe('#/?target=backports&base=reef');
       expect(branch().value).toBe('reef');
-      expect(screen.getByText('No branch of this target is named “main”.')).toBeTruthy();
+      expect(screen.getByText('No branch of this target is named “master”.')).toBeTruthy();
       await fireEvent.click(screen.getByRole('button', { name: 'Clear the Branch filter' }));
       expect(loc.hash()).toBe('#/?target=backports');
     });
@@ -460,7 +459,7 @@ describe('filter bar', () => {
       expect(hint?.textContent).toBe('The “backport of #N” line in a PR’s description; older backports seldom carry it.');
       links.value = 'unlinked';
       await fireEvent.change(links);
-      expect(loc.hash()).toBe('#/?target=main&backport=unlinked');
+      expect(loc.hash()).toBe('#/?target=master&backport=unlinked');
     });
 
     it('says when the data does not record the link, which then counts as none', async () => {
@@ -512,10 +511,10 @@ describe('filter bar', () => {
     const kind = screen.getByLabelText('Kind') as HTMLSelectElement;
     kind.value = 'docs';
     await fireEvent.change(kind);
-    expect(loc.hash()).toBe('#/?target=main&kind=docs');
+    expect(loc.hash()).toBe('#/?target=master&kind=docs');
     kind.value = '';
     await fireEvent.change(kind);
-    expect(loc.hash()).toBe('#/?target=main');
+    expect(loc.hash()).toBe('#/?target=master');
   });
 
   it('offers every login the data names to the Author and Reviewer filters, a bot marked', async () => {
@@ -557,14 +556,14 @@ describe('filter bar', () => {
       render(App, props);
       authorInput().value = `(deleted) ${NAME_A}`;
       await fireEvent.change(authorInput());
-      expect(loc.hash()).toBe(`#/?target=main&author=${encodeURIComponent(`ghost:${NAME_A}`)}`);
+      expect(loc.hash()).toBe(`#/?target=master&author=${encodeURIComponent(`ghost:${NAME_A}`)}`);
       expect(authorInput().value).toBe(`(deleted) ${NAME_A}`);
     });
 
     it('takes an old address with author=ghost as the pooled entry, and says beside the input what it pools', async () => {
       const { props, loc } = await page('#/?author=ghost', {}, named);
       render(App, props);
-      expect(loc.hash()).toBe('#/?target=main&author=ghost');
+      expect(loc.hash()).toBe('#/?target=master&author=ghost');
       expect(authorInput().value).toBe('(deleted, unknown)');
       const note = screen.getByText(`(deleted, unknown): ${POOLED_NOTE}`);
       expect(authorInput().getAttribute('aria-describedby')?.split(' ')).toContain(note.id);
@@ -577,7 +576,7 @@ describe('filter bar', () => {
     expect((screen.getByLabelText('Author') as HTMLInputElement).value).toBe('fixture-author-d');
     expect((screen.getByLabelText('Reviewer') as HTMLInputElement).value).toBe('fixture-author-f');
     await fireEvent.click(screen.getByRole('button', { name: 'Clear the Reviewer filter' }));
-    expect(loc.hash()).toBe('#/?target=main&author=fixture-author-d');
+    expect(loc.hash()).toBe('#/?target=master&author=fixture-author-d');
     expect((screen.getByLabelText('Reviewer') as HTMLInputElement).value).toBe('');
     expect(screen.queryByRole('button', { name: 'Clear the Reviewer filter' })).toBeNull();
   });
@@ -588,11 +587,11 @@ describe('filter bar', () => {
     const author = screen.getByLabelText('Author') as HTMLInputElement;
     author.value = ' Fixture-Author-A ';
     await fireEvent.change(author);
-    expect(loc.hash()).toBe('#/?target=main&author=fixture-author-a');
+    expect(loc.hash()).toBe('#/?target=master&author=fixture-author-a');
     expect(author.value).toBe('fixture-author-a');
     author.value = '';
     await fireEvent.change(author);
-    expect(loc.hash()).toBe('#/?target=main');
+    expect(loc.hash()).toBe('#/?target=master');
   });
 
   it('says beside the Reviewer input, in view, that it keeps the PRs reviewed or commented on in the period', async () => {
@@ -610,7 +609,7 @@ describe('filter bar', () => {
     const reviewer = screen.getByLabelText('Reviewer') as HTMLInputElement;
     reviewer.value = 'someone-else';
     await fireEvent.change(reviewer);
-    expect(loc.hash()).toBe('#/?target=main&reviewer=fixture-author-e');
+    expect(loc.hash()).toBe('#/?target=master&reviewer=fixture-author-e');
     expect(reviewer.value).toBe('fixture-author-e');
     expect(screen.getByText('No PR in the data names “someone-else”.')).toBeTruthy();
   });
@@ -622,7 +621,7 @@ describe('filter bar', () => {
     from.value = '2026-01-01';
     await fireEvent.change(from);
     expect(from.value).toBe('2026-05-15');
-    expect(loc.hash()).toBe('#/?target=main');
+    expect(loc.hash()).toBe('#/?target=master');
   });
 
   describe('over a window longer than six months', () => {
@@ -637,7 +636,7 @@ describe('filter bar', () => {
       expect(pressed('Last 6 months')).toBe('false');
       expect((screen.getByLabelText('From') as HTMLInputElement).value).toBe('2025-01-01');
       expect((screen.getByLabelText('To') as HTMLInputElement).value).toBe('2026-11-15');
-      expect(loc.hash()).toBe('#/?target=main');
+      expect(loc.hash()).toBe('#/?target=master');
     });
 
     it('keeps a typed start inside the window', async () => {
@@ -649,7 +648,7 @@ describe('filter bar', () => {
       from.value = '2025-03-01';
       await fireEvent.change(from);
       expect(from.value).toBe('2025-03-01');
-      expect(loc.hash()).toBe('#/?target=main&from=2025-03-01');
+      expect(loc.hash()).toBe('#/?target=master&from=2025-03-01');
     });
 
     it('moves the period to the last six months and back to the whole window in one choice each', async () => {
@@ -659,14 +658,14 @@ describe('filter bar', () => {
       expect(pressed('All, from 1 Jan 2025')).toBe('false');
 
       await fireEvent.click(screen.getByRole('button', { name: 'Last 6 months' }));
-      expect(loc.hash()).toBe('#/?target=main&from=2026-05-15');
+      expect(loc.hash()).toBe('#/?target=master&from=2026-05-15');
       expect((screen.getByLabelText('From') as HTMLInputElement).value).toBe('2026-05-15');
       expect((screen.getByLabelText('To') as HTMLInputElement).value).toBe('2026-11-15');
       expect(pressed('Last 6 months')).toBe('true');
       expect(pressed('All, from 1 Jan 2025')).toBe('false');
 
       await fireEvent.click(screen.getByRole('button', { name: 'All, from 1 Jan 2025' }));
-      expect(loc.hash()).toBe('#/?target=main');
+      expect(loc.hash()).toBe('#/?target=master');
       expect(pressed('All, from 1 Jan 2025')).toBe('true');
       expect(pressed('Last 6 months')).toBe('false');
     });
@@ -687,6 +686,6 @@ describe('filter bar', () => {
     render(App, props);
     expect(presets()).toEqual(['All, from 1 Sep 2026']);
     expect(screen.getByRole('button', { name: 'All, from 1 Sep 2026' }).getAttribute('aria-pressed')).toBe('true');
-    expect(loc.hash()).toBe('#/?target=main');
+    expect(loc.hash()).toBe('#/?target=master');
   });
 });

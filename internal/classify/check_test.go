@@ -113,7 +113,7 @@ Base branches: 0
 
 	DescribeTable("compares the counts over every record when the window is the default",
 		func(windowStart time.Time) {
-			in.Records[0].Created = time.Date(2011, 9, 22, 0, 0, 0, 0, time.UTC)
+			in.Records[0].Created = time.Date(2016, 7, 22, 0, 0, 0, 0, time.UTC)
 			in.Records[1].Created = time.Date(2018, 3, 1, 0, 0, 0, 0, time.UTC)
 			in.Meta = &record.Meta{WindowStart: windowStart, GitHubCounts: record.Counts{OpenedInWindow: 3, Open: 1}}
 

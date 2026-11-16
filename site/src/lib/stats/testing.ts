@@ -35,7 +35,7 @@ export interface Event {
 }
 
 /**
- * A dataset of one year. Defaults: ready at `created`, open, on `main`, in
+ * A dataset of one year. Defaults: ready at `created`, open, on `master`, in
  * the window, not disclosed, by meta's first person, and every optional
  * time `-1`.
  */

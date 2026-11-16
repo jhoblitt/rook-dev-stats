@@ -64,6 +64,19 @@ var _ = Describe("FromEntry", func() {
 		Entry("a deleted account's backport, named by its committer, its comment and review by deleted accounts still ghost", "ghost-named"),
 	)
 
+	It("derives the same record whatever closing issues the entry holds", func() {
+		e := fixture("backport")
+		want, err := extract.FromEntry(e)
+		Expect(err).NotTo(HaveOccurred())
+
+		e.ClosingIssues = []fetch.ClosingIssue{
+			{Number: 7, Repository: "rook/rook", Labels: []fetch.Label{{Name: "bug"}}},
+			{Number: 8, Repository: "ceph/ceph-csi", Labels: []fetch.Label{}},
+		}
+
+		Expect(extract.FromEntry(e)).To(Equal(want))
+	})
+
 	Describe("the author's name", func() {
 		names := func() *fetch.CommitNames {
 			return &fetch.CommitNames{Commits: []fetch.CommitName{{OID: "1", Author: "Kim Example", Committer: "Ivy Example"}}}

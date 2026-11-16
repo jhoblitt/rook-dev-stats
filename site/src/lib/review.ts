@@ -365,7 +365,7 @@ export function spanNote(
   span: keyof typeof SPAN_TITLES,
   filters: Pick<Filters, 'target' | 'backportLink'>,
 ): string | undefined {
-  return span === 'firstCommitToOpened' && filters.target !== 'main' && !onlyBackports(filters)
+  return span === 'firstCommitToOpened' && filters.target !== 'master' && !onlyBackports(filters)
     ? 'For a backport, the first commit is the original work’s, so this is how long after it the backport was opened.'
     : undefined;
 }

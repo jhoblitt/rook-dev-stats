@@ -108,7 +108,7 @@ describe('Velocity', () => {
     render(App, props);
     const figure = section().getByRole('figure', { name: PRS });
     await fireEvent.click(within(figure).getByRole('button', { name: /^week of 2026-05-18:/ }));
-    expect(loc.hash()).toBe('#/?target=main&week=2026-05-18');
+    expect(loc.hash()).toBe('#/?target=master&week=2026-05-18');
     expect(within(figure).getByRole('button', { name: /^week of 2026-05-18:/ }).getAttribute('aria-pressed')).toBe('true');
   });
 
@@ -117,6 +117,6 @@ describe('Velocity', () => {
     render(App, props);
     const figure = section().getByRole('figure', { name: BACKLOG });
     await fireEvent.click(within(figure).getByRole('button', { name: 'week of 2026-06-01, 30–90 days: 1 of 3 open' }));
-    expect(loc.hash()).toBe('#/?target=main&week=2026-06-01&band=30-90');
+    expect(loc.hash()).toBe('#/?target=master&week=2026-06-01&band=30-90');
   });
 });

@@ -1,4 +1,4 @@
-// Package fetch walks ceph/ceph pull requests through GitHub's GraphQL API
+// Package fetch walks rook/rook pull requests through GitHub's GraphQL API
 // into the local raw cache.
 package fetch
 
@@ -20,16 +20,16 @@ import (
 
 // The repository the walk reads.
 const (
-	Owner = "ceph"
-	Name  = "ceph"
+	Owner = "rook"
+	Name  = "rook"
 )
 
-// WindowStart is the start of the data window: 2011-09-01, the day ceph/ceph
-// was created on GitHub, three weeks before its first pull request. A
-// window that starts before every pull request makes the data the whole
-// history: each author's baseline of earlier pull requests is zero, and
-// prior_prs counts the author's earlier records.
-var WindowStart = time.Date(2011, 9, 1, 0, 0, 0, 0, time.UTC)
+// WindowStart is the start of the data window: 2016-07-08, the day rook/rook
+// was created on GitHub, so before its first pull request. A window that
+// starts before every pull request makes the data the whole history: each
+// author's baseline of earlier pull requests is zero, and prior_prs counts
+// the author's earlier records.
+var WindowStart = time.Date(2016, 7, 8, 0, 0, 0, 0, time.UTC)
 
 // Defaults for Config's zero values.
 const (
@@ -399,6 +399,37 @@ type prNode struct {
 	Comments      *connection[commentNode] `json:"comments"`
 	Reviews       *connection[reviewNode]  `json:"reviews"`
 	TimelineItems *connection[Event]       `json:"timelineItems"`
+	// ClosingIssues is a first page alone, which the walk never pages on.
+	ClosingIssues *connection[issueNode] `json:"closingIssuesReferences"`
+}
+
+type issueNode struct {
+	Number     int `json:"number"`
+	Repository *struct {
+		NameWithOwner string `json:"nameWithOwner"`
+	} `json:"repository"`
+	Labels *connection[Label] `json:"labels"`
+}
+
+// closingIssues flattens n's closing issues as the cache holds them. A reply
+// without them, or with null, is no closing issues: unlike a missing
+// connection, it is no reason to give up on the pull request.
+func closingIssues(n *prNode) []ClosingIssue {
+	out := []ClosingIssue{}
+	if n.ClosingIssues == nil {
+		return out
+	}
+	for _, is := range n.ClosingIssues.Nodes {
+		c := ClosingIssue{Number: is.Number, Labels: []Label{}}
+		if is.Repository != nil {
+			c.Repository = is.Repository.NameWithOwner
+		}
+		if is.Labels != nil {
+			c.Labels = append(c.Labels, is.Labels.Nodes...)
+		}
+		out = append(out, c)
+	}
+	return out
 }
 
 // databaseID parses a fullDatabaseId of pull request number; null is no id.
@@ -544,6 +575,7 @@ func (w *walker) download(ctx context.Context, n *prNode) (Entry, error) {
 	if e.Labels, err = rest(ctx, w, n.Number, ghapi.Labels, n.Labels); err != nil {
 		return Entry{}, err
 	}
+	e.ClosingIssues = closingIssues(n)
 	commits, err := rest(ctx, w, n.Number, ghapi.Commits, n.Commits)
 	if err != nil {
 		return Entry{}, err

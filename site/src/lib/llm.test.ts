@@ -30,7 +30,7 @@ const DAY = 86_400;
 
 describe('byDisclosure', () => {
   it('splits the rows into those not disclosing and those disclosing, in order', () => {
-    // On main, opened in the period: 66500, 67000 and 67100 disclose (rows 3, 9, 10).
+    // On master, opened in the period: 66500, 67000 and 67100 disclose (rows 3, 9, 10).
     const { notDisclosed, disclosed } = byDisclosure(data, opened);
     expect([...disclosed].map((r) => data.prs.number[r])).toEqual([66500, 67000, 67100]);
     expect([...notDisclosed].map((r) => data.prs.number[r])).toEqual([66510, 66600, 66700, 66900]);
