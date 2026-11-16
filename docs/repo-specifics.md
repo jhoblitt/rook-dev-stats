@@ -110,11 +110,24 @@ Rook where it had fit Ceph.
   address or `#N`. 10,219 of the 23,632 pull requests off the development
   branch carry it.
 - **rook:** Mergify opens most backports. Its description ends "This is an
-  automatic backport of pull request #N done by Mergify", and its title
-  ends `(backport #N)`.
-- **Where:** `internal/extract/hints.go` (`backportOf`).
-- **Found:** sampling. 76 of the 200 newest Rook pull requests were Mergify
-  backports.
+  automatic backport of pull request #N done by Mergify" ("automated" in
+  older versions), and its title ends `(backport #N)`, or `(bp #N)` in
+  older versions. People write "backport of #N" or the same title
+  suffixes, with or without the space or the `#`. The first that names a
+  pull request other than the backport itself decides: Mergify's sentence,
+  then "backport of" with `#N` or this repository's address, then the
+  title's suffix. A backport of a backport carries two of Mergify's
+  sentences; the first, the original's, wins.
+- **Where:** `internal/extract/hints.go` (`mergifySentence`, `backportOf`,
+  `titleSuffix`); the address is built from `internal/fetch/fetch.go`
+  (`Owner`, `Name`).
+- **Found:** the raw cache. 3,297 of Mergify's 3,308 pull requests name
+  an original, 3,295 by its sentence and 2 by their title alone; the
+  other 11 are its merge-queue and configuration pull requests, not
+  backports. 3,421 of the 11,876 pull requests name an
+  original, 3,420 of the 4,033 off `master`, and 8 name one GitHub no
+  longer serves. Linking them cuts the kind unknown off `master` from
+  98.6% to 66.1%.
 
 ### Who makes a backport, and what its commits carry
 - **Varies:** whether people or a bot open backports, and whether the copied
@@ -158,8 +171,8 @@ Rook where it had fit Ceph.
   (`SourceLabels`, `SourceIssues`), `data/kinds.yaml`.
 - **Found:** the two projects' PR templates and labels. On rook/rook's
   whole history the kind is unknown for 64.5% of the 7,843 pull requests
-  to `master` and 76.1% of all 11,876, before backports are linked to
-  their originals.
+  to `master` and 76.1% of all 11,876 before backports are linked to
+  their originals, 65.1% after.
 
 ### External issue tracker
 - **Varies:** whether issues live on GitHub or on another host that the tool

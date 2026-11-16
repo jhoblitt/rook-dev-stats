@@ -456,7 +456,9 @@ describe('filter bar', () => {
         ['unlinked', 'no link'],
       ]);
       const hint = document.getElementById(links.getAttribute('aria-describedby') as string);
-      expect(hint?.textContent).toBe('The “backport of #N” line in a PR’s description; older backports seldom carry it.');
+      expect(hint?.textContent).toBe(
+        'Mergify’s “automatic backport of pull request #N”, a “backport of #N” line, or a “(backport #N)” or “(bp #N)” title; most release-branch PRs before 2020 have none.',
+      );
       links.value = 'unlinked';
       await fireEvent.change(links);
       expect(loc.hash()).toBe('#/?target=master&backport=unlinked');
