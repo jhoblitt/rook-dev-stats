@@ -17,7 +17,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/version"
+	"github.com/jhoblitt/rook-dev-stats/internal/version"
 )
 
 // MinInterval is the least time between the starts of two requests,
@@ -144,7 +144,7 @@ func userAgent() string {
 	if v == "" {
 		v = "devel"
 	}
-	return "cephstats/" + v
+	return "rookstats/" + v
 }
 
 // Tickets asks for at most BatchSize tickets in one request, with every

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
 )
 
 // GhostLogin is the login a null author is stored under: GitHub returns a

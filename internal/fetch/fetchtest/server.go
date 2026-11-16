@@ -1,5 +1,5 @@
 // Package fetchtest is an in-memory stand-in for GitHub's GraphQL API that
-// answers the queries cephstats fetch sends, for specs.
+// answers the queries rookstats fetch sends, for specs.
 package fetchtest
 
 import (
@@ -16,8 +16,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
-	"github.com/jhoblitt/ceph-dev-stats/internal/ghapi"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/ghapi"
 )
 
 // Request is one request the server received.

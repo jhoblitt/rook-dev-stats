@@ -12,12 +12,12 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/cli"
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch/fetchtest"
-	"github.com/jhoblitt/ceph-dev-stats/internal/ghapi"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tables"
+	"github.com/jhoblitt/rook-dev-stats/internal/cli"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch/fetchtest"
+	"github.com/jhoblitt/rook-dev-stats/internal/ghapi"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/tables"
 )
 
 var _ = Describe("fetch", func() {
@@ -42,7 +42,7 @@ var _ = Describe("fetch", func() {
 		stderr = &bytes.Buffer{}
 		cacheDir = GinkgoT().TempDir()
 		dataDir = GinkgoT().TempDir()
-		for _, key := range []string{"CEPHSTATS_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"} {
+		for _, key := range []string{"ROOKSTATS_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"} {
 			GinkgoT().Setenv(key, "")
 		}
 		server = fetchtest.NewServer(
@@ -100,7 +100,7 @@ var _ = Describe("fetch", func() {
 
 	Context("with a token", func() {
 		BeforeEach(func() {
-			GinkgoT().Setenv("CEPHSTATS_GITHUB_TOKEN", token)
+			GinkgoT().Setenv("ROOKSTATS_GITHUB_TOKEN", token)
 		})
 
 		It("walks back to the window start when there is no data/meta.json", func() {
@@ -216,7 +216,7 @@ var _ = Describe("fetch", func() {
 				Expect(run()).To(Succeed())
 				server.Update(2, func(e *fetch.Entry) { e.Title = "retitled without moving updatedAt" })
 				if env != "" {
-					GinkgoT().Setenv("CEPHSTATS_REFETCH", env)
+					GinkgoT().Setenv("ROOKSTATS_REFETCH", env)
 				}
 
 				Expect(run(args...)).To(Succeed())
@@ -225,8 +225,8 @@ var _ = Describe("fetch", func() {
 			},
 			Entry("neither the flag nor the environment", "", "pr"),
 			Entry("--refetch", "", "retitled without moving updatedAt", "--refetch"),
-			Entry("CEPHSTATS_REFETCH=true", "true", "retitled without moving updatedAt"),
-			Entry("CEPHSTATS_REFETCH=false", "false", "pr"),
+			Entry("ROOKSTATS_REFETCH=true", "true", "retitled without moving updatedAt"),
+			Entry("ROOKSTATS_REFETCH=false", "false", "pr"),
 		)
 
 		It("rejects --since with --full", func() {

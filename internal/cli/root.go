@@ -1,8 +1,8 @@
-// Package cli builds the cephstats command tree.
+// Package cli builds the rookstats command tree.
 //
 // Managed by go-conventions (references/cli.md owns the cobra and viper
 // contract, references/logging.md the logger). Configuration precedence is
-// flags, then CEPHSTATS_* environment variables, then the config file,
+// flags, then ROOKSTATS_* environment variables, then the config file,
 // then defaults, and every value is read back through viper.
 package cli
 
@@ -16,7 +16,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/version"
+	"github.com/jhoblitt/rook-dev-stats/internal/version"
 )
 
 // Run executes the command tree against args and returns the first error.
@@ -29,7 +29,7 @@ func Run(ctx context.Context, args []string, stdin io.Reader, stdout, stderr io.
 func newRootCmd(stdin io.Reader, stdout, stderr io.Writer) *cobra.Command {
 	v := viper.New()
 	cmd := &cobra.Command{
-		Use:           "cephstats",
+		Use:           "rookstats",
 		Short:         "Fetch ceph/ceph pull requests and build the data behind the statistics site",
 		Version:       version.String(),
 		SilenceUsage:  true,
@@ -44,8 +44,8 @@ func newRootCmd(stdin io.Reader, stdout, stderr io.Writer) *cobra.Command {
 
 	pf := cmd.PersistentFlags()
 	pf.String("config", "", "config file to read after flags and environment")
-	pf.String("log-level", "info", "log level: debug, info, warn, or error (CEPHSTATS_LOG_LEVEL)")
-	pf.String("log-format", "json", "log format: json or text (CEPHSTATS_LOG_FORMAT)")
+	pf.String("log-level", "info", "log level: debug, info, warn, or error (ROOKSTATS_LOG_LEVEL)")
+	pf.String("log-format", "json", "log format: json or text (ROOKSTATS_LOG_FORMAT)")
 
 	cmd.AddCommand(newFetchCmd(v), newExtractCmd(v), newTicketsCmd(v), newCheckCmd(v), newRollupCmd(v))
 
@@ -56,7 +56,7 @@ func newRootCmd(stdin io.Reader, stdout, stderr io.Writer) *cobra.Command {
 // config file when one is named, and installs the default logger. It runs
 // before every command, so a subcommand's own flags are bound as well.
 func configure(cmd *cobra.Command, v *viper.Viper, stderr io.Writer) error {
-	v.SetEnvPrefix("CEPHSTATS")
+	v.SetEnvPrefix("ROOKSTATS")
 	v.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "_"))
 	v.AutomaticEnv()
 	if err := v.BindPFlags(cmd.Flags()); err != nil {

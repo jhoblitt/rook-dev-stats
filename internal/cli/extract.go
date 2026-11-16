@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/extract"
+	"github.com/jhoblitt/rook-dev-stats/internal/extract"
 )
 
 func newExtractCmd(v *viper.Viper) *cobra.Command {
@@ -26,7 +26,7 @@ whose content changes are rewritten.`,
 		},
 	}
 	f := cmd.Flags()
-	f.String("cache-dir", ".cache", "raw cache directory (CEPHSTATS_CACHE_DIR)")
-	f.String("data", "data", "committed data directory (CEPHSTATS_DATA)")
+	f.String("cache-dir", ".cache", "raw cache directory (ROOKSTATS_CACHE_DIR)")
+	f.String("data", "data", "committed data directory (ROOKSTATS_DATA)")
 	return cmd
 }

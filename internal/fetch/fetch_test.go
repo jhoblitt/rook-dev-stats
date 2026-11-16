@@ -19,10 +19,10 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch"
-	"github.com/jhoblitt/ceph-dev-stats/internal/fetch/fetchtest"
-	"github.com/jhoblitt/ceph-dev-stats/internal/ghapi"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch/fetchtest"
+	"github.com/jhoblitt/rook-dev-stats/internal/ghapi"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
 )
 
 const token = "ghp_spec-token-never-written"

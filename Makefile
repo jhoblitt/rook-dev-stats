@@ -81,32 +81,32 @@ check: generate-check fmt-check vet lint fix-check tidy-check test ## The local 
 
 # The committed data under data/. Outside the go-conventions contract above.
 
-# fetch reads the token from CEPHSTATS_GITHUB_TOKEN, GH_TOKEN or
+# fetch reads the token from ROOKSTATS_GITHUB_TOKEN, GH_TOKEN or
 # GITHUB_TOKEN; with none of them set, gh's token is passed to fetch alone.
 .PHONY: data-refresh
 data-refresh: ## Pull from GitHub, re-derive the records, read new ticket types, check
-	@if [ -z "$${CEPHSTATS_GITHUB_TOKEN}$${GH_TOKEN}$${GITHUB_TOKEN}" ]; then \
-	  CEPHSTATS_GITHUB_TOKEN=$$(gh auth token) || exit 1; \
-	  export CEPHSTATS_GITHUB_TOKEN; \
+	@if [ -z "$${ROOKSTATS_GITHUB_TOKEN}$${GH_TOKEN}$${GITHUB_TOKEN}" ]; then \
+	  ROOKSTATS_GITHUB_TOKEN=$$(gh auth token) || exit 1; \
+	  export ROOKSTATS_GITHUB_TOKEN; \
 	fi; \
-	go run ./cmd/cephstats fetch
-	go run ./cmd/cephstats extract
-	go run ./cmd/cephstats tickets
-	go run ./cmd/cephstats check
+	go run ./cmd/rookstats fetch
+	go run ./cmd/rookstats extract
+	go run ./cmd/rookstats tickets
+	go run ./cmd/rookstats check
 
 .PHONY: data-check
 data-check: ## Validate the hand-edited tables in data/ against the records
-	go run ./cmd/cephstats check
+	go run ./cmd/rookstats check
 
 # The reports rank accounts by comment count: for whoever edits the tables,
 # never for CI's public log.
 .PHONY: data-report
 data-report: ## Validate the tables and report what they do not yet match
-	go run ./cmd/cephstats check --report
+	go run ./cmd/rookstats check --report
 
 # The statistics site under site/ (Vite, Svelte, TypeScript). Outside the
 # go-conventions contract above. The site fetches its data at run time from
-# site/public/data/, which `cephstats rollup` writes and git ignores.
+# site/public/data/, which `rookstats rollup` writes and git ignores.
 SITE_DIR := site
 SITE_DATA := $(SITE_DIR)/public/data
 SITE_FIXTURE := $(SITE_DIR)/src/lib/__fixtures__/data
@@ -123,7 +123,7 @@ site-install: ## Install the site's npm dependencies from the lockfile
 
 .PHONY: site-data
 site-data: ## Roll the records up into the site's data files
-	go run ./cmd/cephstats rollup --out $(SITE_DATA)
+	go run ./cmd/rookstats rollup --out $(SITE_DATA)
 
 .PHONY: site-dev-data
 site-dev-data: ## Use the test fixture as the site's data (no Go side needed)

@@ -1,4 +1,4 @@
-// The fixture's meta with deleted accounts added, in memory, as `cephstats
+// The fixture's meta with deleted accounts added, in memory, as `rookstats
 // rollup` writes them: the pooled `ghost` entry, and two deleted accounts
 // known by the names on their commits, each `ghost:` and the name, listed in
 // `people_deleted`. The names are invented; the second holds a space, an

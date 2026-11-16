@@ -648,7 +648,7 @@ async function fetchJson(fetchFn: Fetch, baseUrl: string, file: string): Promise
   }
 }
 
-/** `baseUrl` ends in a slash, e.g. `/ceph-dev-stats/data/`. */
+/** `baseUrl` ends in a slash, e.g. `/rook-dev-stats/data/`. */
 export async function loadMeta(baseUrl: string, fetchFn: Fetch): Promise<Meta> {
   return parseMeta(await fetchJson(fetchFn, baseUrl, 'meta.json'));
 }

@@ -122,7 +122,7 @@
   });
 </script>
 
-<h1 class="visually-hidden">Ceph pull requests</h1>
+<h1 class="visually-hidden">Rook pull requests</h1>
 
 <FilterBar />
 

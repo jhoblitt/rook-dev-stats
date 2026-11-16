@@ -5,7 +5,7 @@
 export type Theme = 'light' | 'dark';
 
 /** index.html's inline script reads the same key. */
-export const THEME_STORAGE_KEY = 'ceph-dev-stats:theme';
+export const THEME_STORAGE_KEY = 'rook-dev-stats:theme';
 
 export function parseTheme(value: string | null | undefined): Theme | null {
   return value === 'light' || value === 'dark' ? value : null;

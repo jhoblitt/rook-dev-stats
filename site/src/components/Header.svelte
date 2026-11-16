@@ -12,7 +12,7 @@
 <header class="site-header">
   <div class="inner">
     <div class="brand">
-      <a class="title" href={routeHash($selection, 'report', meta)}>Ceph pull requests</a>
+      <a class="title" href={routeHash($selection, 'report', meta)}>Rook pull requests</a>
       <p class="as-of">data as of <time class="num" datetime={asOf}>{asOf}</time></p>
     </div>
     <div class="nav"><Nav /></div>

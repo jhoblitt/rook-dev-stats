@@ -11,10 +11,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
-	"github.com/jhoblitt/ceph-dev-stats/internal/rollup"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tables"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tracker"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/rollup"
+	"github.com/jhoblitt/rook-dev-stats/internal/tables"
+	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 // dataDir holds the hand-made dataset: the tables, the tickets, meta.json
@@ -22,7 +22,7 @@ import (
 // class and kind source.
 const dataDir = "testdata/data"
 
-// loadInput reads dataDir as cephstats rollup does.
+// loadInput reads dataDir as rookstats rollup does.
 func loadInput() rollup.Input {
 	GinkgoHelper()
 	t, err := tables.Load(dataDir)

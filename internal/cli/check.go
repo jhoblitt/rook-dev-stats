@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/classify"
-	"github.com/jhoblitt/ceph-dev-stats/internal/record"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tables"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tracker"
+	"github.com/jhoblitt/rook-dev-stats/internal/classify"
+	"github.com/jhoblitt/rook-dev-stats/internal/record"
+	"github.com/jhoblitt/rook-dev-stats/internal/tables"
+	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 func newCheckCmd(v *viper.Viper) *cobra.Command {
@@ -58,9 +58,9 @@ tickets.json are each optional.`,
 		},
 	}
 	f := cmd.Flags()
-	f.String("data", "data", "committed data directory (CEPHSTATS_DATA)")
-	f.Bool("report", false, "print the reports for whoever edits the tables (CEPHSTATS_REPORT)")
-	f.Int("top", 50, "entries each ranked report lists, 0 for all; the problem and base-branch reports list every entry (CEPHSTATS_TOP)")
+	f.String("data", "data", "committed data directory (ROOKSTATS_DATA)")
+	f.Bool("report", false, "print the reports for whoever edits the tables (ROOKSTATS_REPORT)")
+	f.Int("top", 50, "entries each ranked report lists, 0 for all; the problem and base-branch reports list every entry (ROOKSTATS_TOP)")
 	return cmd
 }
 

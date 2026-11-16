@@ -10,8 +10,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/cli"
-	"github.com/jhoblitt/ceph-dev-stats/internal/tables"
+	"github.com/jhoblitt/rook-dev-stats/internal/cli"
+	"github.com/jhoblitt/rook-dev-stats/internal/tables"
 )
 
 var _ = Describe("rollup", func() {

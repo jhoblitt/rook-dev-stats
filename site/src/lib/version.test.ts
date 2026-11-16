@@ -21,6 +21,6 @@ describe('formatVersion', () => {
   });
 
   it('points at the repository', () => {
-    expect(REPO_URL).toBe('https://github.com/jhoblitt/ceph-dev-stats');
+    expect(REPO_URL).toBe('https://github.com/jhoblitt/rook-dev-stats');
   });
 });

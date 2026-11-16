@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/cli"
+	"github.com/jhoblitt/rook-dev-stats/internal/cli"
 )
 
 var _ = Describe("Run", func() {
@@ -16,7 +16,7 @@ var _ = Describe("Run", func() {
 	BeforeEach(func() {
 		stdout = &bytes.Buffer{}
 		stderr = &bytes.Buffer{}
-		for _, key := range []string{"CEPHSTATS_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"} {
+		for _, key := range []string{"ROOKSTATS_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"} {
 			GinkgoT().Setenv(key, "")
 		}
 	})

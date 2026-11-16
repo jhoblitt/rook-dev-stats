@@ -1,4 +1,4 @@
-export const REPO_URL = 'https://github.com/jhoblitt/ceph-dev-stats';
+export const REPO_URL = 'https://github.com/jhoblitt/rook-dev-stats';
 
 export interface VersionLink {
   label: string;

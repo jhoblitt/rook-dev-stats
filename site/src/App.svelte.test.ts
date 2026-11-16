@@ -70,7 +70,7 @@ describe('App', () => {
     // As following the Statistics link does: the same address, on the report.
     props.page.selection.update((s) => ({ ...s, route: 'report' }));
     await waitFor(() => expect(held.length).toBeGreaterThan(0));
-    await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: 'Ceph pull requests' })).toBeTruthy());
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: 'Rook pull requests' })).toBeTruthy());
 
     expect(screen.getByText('Loading the data for this period: the files of 2 years, 2025 to 2026.')).toBeTruthy();
     expect(document.querySelector('.waiting')?.getAttribute('aria-busy')).toBe('true');
@@ -289,8 +289,8 @@ describe('App', () => {
     render(App, (await page('')).props);
     const footer = within(screen.getByRole('contentinfo'));
     expect(footer.getByText('dev')).toBeTruthy();
-    expect(footer.getByRole('link', { name: 'github.com/jhoblitt/ceph-dev-stats' }).getAttribute('href')).toBe(
-      'https://github.com/jhoblitt/ceph-dev-stats',
+    expect(footer.getByRole('link', { name: 'github.com/jhoblitt/rook-dev-stats' }).getAttribute('href')).toBe(
+      'https://github.com/jhoblitt/rook-dev-stats',
     );
   });
 

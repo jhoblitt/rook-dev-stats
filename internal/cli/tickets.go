@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/jhoblitt/ceph-dev-stats/internal/tracker"
+	"github.com/jhoblitt/rook-dev-stats/internal/tracker"
 )
 
 func newTicketsCmd(v *viper.Viper) *cobra.Command {
@@ -31,8 +31,8 @@ saved after each request, so an interrupted run keeps what it has.`,
 		},
 	}
 	f := cmd.Flags()
-	f.String("data", "data", "committed data directory (CEPHSTATS_DATA)")
-	f.String("tracker-url", tracker.DefaultURL, "tracker base URL (CEPHSTATS_TRACKER_URL)")
-	f.Bool("refresh", false, "ask again for the saved tickets whose type is empty (CEPHSTATS_REFRESH)")
+	f.String("data", "data", "committed data directory (ROOKSTATS_DATA)")
+	f.String("tracker-url", tracker.DefaultURL, "tracker base URL (ROOKSTATS_TRACKER_URL)")
+	f.Bool("refresh", false, "ask again for the saved tickets whose type is empty (ROOKSTATS_REFRESH)")
 	return cmd
 }
