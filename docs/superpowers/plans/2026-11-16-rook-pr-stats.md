@@ -38,6 +38,7 @@
 - `make check` runs `go test -race` and needs the sandbox disabled; `go mod download` and every `gh` batch likewise. Scratch goes in `$TMPDIR`.
 - The owner granted: create and configure the repository, open PRs and merge them once CI is green, checking in at milestones. The milestones are Task 4 (first live page with data) and Task 8 (banner removed).
 - Wait for each merge's release run to finish before merging the next PR. A merge during the run cancels it, or leaves semantic-release behind the remote and publishing nothing.
+- `docs/repo-specifics.md` is the registry of what depends on the repository, kept at the owner's request for a possible generic tool. A task that makes the tool fit Rook where it fit Ceph adds or updates its entry in the same PR.
 - No Ceph fixture, Ceph table entry or Ceph sentence survives Task 8. A grep for `ceph/ceph`, `tracker.ceph`, `cephstats` and `CEPHSTATS` in the tree, outside comments that credit the sibling, comes back empty.
 
 ## Local preview
