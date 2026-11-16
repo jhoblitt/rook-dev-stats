@@ -1,0 +1,95 @@
+# Comments that only trigger automation. A comment is a command when its
+# whole text matches a pattern, in any case; the first command that
+# matches, top to bottom, names it.
+#
+# A comment addressed to a bot is a command whether or not the bot acts
+# on it: "jenkins make check" and misspellings such as "jenkinst test api"
+# ask for a test run and answer nobody. A comment that talks to people
+# about the automation ("make check failures look relevant") is not.
+commands:
+  # Jenkins, ceph/ceph's CI: "jenkins test <job>" runs a job again.
+  - id: jenkins-test-make-check-arm64
+    name: jenkins test make check arm64
+    pattern: '/?jenkins (test |retest )?make check arm64'
+  - id: jenkins-test-make-check
+    name: jenkins test make check
+    pattern: '/?jenkins (test |run )?make check\.?'
+  - id: jenkins-test-windows
+    name: jenkins test windows
+    pattern: 'jenkins test windows'
+  - id: jenkins-test-api
+    name: jenkins test api
+    pattern: 'jenkins test api'
+  - id: jenkins-test-dashboard-cephadm
+    name: jenkins test dashboard cephadm
+    pattern: 'jenkins test dashboard cephadm'
+  - id: jenkins-test-dashboard
+    name: jenkins test dashboard
+    pattern: 'jenkins test dashboard'
+  - id: jenkins-test-docs
+    name: jenkins test docs
+    pattern: 'jenkins test docs'
+  - id: jenkins-test-container-make-check
+    name: jenkins test container make check
+    pattern: 'jenkins test container make check'
+  - id: jenkins-test-signed
+    name: jenkins test signed
+    pattern: 'jenkins test signed'
+  - id: jenkins-test-rook-e2e
+    name: jenkins test rook e2e
+    pattern: 'jenkins test rook e2e'
+  - id: jenkins-test-submodules
+    name: jenkins test submodules
+    pattern: 'jenkins test submodules'
+  - id: jenkins-test-pr
+    name: jenkins test pr
+    pattern: 'jenkins test pr'
+  - id: jenkins-test
+    name: jenkins test, another job
+    pattern: 'jenkins test .+'
+  - id: jenkins-retest
+    name: jenkins retest
+    pattern: 'jenkins (please )?res?test\b.*'
+  - id: jenkins-ceph-volume
+    name: jenkins ceph-volume
+    pattern: 'jenkins ceph-volume .+'
+  # Any other request to Jenkins, misspelt names included.
+  - id: jenkins-other
+    name: jenkins, another request
+    pattern: '/?(jenkins|jenkin|jenins|jenkinst|jenkons)[ ,].*'
+  # The release-engineering audit bot.
+  - id: audit-retest
+    name: /audit retest
+    pattern: '[/\\]audit retest|/retest audit'
+  - id: audit-override
+    name: /audit override
+    pattern: '/audit overr+ide( .+)?'
+  - id: audit-other
+    name: /audit, another request
+    pattern: '/audit( .+)?'
+  - id: config-check-ok
+    name: /config check ok
+    pattern: '/?config check ok'
+  # Lets Jenkins test a pull request from someone outside the organisation.
+  - id: ok-to-test
+    name: ok to test
+    pattern: '/?ok[ -]+to[ -]+test\.?'
+  # Also addressed to Jenkins ("jenkins: retest this please"), misspelt, or
+  # with the reason in parentheses ("retest this please (jenkins)").
+  - id: retest
+    name: retest this please
+    pattern: '(jenkins[:,，] ?|jenkis )?(retest|restest)( this| docs)?,?( please| pelase)?\.?( \(.*\))?'
+  # An older way to ask Jenkins for a run, mostly 2016 to 2021, alone or
+  # with the reason in parentheses: "test this please (no logs)", "hey
+  # jenkins, test this please !".
+  - id: test-this-please
+    name: test this please
+    pattern: '(hey,? )?(jenkins[:,]? )?test this (please|pls)\.?( !)?( \(.*\))?'
+  # The same request in other words, posted as a whole comment in 2016.
+  - id: check-this-please
+    name: check this please
+    pattern: 'check this please\.?'
+  # Asks the stale bot to drop its "stale" label.
+  - id: unstale
+    name: unstale
+    pattern: '/?unstale( me)?( please)?\.?'

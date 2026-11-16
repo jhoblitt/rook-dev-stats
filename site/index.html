@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="How long ceph/ceph pull requests wait for review, approval and merge, and whether disclosed AI assistance is changing it."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>Ceph pull requests</title>
+    <script>
+      // Apply a stored theme before first paint; the key is THEME_STORAGE_KEY in src/lib/theme.ts.
+      try {
+        var theme = localStorage.getItem('ceph-dev-stats:theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>This page computes its statistics in the browser and needs JavaScript.</noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+trailer_keys: [assisted-by]
+phrases: ['assisted by', 'generated with']
+families:
+  - {id: claude, name: Claude, patterns: [claude]}
+  - {id: copilot, name: GitHub Copilot, patterns: [copilot]}
+  - {id: unspecified, name: unspecified, patterns: ['\bllm\b']}
+ignore: []

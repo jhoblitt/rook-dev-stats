@@ -1,0 +1,27 @@
+{
+  "number": 70005,
+  "updated": "2026-10-09T10:00:00Z",
+  "title": "common: tidy the option table",
+  "author": {"login": "judy-example", "bot": false},
+  "association": "none",
+  "base": "main",
+  "created": "2026-10-01T10:00:00Z",
+  "state": "closed",
+  "draft": true,
+  "additions": 15,
+  "deletions": 15,
+  "files": 2,
+  "labels": [],
+  "commits": {"count": 3, "first_authored": "2026-10-02T09:00:00Z", "last_committed": "2026-10-08T00:00:00Z", "list": [
+    {"authored": "2026-10-03T08:00:00Z", "committed": "2026-10-04T08:00:00Z"},
+    {"authored": "2026-10-02T09:00:00Z", "committed": "2026-10-08T00:00:00Z"},
+    {"authored": "2026-10-05T08:00:00Z", "committed": "2026-10-06T08:00:00Z"}
+  ]},
+  "prior_prs": null,
+  "events": [
+    {"at": "2026-10-09T10:00:00Z", "kind": "closed"}
+  ],
+  "reviews": [],
+  "comments": [],
+  "disclosure": {"trailers": [], "description": ["Assisted-by: Gemini"], "commit_prose": []}
+}

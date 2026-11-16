@@ -1,0 +1,82 @@
+{
+  "number": 70003,
+  "title": "osd: drop a stale assert",
+  "body": "The assert no longer holds since the peering rework.\r\n\r\n## Checklist\r\n- Tracker (select at least one)\r\n  - [x] References tracker ticket\r\n  - [X] Very recent bug; references commit where it was introduced\r\n  - [ ] New feature (ticket optional)\r\n  - [ ] Doc update (no ticket needed)\r\n  - [ ] Code cleanup (no ticket needed)\r\n- Tests (select at least one)\r\n  - [x] No tests\r\n",
+  "state": "MERGED",
+  "isDraft": false,
+  "createdAt": "2026-08-10T06:00:00Z",
+  "updatedAt": "2026-09-01T00:00:00Z",
+  "closedAt": "2026-08-30T20:00:00Z",
+  "mergedAt": "2026-08-30T20:00:00Z",
+  "baseRefName": "main",
+  "additions": 1,
+  "deletions": 3,
+  "changedFiles": 1,
+  "authorAssociation": "FIRST_TIME_CONTRIBUTOR",
+  "author": {
+    "login": "erin-example",
+    "__typename": "User"
+  },
+  "labels": [],
+  "commits": [
+    {
+      "authoredDate": "2026-08-09T22:00:00Z",
+      "committedDate": "2026-08-25T10:00:00Z",
+      "message": "osd: drop a stale assert\n\nFixes: https://tracker.ceph.com/issues/90030\nCo-authored-by: Frank Example <frank@example.com>\nCo-authored-by: Claude <noreply@anthropic.com>\nSigned-off-by: Erin Example <erin@example.com>\n"
+    }
+  ],
+  "comments": [],
+  "reviews": [
+    {
+      "submittedAt": "2026-08-29T09:00:00Z",
+      "state": "APPROVED",
+      "author": {
+        "login": "grace-example",
+        "__typename": "User"
+      }
+    },
+    {
+      "submittedAt": "2026-08-11T09:00:00Z",
+      "state": "CHANGES_REQUESTED",
+      "author": {
+        "login": "grace-example",
+        "__typename": "User"
+      }
+    },
+    {
+      "submittedAt": "2026-08-12T09:00:00Z",
+      "state": "DISMISSED",
+      "author": {
+        "login": "heidi-example",
+        "__typename": "User"
+      }
+    },
+    {
+      "submittedAt": "2026-08-26T09:00:00Z",
+      "state": "COMMENTED",
+      "author": {
+        "login": "erin-example",
+        "__typename": "User"
+      }
+    }
+  ],
+  "timelineItems": [
+    {
+      "__typename": "ClosedEvent",
+      "createdAt": "2026-08-15T00:00:00Z"
+    },
+    {
+      "__typename": "ReopenedEvent",
+      "createdAt": "2026-08-20T00:00:00Z"
+    },
+    {
+      "__typename": "MergedEvent",
+      "createdAt": "2026-08-30T20:00:00Z"
+    },
+    {
+      "__typename": "ClosedEvent",
+      "createdAt": "2026-08-30T20:00:00Z"
+    }
+  ],
+  "fetchedAt": "2026-11-15T12:00:00Z"
+}

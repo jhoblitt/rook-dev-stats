@@ -1,0 +1,192 @@
+# What each label says about a pull request. An entry is a label's name,
+# in which `*` stands for any run of characters, `/` included, and every
+# other character for itself. `cephstats check`
+# fails on a label carried by 5 or more pull requests that no entry here,
+# and no kind label in kinds.yaml, classifies.
+
+# A pull request with two component labels belongs to both components.
+# Most of these labels are set by ceph/ceph's labeler from the paths a pull
+# request touches, so one pull request often carries several.
+components:
+  - id: rgw
+    name: RGW
+    labels: [rgw]
+  # kcephfs marks the kernel client and its mount helper, mount.ceph;
+  # client_lock, work on the client's lock of that name.
+  - id: cephfs
+    name: CephFS
+    labels: [cephfs, kcephfs, client_lock]
+  # krbd marks the kernel RBD client and its tests.
+  - id: rbd
+    name: RBD
+    labels: [rbd, krbd]
+  # cache-tiering marks the OSD's cache tiers.
+  - id: core
+    name: Core (RADOS)
+    labels: [core, cache-tiering]
+  # The messenger, src/msg, is RADOS's network layer. Most pull requests
+  # labelled messenger, from 2019 and 2020, carry no core label. rdma marks
+  # the messenger's RDMA transport.
+  - id: messenger
+    name: Messenger
+    labels: [messenger, rdma]
+  - id: mon
+    name: Monitor
+    labels: [mon]
+  - id: mgr
+    name: Manager
+    labels: [mgr]
+  # carbon marks the Dashboard's move to the Carbon design system.
+  - id: dashboard
+    name: Dashboard
+    labels: [dashboard, carbon]
+  # SeaStore is Crimson's object store: 27 of its 29 pull requests carry
+  # crimson too. crimson-perf marks Crimson performance work, and
+  # crimson-replicated-recovery the Crimson OSD work gathered under that name.
+  - id: crimson
+    name: Crimson
+    labels: [crimson, seastore, crimson-perf, crimson-replicated-recovery]
+  - id: bluestore
+    name: BlueStore
+    labels: [bluestore]
+  - id: cephadm
+    name: cephadm
+    labels: [cephadm]
+  - id: orchestrator
+    name: Orchestrator
+    labels: [orchestrator]
+  - id: rook
+    name: Rook
+    labels: [rook]
+  - id: nvmeof
+    name: NVMe-oF
+    labels: [nvmeof]
+  - id: nfs
+    name: NFS
+    labels: [nfs]
+  - id: smb
+    name: SMB
+    labels: [smb]
+  - id: ceph-volume
+    name: ceph-volume
+    labels: [ceph-volume]
+  - id: monitoring
+    name: Monitoring
+    labels: [monitoring]
+  # The daemon that exports the performance counters of a host's daemons to
+  # Prometheus.
+  - id: ceph-exporter
+    name: ceph-exporter
+    labels: [exporter]
+  - id: telemetry
+    name: Telemetry
+    labels: [telemetry]
+  - id: libcephsqlite
+    name: libcephsqlite
+    labels: [libcephsqlite]
+  # The asynchronous C++ RADOS client library, src/neorados.
+  - id: neorados
+    name: neorados
+    labels: [neorados]
+  - id: common
+    name: Common
+    labels: [common]
+  - id: pybind
+    name: Python bindings
+    labels: [pybind]
+  - id: tracing
+    name: Tracing
+    labels: [tracing]
+  - id: tools
+    name: Tools
+    labels: [tools]
+  - id: scripts
+    name: Scripts
+    labels: [script]
+  - id: build-ops
+    name: Build/ops
+    labels: [build/ops]
+  - id: ci
+    name: CI
+    labels: [CI]
+  - id: docs
+    name: Documentation
+    labels: [documentation]
+  # vstart_runner marks the harness that runs teuthology tasks on a vstart
+  # cluster.
+  - id: tests
+    name: Tests
+    labels: [tests, vstart_runner]
+
+# Where a pull request is in the review, test, backport and merge process.
+process:
+  - 'needs-*'
+  - 'need-*'
+  - 'wip-*'
+  - 'releng-audit-*'
+  - 'backport*'
+  - 'ui-tested-*'
+  # A release's backport batches: nautilus-batch-1, quincy-batch-1, …
+  - '*-batch-*'
+  # Crimson's backport batches: crimson backport squid, …
+  - 'crimson backport *'
+  # A person's testing queues: <name>-testing-<suffix>.
+  - '*-testing-*'
+  # A backport waiting on a merge to a newer release: waiting-pacific-merge.
+  - 'waiting-*-merge'
+  - DNM
+  - do-not-merge
+  - In Progress
+  - pending-discussion
+  - crimson-has-followup
+  - skip-teuthology
+  - ci-approved
+  - ready-to-merge
+  - TESTED
+  - verified-in-octo-lab
+  - RGW-TESTED
+  - Rados-Tested
+  - core-Tested
+  - passed-qa
+  - no-backport-required
+  - tentacle-next
+  - dashboard-umbrella
+  - rocky10-tentacle
+  - jaya-bluestore-testing
+  - stale
+  - pinned
+  # Closed and discarded, 2014-2016: test pushes, wrong branches, superseded
+  # work.
+  - trash
+
+# Labels that are neither: what kind of change it is beyond its kind, the
+# platform, the dependency-update bot's own labels, a programme.
+other:
+  - api-change
+  - config-change
+  - api
+  - config
+  - security
+  - performance
+  - regression
+  - improvement
+  - improvements
+  - revert
+  - FreeBSD
+  - win32
+  - rocky10
+  - ubuntu-24.04
+  - arm64
+  - aarch64
+  - Clang
+  - python3
+  - dependencies
+  - javascript
+  - python
+  - github_actions
+  - GSoC / Outreachy
+  # Pull requests from an Open Source Day event, by year: open-source-day,
+  # open-source-day-2023, …
+  - 'open-source-day*'
+  # Red Hat QE's changes to its downstream branches, rh-nautilus and others.
+  - rh-qe-downstream-change

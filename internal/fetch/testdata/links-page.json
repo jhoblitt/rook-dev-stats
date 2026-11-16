@@ -1,0 +1,61 @@
+{
+  "data": {
+    "repository": {
+      "pullRequests": {
+        "pageInfo": {"hasNextPage": false, "endCursor": "Y3Vyc29yOjE="},
+        "nodes": [
+          {
+            "number": 69877,
+            "title": "rgw: link every event",
+            "body": "body",
+            "state": "MERGED",
+            "isDraft": false,
+            "createdAt": "2026-10-27T20:00:00Z",
+            "updatedAt": "2026-11-01T05:00:00Z",
+            "closedAt": "2026-11-01T05:00:00Z",
+            "mergedAt": "2026-11-01T05:00:00Z",
+            "baseRefName": "main",
+            "additions": 3,
+            "deletions": 1,
+            "changedFiles": 2,
+            "authorAssociation": "MEMBER",
+            "author": {"login": "alice", "__typename": "User"},
+            "labels": {"pageInfo": {"hasNextPage": false, "endCursor": null}, "nodes": []},
+            "commits": {
+              "pageInfo": {"hasNextPage": false, "endCursor": "MQ"},
+              "nodes": [
+                {"commit": {"oid": "3f9a1c0d2b4e6f8a0c1e3d5b7f9a1c3e5d7b9f1a", "authoredDate": "2026-10-28T06:00:00Z", "committedDate": "2026-10-28T16:00:00Z", "message": "rgw: one"}},
+                {"commit": {"oid": "8b2d4f6a8c0e2a4c6e8a0c2e4a6c8e0a2c4e6a8c", "authoredDate": "2026-10-29T06:00:00Z", "committedDate": "2026-10-29T16:00:00Z", "message": "rgw: two"}}
+              ]
+            },
+            "comments": {
+              "pageInfo": {"hasNextPage": false, "endCursor": "MQ"},
+              "nodes": [
+                {"fullDatabaseId": "4854682435", "createdAt": "2026-10-29T02:00:00Z", "body": "jenkins test make check", "author": {"login": "bob", "__typename": "User"}}
+              ]
+            },
+            "reviews": {
+              "pageInfo": {"hasNextPage": false, "endCursor": "MQ"},
+              "nodes": [
+                {"fullDatabaseId": "3412345678", "submittedAt": "2026-10-29T12:00:00Z", "state": "APPROVED", "author": {"login": "carol", "__typename": "User"}}
+              ]
+            },
+            "timelineItems": {
+              "pageInfo": {"hasNextPage": false, "endCursor": "Ng"},
+              "nodes": [
+                {"__typename": "ReadyForReviewEvent", "createdAt": "2026-10-28T20:00:00Z", "url": "https://github.com/ceph/ceph/pull/69877#event-28644873432"},
+                {"__typename": "HeadRefForcePushedEvent", "createdAt": "2026-10-29T18:00:00Z", "beforeCommit": {"oid": "1111111111111111111111111111111111111111"}, "afterCommit": {"oid": "8b2d4f6a8c0e2a4c6e8a0c2e4a6c8e0a2c4e6a8c"}},
+                {"__typename": "HeadRefForcePushedEvent", "createdAt": "2026-10-29T19:00:00Z", "beforeCommit": null, "afterCommit": null},
+                {"__typename": "ClosedEvent", "createdAt": "2026-10-30T01:00:00Z", "url": "https://github.com/ceph/ceph/pull/69877#event-28644900001"},
+                {"__typename": "ReopenedEvent", "createdAt": "2026-10-30T02:00:00Z"},
+                {"__typename": "ConvertToDraftEvent", "createdAt": "2026-10-30T03:00:00Z", "url": "https://github.com/ceph/ceph/pull/69877#event-28644900002"},
+                {"__typename": "MergedEvent", "createdAt": "2026-11-01T05:00:00Z", "url": "https://github.com/ceph/ceph/pull/69877#event-28644900003", "commit": {"oid": "c0ffee0000000000000000000000000000000001"}},
+                {"__typename": "ClosedEvent", "createdAt": "2026-11-01T05:00:00Z", "url": "https://github.com/ceph/ceph/pull/69877#event-28644900004"}
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

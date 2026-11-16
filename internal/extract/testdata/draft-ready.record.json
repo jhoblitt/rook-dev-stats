@@ -1,0 +1,35 @@
+{
+  "number": 70002,
+  "updated": "2026-07-06T11:00:00Z",
+  "title": "mds: retry the session flush",
+  "author": {"login": "dave-example", "bot": false},
+  "association": "contributor",
+  "base": "main",
+  "created": "2026-07-01T10:00:00Z",
+  "state": "open",
+  "draft": false,
+  "additions": 7,
+  "deletions": 1,
+  "files": 1,
+  "labels": ["cephfs", "needs-review"],
+  "commits": {"count": 1, "first_authored": "2026-07-01T09:30:00Z", "last_committed": "2026-07-05T08:00:00Z", "list": [
+    {"authored": "2026-07-01T09:30:00Z", "committed": "2026-07-05T08:00:00Z"}
+  ]},
+  "prior_prs": null,
+  "events": [
+    {"at": "2026-07-03T12:00:00Z", "kind": "ready"},
+    {"at": "2026-07-04T09:00:00Z", "kind": "draft"},
+    {"at": "2026-07-05T09:00:00Z", "kind": "ready"}
+  ],
+  "reviews": [
+    {"at": "2026-07-03T12:30:00Z", "by": "copilot-pull-request-reviewer", "bot": true, "state": "commented"}
+  ],
+  "comments": [
+    {"at": "2026-07-01T10:05:00Z", "by": "github-actions", "bot": true}
+  ],
+  "disclosure": {
+    "trailers": [],
+    "description": ["🤖 Generated with [Claude Code](https://claude.com/claude-code)"],
+    "commit_prose": []
+  }
+}

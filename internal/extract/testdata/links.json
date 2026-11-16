@@ -1,0 +1,108 @@
+{
+  "number": 70010,
+  "title": "rbd: page the snapshot list",
+  "body": "The snapshot list is paged so large images load quickly.",
+  "state": "MERGED",
+  "isDraft": false,
+  "createdAt": "2026-09-01T08:00:00Z",
+  "updatedAt": "2026-09-12T10:00:00Z",
+  "closedAt": "2026-09-12T09:00:00Z",
+  "mergedAt": "2026-09-12T09:00:00Z",
+  "baseRefName": "main",
+  "additions": 20,
+  "deletions": 4,
+  "changedFiles": 2,
+  "authorAssociation": "CONTRIBUTOR",
+  "author": {
+    "login": "ivan-example",
+    "__typename": "User"
+  },
+  "labels": [
+    {
+      "name": "rbd"
+    }
+  ],
+  "commits": [
+    {
+      "oid": "1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d",
+      "authoredDate": "2026-08-31T10:00:00Z",
+      "committedDate": "2026-09-03T11:00:00+02:00",
+      "message": "rbd: add a page cursor\n\nSigned-off-by: Ivan Example <ivan@example.com>\n"
+    },
+    {
+      "oid": "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e",
+      "authoredDate": "2026-08-30T10:00:00Z",
+      "committedDate": "2026-09-03T09:00:00Z",
+      "message": "rbd: page the snapshot list\n\nSigned-off-by: Ivan Example <ivan@example.com>\n"
+    },
+    {
+      "oid": "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f",
+      "authoredDate": "2026-09-01T07:00:00Z",
+      "committedDate": "2026-09-03T09:05:00Z",
+      "message": "rbd: test paging\n\nSigned-off-by: Ivan Example <ivan@example.com>\n"
+    }
+  ],
+  "comments": [
+    {
+      "fullDatabaseId": "4854682435",
+      "createdAt": "2026-09-02T09:00:00Z",
+      "body": "jenkins test make check",
+      "author": {
+        "login": "judy-example",
+        "__typename": "User"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "fullDatabaseId": "3123456789",
+      "submittedAt": "2026-09-05T15:00:00Z",
+      "state": "APPROVED",
+      "author": {
+        "login": "judy-example",
+        "__typename": "User"
+      }
+    }
+  ],
+  "timelineItems": [
+    {
+      "__typename": "HeadRefForcePushedEvent",
+      "createdAt": "2026-09-03T09:10:00Z",
+      "beforeCommit": {
+        "oid": "9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c"
+      },
+      "afterCommit": {
+        "oid": "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f"
+      }
+    },
+    {
+      "__typename": "ReadyForReviewEvent",
+      "createdAt": "2026-09-03T10:00:00Z",
+      "url": "https://github.com/ceph/ceph/pull/70010#event-28644873432"
+    },
+    {
+      "__typename": "ClosedEvent",
+      "createdAt": "2026-09-06T00:00:00Z",
+      "url": "https://github.com/ceph/ceph/pull/70010#event-28700000001"
+    },
+    {
+      "__typename": "ReopenedEvent",
+      "createdAt": "2026-09-07T00:00:00Z"
+    },
+    {
+      "__typename": "MergedEvent",
+      "createdAt": "2026-09-12T09:00:00Z",
+      "url": "https://github.com/ceph/ceph/pull/70010#event-28800000002",
+      "commit": {
+        "oid": "4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f70"
+      }
+    },
+    {
+      "__typename": "ClosedEvent",
+      "createdAt": "2026-09-12T09:00:00Z",
+      "url": "https://github.com/ceph/ceph/pull/70010#event-28800000003"
+    }
+  ],
+  "fetchedAt": "2026-11-15T12:00:00Z",
+  "formatVersion": 1
+}

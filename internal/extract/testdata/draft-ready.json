@@ -1,0 +1,70 @@
+{
+  "number": 70002,
+  "title": "mds: retry the session flush",
+  "body": "Retry the flush once before giving up.\r\n\r\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\r\n\r\n<!--\r\n- [ ] Tracker (select at least one)\r\n-->\r\n",
+  "state": "OPEN",
+  "isDraft": false,
+  "createdAt": "2026-07-01T10:00:00Z",
+  "updatedAt": "2026-07-06T11:00:00Z",
+  "closedAt": null,
+  "mergedAt": null,
+  "baseRefName": "main",
+  "additions": 7,
+  "deletions": 1,
+  "changedFiles": 1,
+  "authorAssociation": "CONTRIBUTOR",
+  "author": {
+    "login": "dave-example",
+    "__typename": "User"
+  },
+  "labels": [
+    {
+      "name": "needs-review"
+    },
+    {
+      "name": "cephfs"
+    }
+  ],
+  "commits": [
+    {
+      "authoredDate": "2026-07-01T09:30:00Z",
+      "committedDate": "2026-07-05T08:00:00Z",
+      "message": "mds: retry the session flush\n\nSigned-off-by: Dave Example <dave@example.com>\n"
+    }
+  ],
+  "comments": [
+    {
+      "createdAt": "2026-07-01T10:05:00Z",
+      "body": "Config Diff Tool Output\n\n```diff\n- a\n+ b\n```\n",
+      "author": {
+        "login": "github-actions",
+        "__typename": "Bot"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "submittedAt": "2026-07-03T12:30:00Z",
+      "state": "COMMENTED",
+      "author": {
+        "login": "copilot-pull-request-reviewer",
+        "__typename": "Bot"
+      }
+    }
+  ],
+  "timelineItems": [
+    {
+      "__typename": "ReadyForReviewEvent",
+      "createdAt": "2026-07-03T12:00:00Z"
+    },
+    {
+      "__typename": "ConvertToDraftEvent",
+      "createdAt": "2026-07-04T09:00:00Z"
+    },
+    {
+      "__typename": "ReadyForReviewEvent",
+      "createdAt": "2026-07-05T09:00:00Z"
+    }
+  ],
+  "fetchedAt": "2026-11-15T12:00:00Z"
+}

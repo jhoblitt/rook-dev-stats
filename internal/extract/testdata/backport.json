@@ -1,0 +1,79 @@
+{
+  "number": 70001,
+  "title": "squid: rgw: fix a <leak> & a race",
+  "body": "backport tracker: https://tracker.ceph.com/issues/90001\r\n\r\n---\r\n\r\nbackport of https://github.com/ceph/ceph/pull/69001\r\nparent tracker: https://tracker.ceph.com/issues/90000\r\n\r\nthis backport was staged using ceph-backport.sh version 16.0.0.0000\r\n",
+  "state": "MERGED",
+  "isDraft": false,
+  "createdAt": "2026-06-02T08:00:00Z",
+  "updatedAt": "2026-06-20T17:30:00Z",
+  "closedAt": "2026-06-20T17:00:00Z",
+  "mergedAt": "2026-06-20T17:00:00Z",
+  "baseRefName": "squid",
+  "additions": 40,
+  "deletions": 12,
+  "changedFiles": 3,
+  "authorAssociation": "MEMBER",
+  "author": {
+    "login": "alice-example",
+    "__typename": "User"
+  },
+  "labels": [
+    {
+      "name": "squid"
+    },
+    {
+      "name": "rgw"
+    }
+  ],
+  "commits": [
+    {
+      "authoredDate": "2026-02-10T09:00:00+01:00",
+      "committedDate": "2026-06-01T12:00:00Z",
+      "message": "rgw: free the buffer on the error path\n\nThe error path returned before freeing the buffer.\n\nFixes: https://tracker.ceph.com/issues/90000\nAssisted-by: Claude Code\nSigned-off-by: Alice Example <alice@example.com>\n(cherry picked from commit 0123456789abcdef0123456789abcdef01234567)\n\nConflicts:\n\tsrc/rgw/rgw_op.cc\n\t- kept the squid include order\n"
+    },
+    {
+      "authoredDate": "2026-02-11T10:00:00Z",
+      "committedDate": "2026-06-01T12:05:00Z",
+      "message": "rgw: take the lock before reading the map\n\nAssisted-by: Claude Code\nSigned-off-by: Alice Example <alice@example.com>\n(cherry picked from commit 89abcdef0123456789abcdef0123456789abcdef)\n"
+    }
+  ],
+  "comments": [
+    {
+      "createdAt": "2026-06-03T09:00:00Z",
+      "body": "jenkins test make check",
+      "author": {
+        "login": "alice-example",
+        "__typename": "User"
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "submittedAt": null,
+      "state": "PENDING",
+      "author": {
+        "login": "carol-example",
+        "__typename": "User"
+      }
+    },
+    {
+      "submittedAt": "2026-06-10T15:00:00Z",
+      "state": "APPROVED",
+      "author": {
+        "login": "bob-example",
+        "__typename": "User"
+      }
+    }
+  ],
+  "timelineItems": [
+    {
+      "__typename": "MergedEvent",
+      "createdAt": "2026-06-20T17:00:00Z"
+    },
+    {
+      "__typename": "ClosedEvent",
+      "createdAt": "2026-06-20T17:00:00Z"
+    }
+  ],
+  "fetchedAt": "2026-11-15T12:00:00Z"
+}

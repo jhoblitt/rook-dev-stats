@@ -1,0 +1,36 @@
+{
+  "number": 70010,
+  "updated": "2026-09-12T10:00:00Z",
+  "title": "rbd: page the snapshot list",
+  "author": {"login": "ivan-example", "bot": false},
+  "association": "contributor",
+  "base": "main",
+  "created": "2026-09-01T08:00:00Z",
+  "state": "merged",
+  "draft": false,
+  "additions": 20,
+  "deletions": 4,
+  "files": 2,
+  "labels": ["rbd"],
+  "commits": {"count": 3, "first_authored": "2026-08-30T10:00:00Z", "last_committed": "2026-09-03T09:05:00Z", "list": [
+    {"sha": "1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d", "authored": "2026-08-31T10:00:00Z", "committed": "2026-09-03T09:00:00Z"},
+    {"sha": "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e", "authored": "2026-08-30T10:00:00Z", "committed": "2026-09-03T09:00:00Z"},
+    {"sha": "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f", "authored": "2026-09-01T07:00:00Z", "committed": "2026-09-03T09:05:00Z"}
+  ]},
+  "prior_prs": null,
+  "events": [
+    {"at": "2026-09-03T09:10:00Z", "kind": "force_push", "sha": "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f"},
+    {"at": "2026-09-03T10:00:00Z", "kind": "ready", "id": 28644873432},
+    {"at": "2026-09-06T00:00:00Z", "kind": "closed", "id": 28700000001},
+    {"at": "2026-09-07T00:00:00Z", "kind": "reopened"},
+    {"at": "2026-09-12T09:00:00Z", "kind": "merged", "id": 28800000002, "sha": "4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f70"},
+    {"at": "2026-09-12T09:00:00Z", "kind": "closed", "id": 28800000003}
+  ],
+  "reviews": [
+    {"at": "2026-09-05T15:00:00Z", "id": 3123456789, "by": "judy-example", "bot": false, "state": "approved"}
+  ],
+  "comments": [
+    {"at": "2026-09-02T09:00:00Z", "id": 4854682435, "by": "judy-example", "bot": false, "text": "jenkins test make check"}
+  ],
+  "disclosure": {"trailers": [], "description": [], "commit_prose": []}
+}

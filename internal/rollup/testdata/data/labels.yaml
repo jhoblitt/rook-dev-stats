@@ -1,0 +1,6 @@
+components:
+  - {id: cephfs, name: CephFS, labels: [cephfs]}
+  - {id: rbd, name: RBD, labels: [rbd]}
+  - {id: rgw, name: RGW, labels: [rgw, 'rgw-*']}
+process: [needs-review]
+other: [cleanup, bug-fix, feature]
