@@ -189,7 +189,7 @@ describe('prTimeline', () => {
     const checklist = META.disclosure.indexOf('checklist');
     expect(checklist).toBeGreaterThan(0);
     const data = dataset([{ number: 70000, created: OPENED, disclosure: checklist }]);
-    expect(prTimeline(data, 0, table(1, [])).disclosure).toBe("AI use disclosed by the PR template's AI-guidelines box");
+    expect(prTimeline(data, 0, table(1, [])).disclosure).toBe('AI use disclosed by the PR template’s AI-guidelines box');
   });
 
   it('draws a merge and the close GitHub records a second after it as the merge alone', () => {

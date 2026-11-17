@@ -221,7 +221,7 @@ const DISCLOSURE_LABELS: Record<string, string> = {
   trailer: 'a disclosing trailer, such as Assisted-by:',
   coauthor: 'Co-authored-by: naming a tool',
   description: 'disclosure phrasing in the description or a commit message',
-  checklist: "the PR template's AI-guidelines box, ticked",
+  checklist: 'the PR template’s AI-guidelines box, ticked',
   none: NOT_DISCLOSED,
 };
 const DISCLOSURE_ORDER = ['trailer', 'coauthor', 'description', 'checklist', 'none'];

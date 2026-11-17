@@ -223,7 +223,7 @@ const BY_BOT = ['bot_account', 'bot_review'];
 /** The words for each disclosure class meta lists, as a PR's timeline heads it. */
 export const DISCLOSURE_WORDS: Readonly<Record<string, string>> = {
   none: NOT_DISCLOSED,
-  checklist: `${DISCLOSED} by the PR template's AI-guidelines box`,
+  checklist: `${DISCLOSED} by the PR template’s AI-guidelines box`,
   description: `${DISCLOSED} in the description`,
   coauthor: `${DISCLOSED} as a co-author`,
   trailer: `${DISCLOSED} in a trailer`,

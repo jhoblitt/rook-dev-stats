@@ -225,7 +225,7 @@ describe('table figures on the fixture', () => {
       ['a disclosing trailer, such as Assisted-by:', '2', '0', '2'],
       ['Co-authored-by: naming a tool', '1', '0', '1'],
       ['disclosure phrasing in the description or a commit message', '0', '1', '1'],
-      ["the PR template's AI-guidelines box, ticked", '0', '0', '0'],
+      ['the PR template’s AI-guidelines box, ticked', '0', '0', '0'],
       ['AI use not disclosed', '6', '2', '8'],
     ]);
   });
