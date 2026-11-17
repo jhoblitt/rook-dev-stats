@@ -38,9 +38,7 @@ var (
 //   - the pull request this one is a backport of: the first named, other
 //     than number itself, by Mergify's sentence in the description, then
 //     "backport of" in the description, then the title's suffix.
-//
-// The commit messages decide nothing yet.
-func Hints(number int, title string, messages []string, description string, issues []record.Issue) *record.KindHints {
+func Hints(number int, title, description string, issues []record.Issue) *record.KindHints {
 	h := record.KindHints{BackportOf: backport(number, title, description)}
 	if len(issues) > 0 {
 		h.Issues = issues

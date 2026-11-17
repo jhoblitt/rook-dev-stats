@@ -79,7 +79,7 @@ func fromEntry(e fetch.Entry) (r record.Record, withheld map[string]int, err err
 		Reviews:     reviews(e.Reviews),
 		Comments:    comments(e.Comments),
 		Disclosure:  disclosure,
-		KindHints:   Hints(e.Number, e.Title, messages, e.Body, closingIssues(e.ClosingIssues)),
+		KindHints:   Hints(e.Number, e.Title, e.Body, closingIssues(e.ClosingIssues)),
 	}, withheld, nil
 }
 
