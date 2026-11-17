@@ -16,12 +16,12 @@ import (
 // a tuned rule reaches the records on the next run.
 
 // broad is the broad word list. Everything is case-insensitive except "AI",
-// which is matched only as an upper-case word. "cursor" is a RADOS term, so
-// Cursor is matched only by its agent address here, and as the value of a
-// -by trailer below. "claude" stays unbounded, since values such as
-// "IBM-Bob:ClaudeSonnet" run it into the next word; the words bounded here
-// otherwise match inside "raider", "philanthropic" and "regenerated
-// without".
+// which is matched only as an upper-case word. "cursor" is an ordinary word
+// in code and docs, as in Rook's prometheus-metric-cursor.png, so Cursor is
+// matched only by its agent address here, and as the value of a -by trailer
+// below. "claude" stays unbounded, so a model name run into the next word,
+// such as "ClaudeSonnet", still matches; the words bounded here otherwise
+// match inside "raider", "philanthropic" and "regenerated without".
 var broad = regexp.MustCompile(`(?i:` +
 	`claude|\banthropic\b|copilot|gemini|codex|chatgpt|openai|` +
 	`\bgpt(?:\b|\d)|\bllms?\b|` +
@@ -33,14 +33,13 @@ var broad = regexp.MustCompile(`(?i:` +
 // byValue is what else the value of a -by trailer may name.
 var byValue = regexp.MustCompile(`(?i)\bcursor\b`)
 
-// toolAddresses are the addresses, lower-cased, that tools sign a line
-// with: every address the committed candidates held when the list was made,
-// and none of a person. An address not here is a person's until a
-// maintainer, prompted by extract's log, adds it. A token is compared with
+// toolAddresses are the addresses, lower-cased, that tools are known to sign
+// a line with, and none of a person. An address not here is a person's until
+// a maintainer, prompted by extract's log, adds it. A token is compared with
 // them whole: nothing in this file looks for one inside a longer string.
 var toolAddresses = map[string]bool{
 	"noreply@anthropic.com":  true, // Claude Code
-	"norpley@anthropic.com":  true, // Claude Code's, misspelled in one commit
+	"norpley@anthropic.com":  true, // Claude Code's, misspelled
 	"cursoragent@cursor.com": true, // Cursor's agent
 	"bob@ibm.com":            true, // IBM Bob
 }
