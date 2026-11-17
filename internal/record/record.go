@@ -128,8 +128,9 @@ type Review struct {
 // Comment is a conversation comment. ID is GitHub's database id, zero when
 // the cache did not have it. Text is kept only for a comment that, after
 // trimming, is a single line of at most 80 characters with no "@" in it
-// but a leading mention of Mergify or Dependabot, since any other mention
-// or an e-mail address names a person; it is empty otherwise.
+// other than in a mention of Mergify or Dependabot that starts it and is
+// followed by white space, since any other mention or an e-mail address
+// names a person; it is empty otherwise.
 type Comment struct {
 	At   time.Time `json:"at"`
 	ID   int64     `json:"id,omitzero"`
