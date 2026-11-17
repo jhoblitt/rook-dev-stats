@@ -32,11 +32,11 @@ var _ = Describe("Check", func() {
 	// clean is a small dataset every check passes on.
 	clean := func() classify.CheckInput {
 		r1 := pr(1)
-		r1.Labels = []string{"needs-review", "rgw"}
+		r1.Labels = []string{"do-not-merge", "ceph-rgw"}
 		r1.Disclosure.Trailers = []string{"Assisted-by: Claude Code", "Co-authored-by: Cursor <cursoragent@cursor.com>"}
 		r1.Disclosure.Description = []string{"Address Claude review comments"}
 		r1.Comments = []record.Comment{
-			{By: "alice", Text: "jenkins test make check"},
+			{By: "alice", Text: "@mergifyio rebase"},
 			{By: "bob", Text: "LGTM"},
 			{By: "bob", Text: "lgtm"},
 			{By: "dependabot", Bot: true, Text: "rebased"},
@@ -45,10 +45,10 @@ var _ = Describe("Check", func() {
 		r1.KindHints = &record.KindHints{Issues: []record.Issue{{Number: 7, Repository: "rook/rook", Labels: []string{"bug"}}}}
 
 		r2 := pr(2)
-		r2.Base = "squid"
+		r2.Base = "release-1.18"
 		r2.Created = time.Date(2026, 5, 1, 0, 0, 0, 0, time.UTC)
 		r2.State = record.StateMerged
-		r2.Labels = []string{"rgw", "squid"}
+		r2.Labels = []string{"ceph-rgw", "security"}
 		r2.Disclosure.Description = []string{"Address Claude review comments", "GPT partition table"}
 		r2.Comments = []record.Comment{{By: "bob", Text: "LGTM"}, {By: "carol"}}
 
@@ -86,8 +86,8 @@ Accounts with the most comments, not typed bots by GitHub: 4
       1  carol
       1  ci-user (bots.yaml)
 Base branches: 2
-      2  main
-      1  squid
+      2  master
+      1  release-1.18
 `))
 	})
 

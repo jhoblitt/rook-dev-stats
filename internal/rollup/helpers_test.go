@@ -58,7 +58,7 @@ func pr(number int) record.Record {
 		Updated:    opened,
 		Title:      "title " + strconv.Itoa(number),
 		Author:     record.Actor{Login: "alice"},
-		Base:       "main",
+		Base:       "master",
 		Created:    opened,
 		State:      record.StateOpen,
 		Labels:     []string{},

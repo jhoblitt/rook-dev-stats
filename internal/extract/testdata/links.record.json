@@ -1,17 +1,17 @@
 {
   "number": 70010,
   "updated": "2026-09-12T10:00:00Z",
-  "title": "rbd: page the snapshot list",
+  "title": "block: page the snapshot list",
   "author": {"login": "ivan-example", "bot": false},
   "association": "contributor",
-  "base": "main",
+  "base": "master",
   "created": "2026-09-01T08:00:00Z",
   "state": "merged",
   "draft": false,
   "additions": 20,
   "deletions": 4,
   "files": 2,
-  "labels": ["rbd"],
+  "labels": ["block"],
   "commits": {"count": 3, "first_authored": "2026-08-30T10:00:00Z", "last_committed": "2026-09-03T09:05:00Z", "list": [
     {"sha": "1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d", "authored": "2026-08-31T10:00:00Z", "committed": "2026-09-03T09:00:00Z"},
     {"sha": "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e", "authored": "2026-08-30T10:00:00Z", "committed": "2026-09-03T09:00:00Z"},
@@ -30,7 +30,7 @@
     {"at": "2026-09-05T15:00:00Z", "id": 3123456789, "by": "judy-example", "bot": false, "state": "approved"}
   ],
   "comments": [
-    {"at": "2026-09-02T09:00:00Z", "id": 4854682435, "by": "judy-example", "bot": false, "text": "jenkins test make check"}
+    {"at": "2026-09-02T09:00:00Z", "id": 4854682435, "by": "judy-example", "bot": false, "text": "@mergifyio rebase"}
   ],
   "disclosure": {"trailers": [], "description": [], "commit_prose": []}
 }

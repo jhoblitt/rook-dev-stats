@@ -114,7 +114,7 @@ describe('the rollup output for the hand-made dataset', () => {
       expect(y.linksRecorded, `prs-${y.year}.json`).toBe(true);
       expect([...y.prs.backport_link], `prs-${y.year}.json`).toEqual(tables[i]!.backport_of.map((n) => (n > 0 ? 1 : 0)));
     });
-    // #66500 on squid says it is a backport of #66200.
+    // #66500 on release-1.18 says it is a backport of #66200.
     const y2026 = years[1]!;
     expect(y2026.prs.backport_link[y2026.prs.number.indexOf(66500)]).toBe(1);
     expect([...y2026.prs.backport_link].filter((v) => v === 1)).toHaveLength(1);

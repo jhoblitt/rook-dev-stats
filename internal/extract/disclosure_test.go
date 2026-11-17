@@ -37,7 +37,7 @@ func description(s string) record.Disclosure {
 var _ = Describe("Candidates", func() {
 	DescribeTable("a commit message line",
 		func(line string, want record.Disclosure) {
-			msg := "rgw: subject line\n\nSome body text.\n\n" + line + "\nSigned-off-by: Jane Roe <jane@example.com>\n"
+			msg := "object: subject line\n\nSome body text.\n\n" + line + "\nSigned-off-by: Jane Roe <jane@example.com>\n"
 			Expect(extract.Candidates([]string{msg}, "")).To(Equal(want), "line %q", line)
 		},
 
@@ -201,7 +201,7 @@ var _ = Describe("Candidates", func() {
 		)
 
 		It("is read only in the description, never in a commit message", func() {
-			msg := "rgw: fix\n\n- [x] Reviewed AI guidelines, if AI assisted with the PR.\n"
+			msg := "object: fix\n\n- [x] Reviewed AI guidelines, if AI assisted with the PR.\n"
 			Expect(extract.Candidates([]string{msg}, "")).To(Equal(prose("- [x] Reviewed AI guidelines, if AI assisted with the PR.")))
 		})
 	})
@@ -209,7 +209,7 @@ var _ = Describe("Candidates", func() {
 	Describe("an address, or what may be one", func() {
 		// commit is a commit message carrying line among its trailers.
 		commit := func(line string) []string {
-			return []string{"rgw: subject line\n\nSome body text.\n\n" + line + "\nSigned-off-by: Jane Roe <jane@example.com>\n"}
+			return []string{"object: subject line\n\nSome body text.\n\n" + line + "\nSigned-off-by: Jane Roe <jane@example.com>\n"}
 		}
 
 		DescribeTable("keeps a line whose only addresses are tools'",
@@ -510,7 +510,7 @@ var _ = Describe("Candidates", func() {
 		)
 
 		It("withholds a quoted local part in an Assisted-by trailer", func() {
-			msg := "rgw: fix\n\nAssisted-by: Claude, questions to \"Ana Smith\"@example.com\n"
+			msg := "object: fix\n\nAssisted-by: Claude, questions to \"Ana Smith\"@example.com\n"
 
 			got, withheld := extract.Candidates([]string{msg}, "")
 
@@ -568,8 +568,8 @@ var _ = Describe("Candidates", func() {
 			"Signed-off-by: Jane Roe <jane@example.com>\n" +
 			"(cherry picked from commit 0123456789abcdef0123456789abcdef01234567)\n\n" +
 			"Conflicts:\n" +
-			"\tsrc/osd/PrimaryLogPG.cc\n" +
-			"\t- kept the squid include order\n"
+			"\tpkg/operator/ceph/cluster/osd/spec.go\n" +
+			"\t- kept release-1.18's import order\n"
 
 		Expect(extract.Candidates([]string{msg}, "")).To(Equal(trailer("Assisted-by: Claude Code")))
 	})
@@ -601,6 +601,6 @@ var _ = Describe("Candidates", func() {
 	})
 
 	It("has no candidates, and empty lists rather than null, for text with none", func() {
-		Expect(extract.Candidates([]string{"rgw: fix\n\nSigned-off-by: Jane Roe <jane@example.com>"}, "")).To(Equal(none()))
+		Expect(extract.Candidates([]string{"object: fix\n\nSigned-off-by: Jane Roe <jane@example.com>"}, "")).To(Equal(none()))
 	})
 })

@@ -26,7 +26,7 @@ func minimal(number int, created string) record.Record {
 		Updated:  at(created),
 		Title:    "a pull request",
 		Author:   record.Actor{Login: "alice"},
-		Base:     "main",
+		Base:     "master",
 		Created:  at(created),
 		State:    record.StateOpen,
 		Labels:   []string{},
@@ -61,16 +61,16 @@ var _ = Describe("records", func() {
 		r := record.Record{
 			Number:      71234,
 			Updated:     at("2026-06-02T10:00:00Z"),
-			Title:       "rgw: a <title> & more",
+			Title:       "object: a <title> & more",
 			Author:      record.Actor{Login: "alice"},
 			Association: "member",
-			Base:        "main",
+			Base:        "master",
 			Created:     at("2026-05-20T08:00:00Z"),
 			State:       record.StateMerged,
 			Additions:   10,
 			Deletions:   2,
 			Files:       3,
-			Labels:      []string{"core", "rgw"},
+			Labels:      []string{"core", "ceph-rgw"},
 			Commits: record.Commits{
 				Count:         2,
 				FirstAuthored: new(at("2026-05-19T07:00:00Z")),
@@ -89,7 +89,7 @@ var _ = Describe("records", func() {
 				{At: at("2026-05-30T00:00:00Z"), ID: 3412345678, By: "bob", State: record.ReviewApproved},
 			},
 			Comments: []record.Comment{
-				{At: at("2026-05-21T00:00:00Z"), ID: 4854682435, By: "carol", Text: "jenkins test make check"},
+				{At: at("2026-05-21T00:00:00Z"), ID: 4854682435, By: "carol", Text: "@mergifyio rebase"},
 				{At: at("2026-05-22T00:00:00Z"), By: "github-actions", Bot: true},
 			},
 			Disclosure: record.Disclosure{
@@ -100,10 +100,10 @@ var _ = Describe("records", func() {
 		Expect(record.WriteRecords(dataDir, []record.Record{r})).To(ConsistOf(monthFile("2026-05")))
 
 		Expect(readFile(monthFile("2026-05"))).To(Equal(
-			`{"number":71234,"updated":"2026-06-02T10:00:00Z","title":"rgw: a <title> & more",` +
-				`"author":{"login":"alice","bot":false},"association":"member","base":"main",` +
+			`{"number":71234,"updated":"2026-06-02T10:00:00Z","title":"object: a <title> & more",` +
+				`"author":{"login":"alice","bot":false},"association":"member","base":"master",` +
 				`"created":"2026-05-20T08:00:00Z","state":"merged","draft":false,` +
-				`"additions":10,"deletions":2,"files":3,"labels":["core","rgw"],` +
+				`"additions":10,"deletions":2,"files":3,"labels":["core","ceph-rgw"],` +
 				`"commits":{"count":2,"first_authored":"2026-05-19T07:00:00Z","last_committed":"2026-05-21T09:00:00Z",` +
 				`"list":[{"sha":"9f1c","authored":"2026-05-20T07:00:00Z","committed":"2026-05-21T09:00:00Z"},` +
 				`{"authored":"2026-05-19T07:00:00Z","committed":"2026-05-20T09:00:00Z"}]},` +
@@ -111,7 +111,7 @@ var _ = Describe("records", func() {
 				`"events":[{"at":"2026-05-31T00:00:00Z","kind":"reopened"},` +
 				`{"at":"2026-06-01T00:00:00Z","kind":"merged","id":28644873432,"sha":"c0ff"}],` +
 				`"reviews":[{"at":"2026-05-30T00:00:00Z","id":3412345678,"by":"bob","bot":false,"state":"approved"}],` +
-				`"comments":[{"at":"2026-05-21T00:00:00Z","id":4854682435,"by":"carol","bot":false,"text":"jenkins test make check"},` +
+				`"comments":[{"at":"2026-05-21T00:00:00Z","id":4854682435,"by":"carol","bot":false,"text":"@mergifyio rebase"},` +
 				`{"at":"2026-05-22T00:00:00Z","by":"github-actions","bot":true}],` +
 				`"disclosure":{"trailers":["Assisted-by: Claude"],"description":[],"commit_prose":[]}}` + "\n"))
 	})
@@ -215,15 +215,15 @@ var _ = Describe("records", func() {
 	})
 
 	It("reads a record written before records carried links, and writes it back byte for byte", func() {
-		line := `{"number":70001,"updated":"2026-06-20T17:30:00Z","title":"squid: rgw: fix a <leak> & a race",` +
-			`"author":{"login":"alice-example","bot":false},"association":"member","base":"squid",` +
+		line := `{"number":70001,"updated":"2026-06-20T17:30:00Z","title":"object: fix a <leak> & a race",` +
+			`"author":{"login":"alice-example","bot":false},"association":"member","base":"release-1.18",` +
 			`"created":"2026-06-02T08:00:00Z","state":"merged","draft":false,"additions":40,"deletions":12,"files":3,` +
-			`"labels":["rgw","squid"],` +
+			`"labels":["ceph-rgw","release-1.18"],` +
 			`"commits":{"count":2,"first_authored":"2026-02-10T08:00:00Z","last_committed":"2026-06-01T12:05:00Z"},` +
 			`"prior_prs":3,` +
 			`"events":[{"at":"2026-06-20T17:00:00Z","kind":"merged"},{"at":"2026-06-20T17:00:00Z","kind":"closed"}],` +
 			`"reviews":[{"at":"2026-06-10T15:00:00Z","by":"bob-example","bot":false,"state":"approved"}],` +
-			`"comments":[{"at":"2026-06-03T09:00:00Z","by":"alice-example","bot":false,"text":"jenkins test make check"}],` +
+			`"comments":[{"at":"2026-06-03T09:00:00Z","by":"alice-example","bot":false,"text":"@mergifyio rebase"}],` +
 			`"disclosure":{"trailers":["Assisted-by: Claude Code"],"description":[],"commit_prose":[]}}` + "\n"
 		Expect(os.MkdirAll(filepath.Join(dataDir, record.PRsDir), 0o750)).To(Succeed())
 		Expect(os.WriteFile(monthFile("2026-06"), []byte(line), 0o600)).To(Succeed())
@@ -259,7 +259,7 @@ var _ = Describe("meta", func() {
 		dataDir = GinkgoT().TempDir()
 		path = filepath.Join(dataDir, record.MetaFile)
 		meta = record.Meta{
-			Repo:           "ceph/ceph",
+			Repo:           "rook/rook",
 			WindowStart:    time.Date(2026, 5, 15, 0, 0, 0, 0, time.UTC),
 			FetchedThrough: time.Date(2026, 11, 15, 12, 0, 1, 0, time.UTC),
 			GitHubCounts:   record.Counts{OpenedInWindow: 4985, OpenedInWindowSource: record.SourceSearch, Open: 2019},
@@ -270,7 +270,7 @@ var _ = Describe("meta", func() {
 		Expect(record.WriteMeta(dataDir, meta)).To(BeTrue())
 
 		Expect(readFile(path)).To(Equal(`{
-  "repo": "ceph/ceph",
+  "repo": "rook/rook",
   "window_start": "2026-05-15T00:00:00Z",
   "fetched_through": "2026-11-15T12:00:01Z",
   "github_counts": {
@@ -294,7 +294,7 @@ var _ = Describe("meta", func() {
 	)
 
 	It("reads a meta.json written before it recorded the source without one", func() {
-		Expect(os.WriteFile(path, []byte(`{"repo":"ceph/ceph","fetched_through":"2026-11-15T12:00:01Z","github_counts":{"opened_in_window":4985,"open":2019}}`), 0o600)).To(Succeed())
+		Expect(os.WriteFile(path, []byte(`{"repo":"rook/rook","fetched_through":"2026-11-15T12:00:01Z","github_counts":{"opened_in_window":4985,"open":2019}}`), 0o600)).To(Succeed())
 
 		m, err := record.ReadMeta(dataDir)
 
@@ -314,7 +314,7 @@ var _ = Describe("meta", func() {
 	})
 
 	It("is an error naming the file when fetched_through is missing", func() {
-		Expect(os.WriteFile(path, []byte(`{"repo":"ceph/ceph"}`), 0o600)).To(Succeed())
+		Expect(os.WriteFile(path, []byte(`{"repo":"rook/rook"}`), 0o600)).To(Succeed())
 
 		_, err := record.ReadMeta(dataDir)
 

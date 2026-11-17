@@ -1,6 +1,6 @@
 components:
-  - {id: cephfs, name: CephFS, labels: [cephfs]}
-  - {id: rbd, name: RBD, labels: [rbd]}
-  - {id: rgw, name: RGW, labels: [rgw, 'rgw-*']}
-process: [needs-review]
+  - {id: block, name: Block, labels: [block]}
+  - {id: filesystem, name: File system, labels: [filesystem]}
+  - {id: object, name: Object, labels: [ceph-rgw, 'object-*']}
+process: [do-not-merge]
 other: [cleanup, bug-fix, feature]

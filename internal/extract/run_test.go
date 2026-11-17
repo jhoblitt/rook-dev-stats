@@ -435,7 +435,7 @@ var _ = Describe("Run", func() {
 	})
 
 	It("adds the cache's baselines to the committed ones of the same window", func() {
-		Expect(record.WriteMeta(dataDir, record.Meta{Repo: "ceph/ceph", WindowStart: window, FetchedThrough: day(11, 1)})).To(BeTrue())
+		Expect(record.WriteMeta(dataDir, record.Meta{Repo: "rook/rook", WindowStart: window, FetchedThrough: day(11, 1)})).To(BeTrue())
 		Expect(record.WriteAuthors(dataDir, map[string]int{"kim": 4, "lee": 1})).To(BeTrue())
 		baselines(map[string]int{"lee": 2, "max": 7})
 
@@ -477,7 +477,7 @@ var _ = Describe("Run", func() {
 
 		Context("in the committed data", func() {
 			BeforeEach(func() {
-				Expect(record.WriteMeta(dataDir, record.Meta{Repo: "ceph/ceph", WindowStart: otherWindow, FetchedThrough: day(10, 1)})).To(BeTrue())
+				Expect(record.WriteMeta(dataDir, record.Meta{Repo: "rook/rook", WindowStart: otherWindow, FetchedThrough: day(10, 1)})).To(BeTrue())
 				Expect(record.WriteAuthors(dataDir, map[string]int{"kim": 40, "lee": 9})).To(BeTrue())
 			})
 
@@ -516,7 +516,7 @@ var _ = Describe("Run", func() {
 	})
 
 	It("leaves the committed meta alone when the cache has none", func() {
-		meta := record.Meta{Repo: "ceph/ceph", WindowStart: window, FetchedThrough: day(11, 1)}
+		meta := record.Meta{Repo: "rook/rook", WindowStart: window, FetchedThrough: day(11, 1)}
 		Expect(record.WriteMeta(dataDir, meta)).To(BeTrue())
 		cache(fixture("ghost"))
 
@@ -539,7 +539,7 @@ var _ = Describe("Run", func() {
 		e := entry(1, "alice", day(6, 1))
 		e.Commits = []fetch.Commit{{
 			AuthoredDate: day(6, 1), CommittedDate: day(6, 1),
-			Message: "rgw: fix\n\nCo-authored-by: Claude Dupont <claude.dupont@example.com>\nCo-authored-by: Claude <noreply@anthropic.com>\nCo-authored-by: Claude Martin\n",
+			Message: "object: fix\n\nCo-authored-by: Claude Dupont <claude.dupont@example.com>\nCo-authored-by: Claude <noreply@anthropic.com>\nCo-authored-by: Claude Martin\n",
 		}}
 		e.Body = "Original-Author: Claude X <x@y>\nCo-authored-by: Ana Smith <ana.smith@Example.com>, Claude\nGenerated with Claude, ask jo@exa_mple.com\n"
 		cache(e)

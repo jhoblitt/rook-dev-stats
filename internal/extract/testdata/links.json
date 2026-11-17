@@ -1,6 +1,6 @@
 {
   "number": 70010,
-  "title": "rbd: page the snapshot list",
+  "title": "block: page the snapshot list",
   "body": "The snapshot list is paged so large images load quickly.",
   "state": "MERGED",
   "isDraft": false,
@@ -8,7 +8,7 @@
   "updatedAt": "2026-09-12T10:00:00Z",
   "closedAt": "2026-09-12T09:00:00Z",
   "mergedAt": "2026-09-12T09:00:00Z",
-  "baseRefName": "main",
+  "baseRefName": "master",
   "additions": 20,
   "deletions": 4,
   "changedFiles": 2,
@@ -19,7 +19,7 @@
   },
   "labels": [
     {
-      "name": "rbd"
+      "name": "block"
     }
   ],
   "commits": [
@@ -33,7 +33,7 @@
       "oid": "2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e",
       "authoredDate": "2026-08-30T10:00:00Z",
       "committedDate": "2026-09-03T09:00:00Z",
-      "message": "rbd: page the snapshot list\n\nSigned-off-by: Ivan Example <ivan@example.com>\n"
+      "message": "block: page the snapshot list\n\nSigned-off-by: Ivan Example <ivan@example.com>\n"
     },
     {
       "oid": "3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f",
@@ -46,7 +46,7 @@
     {
       "fullDatabaseId": "4854682435",
       "createdAt": "2026-09-02T09:00:00Z",
-      "body": "jenkins test make check",
+      "body": "@mergifyio rebase",
       "author": {
         "login": "judy-example",
         "__typename": "User"
@@ -78,12 +78,12 @@
     {
       "__typename": "ReadyForReviewEvent",
       "createdAt": "2026-09-03T10:00:00Z",
-      "url": "https://github.com/ceph/ceph/pull/70010#event-28644873432"
+      "url": "https://github.com/rook/rook/pull/70010#event-28644873432"
     },
     {
       "__typename": "ClosedEvent",
       "createdAt": "2026-09-06T00:00:00Z",
-      "url": "https://github.com/ceph/ceph/pull/70010#event-28700000001"
+      "url": "https://github.com/rook/rook/pull/70010#event-28700000001"
     },
     {
       "__typename": "ReopenedEvent",
@@ -92,7 +92,7 @@
     {
       "__typename": "MergedEvent",
       "createdAt": "2026-09-12T09:00:00Z",
-      "url": "https://github.com/ceph/ceph/pull/70010#event-28800000002",
+      "url": "https://github.com/rook/rook/pull/70010#event-28800000002",
       "commit": {
         "oid": "4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f70"
       }
@@ -100,7 +100,7 @@
     {
       "__typename": "ClosedEvent",
       "createdAt": "2026-09-12T09:00:00Z",
-      "url": "https://github.com/ceph/ceph/pull/70010#event-28800000003"
+      "url": "https://github.com/rook/rook/pull/70010#event-28800000003"
     }
   ],
   "fetchedAt": "2026-11-15T12:00:00Z",

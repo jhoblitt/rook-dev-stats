@@ -89,10 +89,10 @@ var _ = Describe("links back to GitHub", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(r.Events).To(Equal([]record.Event{{At: e.CreatedAt, Kind: record.KindClosed}}), "address %q", url)
 			},
-			Entry("an issue comment's address", "https://github.com/ceph/ceph/pull/1#issuecomment-5"),
-			Entry("no digits", "https://github.com/ceph/ceph/pull/1#event-"),
-			Entry("something after the digits", "https://github.com/ceph/ceph/pull/1#event-12x"),
-			Entry("more digits than an int64 holds", "https://github.com/ceph/ceph/pull/1#event-99999999999999999999"),
+			Entry("an issue comment's address", "https://github.com/rook/rook/pull/1#issuecomment-5"),
+			Entry("no digits", "https://github.com/rook/rook/pull/1#event-"),
+			Entry("something after the digits", "https://github.com/rook/rook/pull/1#event-12x"),
+			Entry("more digits than an int64 holds", "https://github.com/rook/rook/pull/1#event-99999999999999999999"),
 		)
 	})
 
@@ -119,7 +119,7 @@ var _ = Describe("links back to GitHub", func() {
 			odd := func(number int, at time.Time) fetch.Entry {
 				e := entry(number, "alice", at)
 				e.TimelineItems = []fetch.Event{
-					{Typename: "ClosedEvent", CreatedAt: at, URL: "https://github.com/ceph/ceph/pull/" + strconv.Itoa(number) + "#closed"},
+					{Typename: "ClosedEvent", CreatedAt: at, URL: "https://github.com/rook/rook/pull/" + strconv.Itoa(number) + "#closed"},
 					{Typename: "ReopenedEvent", CreatedAt: at.Add(time.Hour)},
 					{Typename: "ClosedEvent", CreatedAt: at.Add(2 * time.Hour)},
 				}
@@ -142,7 +142,7 @@ var _ = Describe("links back to GitHub", func() {
 			Expect(warnings).To(HaveExactElements(And(
 				HaveKeyWithValue("level", "WARN"),
 				HaveKeyWithValue("events", 2.0),
-				HaveKeyWithValue("example", "https://github.com/ceph/ceph/pull/1#closed"),
+				HaveKeyWithValue("example", "https://github.com/rook/rook/pull/1#closed"),
 			)), "log:\n%s", logs.String())
 		})
 

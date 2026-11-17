@@ -8,7 +8,7 @@
   "updatedAt": "2026-10-09T10:00:00.250Z",
   "closedAt": "2026-10-09T10:00:00Z",
   "mergedAt": null,
-  "baseRefName": "main",
+  "baseRefName": "master",
   "additions": 15,
   "deletions": 15,
   "changedFiles": 2,

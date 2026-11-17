@@ -49,11 +49,11 @@ var _ = Describe("check", func() {
 		}
 		opened := time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC)
 		_, err := record.WriteRecords(dataDir, []record.Record{{
-			Number: 7, Updated: opened, Created: opened, Base: "main", State: record.StateOpen,
+			Number: 7, Updated: opened, Created: opened, Base: "master", State: record.StateOpen,
 			Author: record.Actor{Login: "alice"},
-			Labels: []string{"rgw"},
+			Labels: []string{"ceph-rgw"},
 			Comments: []record.Comment{
-				{At: opened, By: "alice", Text: "jenkins test make check"},
+				{At: opened, By: "alice", Text: "@mergifyio rebase"},
 				{At: opened, By: "bob", Text: "LGTM"},
 			},
 			Disclosure: record.Disclosure{Trailers: trailers, CommitProse: commitProse},
@@ -80,7 +80,7 @@ var _ = Describe("check", func() {
 
 		Expect(run("--report")).To(Succeed())
 		Expect(stdout.String()).To(ContainSubstring("Counts: 1 opened in the window (GitHub's search: 1), 1 open (GitHub's listing: 1)\n"))
-		Expect(stdout.String()).To(ContainSubstring("Base branches: 1\n      1  main\n"))
+		Expect(stdout.String()).To(ContainSubstring("Base branches: 1\n      1  master\n"))
 	})
 
 	It("fails, listing the problems it found", func() {

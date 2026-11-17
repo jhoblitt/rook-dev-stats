@@ -42,7 +42,7 @@ func user(login string) *fetch.Actor { return &fetch.Actor{Login: login, Typenam
 func pr(number, updated int, state string) fetch.Entry {
 	e := fetch.Entry{
 		Number: number, Title: "pr " + strconv.Itoa(number), Body: "body", State: state,
-		CreatedAt: at(-100), UpdatedAt: at(updated), BaseRefName: "main",
+		CreatedAt: at(-100), UpdatedAt: at(updated), BaseRefName: "master",
 		Additions: 3, Deletions: 1, ChangedFiles: 2, AuthorAssociation: "MEMBER",
 		Author: user("alice"),
 	}
@@ -203,7 +203,7 @@ var _ = Describe("Run", func() {
 	It("caches a PR with every page of its commits, comments and reviews, in order", func() {
 		want := pr(1, 5, "MERGED")
 		want.MergedAt = new(at(5))
-		want.Labels = []fetch.Label{{Name: "rgw"}, {Name: "tests"}, {Name: "backport"}}
+		want.Labels = []fetch.Label{{Name: "ceph-rgw"}, {Name: "tests"}, {Name: "backport"}}
 		want.ClosingIssues = []fetch.ClosingIssue{
 			{Number: 40, Repository: "rook/rook", Labels: []fetch.Label{{Name: "bug"}, {Name: "csi"}}},
 			{Number: 39, Repository: "ceph/ceph-csi", Labels: []fetch.Label{}},
@@ -714,7 +714,7 @@ var _ = Describe("Run", func() {
 			return t
 		}
 		ref := func(oid string) *fetch.CommitRef { return &fetch.CommitRef{OID: oid} }
-		const addr = "https://github.com/ceph/ceph/pull/69877#event-"
+		const addr = "https://github.com/rook/rook/pull/69877#event-"
 		e := entry(69877)
 		Expect(e.FormatVersion).To(Equal(fetch.FormatVersion))
 		Expect(e.Commits).To(HaveExactElements(

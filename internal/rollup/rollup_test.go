@@ -98,9 +98,9 @@ var _ = Describe("Build", func() {
 			Entry("not the author's comments and reviews, commands, bot accounts or bot reviews", func(r *record.Record) {
 				r.Comments = []record.Comment{
 					comment(h(1), "alice", "thanks"),
-					comment(h(2), "bob", "jenkins test make check"),
+					comment(h(2), "bob", "@mergifyio rebase"),
 					comment(h(3), "ci-runner", "looks good"),
-					botComment(h(4), "ceph-bot", "build passed"),
+					botComment(h(4), "mergify", "build passed"),
 					comment(h(9), "bob", "a real review comment"),
 				}
 				r.Reviews = []record.Review{
@@ -222,10 +222,10 @@ var _ = Describe("Build", func() {
 				review(h(5), "ci-runner", record.ReviewApproved),
 			}
 			r.Comments = []record.Comment{
-				comment(h(1), "alice", "jenkins test make check"),
-				comment(h(2), "bob", "jenkins retest this please"),
-				botComment(h(3), "ceph-bot", "jenkins test make check"),
-				comment(h(4), "ci-runner", "jenkins test make check"),
+				comment(h(1), "alice", "@mergifyio rebase"),
+				comment(h(2), "bob", "ok to test"),
+				botComment(h(3), "mergify", "@mergifyio rebase"),
+				comment(h(4), "ci-runner", "@mergifyio rebase"),
 				comment(h(5), "bob", "lgtm"),
 			}
 			o := build(r)
@@ -276,11 +276,11 @@ var _ = Describe("Build", func() {
 
 		It("indexes state and base, and copies the sizes and flags", func() {
 			a, b, c := pr(1), pr(2), pr(3)
-			a.Base, a.Additions, a.Deletions, a.Files, a.Commits.Count = "squid", 10, 2, 3, 4
-			b.Base, b.State, b.Draft = "main", record.StateMerged, true
-			c.Base, c.State = "reef", record.StateClosed
+			a.Base, a.Additions, a.Deletions, a.Files, a.Commits.Count = "release-1.18", 10, 2, 3, 4
+			b.Base, b.State, b.Draft = "master", record.StateMerged, true
+			c.Base, c.State = "release-1.17", record.StateClosed
 			o := build(c, a, b)
-			Expect(o.meta().Bases).To(Equal([]string{"main", "reef", "squid"}))
+			Expect(o.meta().Bases).To(Equal([]string{"master", "release-1.17", "release-1.18"}))
 			Expect(o.col(2026, "number")).To(Equal([]int64{1, 2, 3}))
 			Expect(o.col(2026, "created")).To(Equal([]int64{epoch(opened), epoch(opened), epoch(opened)}))
 			Expect(o.col(2026, "base")).To(Equal([]int64{2, 0, 1}))
@@ -326,7 +326,7 @@ var _ = Describe("Build", func() {
 
 		It("indexes the disclosure, its families and the components, lists ascending", func() {
 			r := pr(1)
-			r.Labels = []string{"cephfs", "rgw", "needs-review"}
+			r.Labels = []string{"filesystem", "ceph-rgw", "do-not-merge"}
 			r.Disclosure = record.Disclosure{
 				Trailers:    []string{"Assisted-by: Claude Code"},
 				Description: []string{"Generated with Copilot"},
@@ -336,7 +336,7 @@ var _ = Describe("Build", func() {
 			Expect(o.meta().Disclosure).To(Equal([]string{"none", "checklist", "description", "coauthor", "trailer"}))
 			Expect(o.one("disclosure")).To(Equal(int64(4)))
 			Expect(o.lists(2026, "families")).To(Equal([][]int{{0, 1}}))
-			Expect(o.lists(2026, "components")).To(Equal([][]int{{0, 2}}))
+			Expect(o.lists(2026, "components")).To(Equal([][]int{{1, 2}}))
 		})
 
 		It("writes empty lists, not null, for no family and no component", func() {
@@ -389,7 +389,7 @@ var _ = Describe("Build", func() {
 		DescribeTable("backport_link: whether the description links the pull request it backports",
 			func(hints *record.KindHints, want int64) {
 				r := pr(2)
-				r.Base = "squid"
+				r.Base = "release-1.18"
 				r.KindHints = hints
 				Expect(build(r).one("backport_link")).To(Equal(want))
 			},
@@ -419,17 +419,17 @@ var _ = Describe("Build", func() {
 			}
 			r.Comments = []record.Comment{
 				{At: h(1), ID: 301, By: "bob"},
-				{At: h(4), ID: 302, By: "alice", Text: "jenkins test make check"},
-				{At: h(4), ID: 303, By: "bob", Text: "jenkins retest this please"},
-				{At: h(6), ID: 304, By: "ci-runner", Text: "jenkins test make check"},
+				{At: h(4), ID: 302, By: "alice", Text: "@mergifyio rebase"},
+				{At: h(4), ID: 303, By: "bob", Text: "ok to test"},
+				{At: h(6), ID: 304, By: "ci-runner", Text: "@mergifyio rebase"},
 				{At: h(8), ID: 305, By: "alice", Text: "thanks"},
 			}
 			Expect(build(r).evs(2026)).To(Equal([]ev{
 				{PR: 1, At: h(1), Kind: "comment_other", Actor: "bob", Ref: "301"},
 				{PR: 1, At: h(2), Kind: "ready", Ref: "101"},
 				{PR: 1, At: h(3), Kind: "review_changes", Actor: "carol", Ref: "201"},
-				{PR: 1, At: h(4), Kind: "command_author", Sub: "make-check", Ref: "302"},
-				{PR: 1, At: h(4), Kind: "command_other", Sub: "retest", Ref: "303"},
+				{PR: 1, At: h(4), Kind: "command_author", Sub: "mergify-rebase", Ref: "302"},
+				{PR: 1, At: h(4), Kind: "command_other", Sub: "ok-to-test", Ref: "303"},
 				{PR: 1, At: h(5), Kind: "review_author", Ref: "202"},
 				{PR: 1, At: h(6), Kind: "bot_account", Ref: "304"},
 				{PR: 1, At: h(6), Kind: "bot_review", Ref: "203"},
@@ -578,10 +578,10 @@ var _ = Describe("Build", func() {
 
 		It("carries titles and authors as written", func() {
 			r := pr(1)
-			r.Title = `rgw: fix a <leak> & a "race"`
+			r.Title = `object: fix a <leak> & a "race"`
 			r.Author = record.Actor{Login: "Alice-Example"}
 			t := build(r).table(2026)
-			Expect(t.Titles).To(Equal([]string{`rgw: fix a <leak> & a "race"`}))
+			Expect(t.Titles).To(Equal([]string{`object: fix a <leak> & a "race"`}))
 			Expect(t.Authors).To(Equal([]string{"Alice-Example"}))
 		})
 	})
@@ -596,7 +596,7 @@ var _ = Describe("Build", func() {
 			b.Author = record.Actor{Login: "bob"}
 			b.Comments = []record.Comment{
 				{At: h(5), By: "dan"},
-				{At: h(3), By: "frank", Text: "jenkins test make check"},
+				{At: h(3), By: "frank", Text: "@mergifyio rebase"},
 				{At: h(4), By: "alice"},
 			}
 			b.Reviews = []record.Review{{At: h(6), By: "bob", State: record.ReviewCommented}}
@@ -671,13 +671,13 @@ var _ = Describe("Build", func() {
 			old.Created = time.Date(2025, 11, 3, 0, 0, 0, 0, time.UTC)
 			old.State, old.Updated = record.StateMerged, time.Date(2025, 11, 4, 0, 0, 0, 0, time.UTC)
 			m := build(pr(2), old).meta()
-			Expect(m.Repo).To(Equal("ceph/ceph"))
+			Expect(m.Repo).To(Equal("rook/rook"))
 			Expect(m.WindowStart).To(Equal(epoch(windowStart)))
 			Expect(m.FetchedThrough).To(Equal(epoch(fetchedThrough)))
 			Expect(m.Years).To(Equal([]int{2025, 2026}))
-			Expect(m.Components).To(Equal([]named{{"cephfs", "CephFS"}, {"rbd", "RBD"}, {"rgw", "RGW"}}))
+			Expect(m.Components).To(Equal([]named{{"block", "Block"}, {"filesystem", "File system"}, {"object", "Object"}}))
 			Expect(m.Families).To(Equal([]named{{"claude", "Claude"}, {"copilot", "GitHub Copilot"}, {"unspecified", "unspecified"}}))
-			Expect(m.Commands).To(Equal([]named{{"make-check", "jenkins test make check"}, {"retest", "jenkins retest this please"}}))
+			Expect(m.Commands).To(Equal([]named{{"mergify-rebase", "@mergifyio rebase"}, {"ok-to-test", "ok to test"}}))
 			Expect(m.Kinds).To(Equal([]named{
 				{"bugfix", "Bug fix"}, {"feature", "Feature"}, {"cleanup", "Cleanup"}, {"docs", "Documentation"}, {"other", "Other"},
 			}))
