@@ -113,6 +113,21 @@ var neverKept = map[string]bool{
 	"link": true, "url": true,
 }
 
+// checklistLine is a Markdown checklist line, its bullet optional: the
+// box's mark, empty or an x in any case, and its label.
+var checklistLine = regexp.MustCompile(`^(?:[-*+]\s*)?\[\s*([xX]?)\s*\]\s*(.*)$`)
+
+// templateLabel is, lower-cased, a label that says no more than the
+// AI-guidelines box of rook/rook's pull request template, with or without
+// its link and its condition. It may name another guide first, as in
+// "reviewed developer guide and ai guidelines", but no other words: they
+// could say how AI was used.
+var templateLabel = regexp.MustCompile(`^reviewed (?:(?:the )?[a-z]+ guides? and )?(?:\[ai guidelines\]\([^)]*\)|ai guidelines)(?:,? if ai assisted with the pr)?\.?$`)
+
+// mergifyBreak is where Mergify joins its sentence to the description of
+// the pull request it backports.
+const mergifyBreak = "<hr>"
+
 // maxCandidate is the most characters of a line a candidate keeps.
 const maxCandidate = 200
 
@@ -122,6 +137,10 @@ const maxCandidate = 200
 //     key ends in -by and whose value does;
 //   - commit_prose: any other commit-message line that matches;
 //   - description: any description line that matches.
+//
+// A description line that is the AI-guidelines box sets Checklist when it
+// is ticked, and is a candidate only when it says more than the template
+// does.
 //
 // A line with a never-kept key is dropped from all three, and so is a line
 // withhold refuses, which is counted in withheld under the key withhold
@@ -154,8 +173,15 @@ func Candidates(messages []string, description string) (d record.Disclosure, wit
 			}
 		}
 	}
+	checklist := false
 	for line := range strings.Lines(description) {
 		line = strings.TrimSpace(line)
+		if isBox, ticked, more := aiBox(line); isBox {
+			checklist = checklist || ticked
+			if !more {
+				continue
+			}
+		}
 		key, _, isTrailer := splitTrailer(line)
 		if isTrailer && neverKept[key] {
 			continue
@@ -164,7 +190,24 @@ func Candidates(messages []string, description string) (d record.Disclosure, wit
 			keep(desc, line)
 		}
 	}
-	return record.Disclosure{Trailers: trailers.lines, Description: desc.lines, CommitProse: prose.lines}, withheld
+	return record.Disclosure{Trailers: trailers.lines, Description: desc.lines, CommitProse: prose.lines, Checklist: checklist}, withheld
+}
+
+// aiBox reports whether line is the AI-guidelines box: a checklist line
+// whose label, lower-cased, starts with "reviewed" and holds "ai
+// guidelines". It reports too whether the box is ticked, and whether the
+// label says more than templateLabel before any mergifyBreak.
+func aiBox(line string) (isBox, ticked, more bool) {
+	m := checklistLine.FindStringSubmatch(line)
+	if m == nil {
+		return false, false, false
+	}
+	label := strings.ToLower(m[2])
+	if !strings.HasPrefix(label, "reviewed") || !strings.Contains(label, "ai guidelines") {
+		return false, false, false
+	}
+	own, _, _ := strings.Cut(label, mergifyBreak)
+	return true, m[1] != "", !templateLabel.MatchString(strings.TrimSpace(own))
 }
 
 // withhold reports whether a candidate line must not be kept, since it may

@@ -221,7 +221,9 @@ Rook where it had fit Ceph.
   `generated-by`.
 - **rook:** `Documentation/Contributing/ai-guidelines.md` requires a
   statement in the PR description. It permits `Co-authored-by`,
-  `Assisted-by` and `Generated-by` trailers.
+  `Assisted-by` and `Generated-by` trailers. The PR template's
+  AI-guidelines box, ticked, counts as the weakest class, "checklist" (see
+  below).
 - **Where:** `data/tools.yaml`, `internal/extract/disclosure.go`,
   `internal/classify/classify.go`.
 - **Found:** each project's documents and `check --report`.
@@ -245,9 +247,19 @@ Rook where it had fit Ceph.
   rule are listed in `ignore`.
 - **rook:** the template line "Reviewed AI guidelines, if AI assisted with
   the PR" matches `\bAI\b`. It is in about 830 pull requests. The owner
-  chose to count a ticked box as its own, weakest class, "checklist".
-- **Where:** `data/tools.yaml` (`ignore`, until the box rule lands),
-  `internal/extract/disclosure.go`, `internal/classify/classify.go`.
+  chose to count a ticked box as its own, weakest class, "checklist",
+  which names no tool. extract reads a description's checklist line whose
+  label starts with "reviewed" and holds "ai guidelines" as the box: a
+  ticked one sets the record's `checklist`, and the line is a candidate
+  only when it says more than the template, as some authors' "(Prepared
+  with AI assistance; …)" does. A Mergify backport joins its own sentence
+  to its original's description with `<hr>`, so when the box ends the
+  description the sentence lands on the box's line; the label is judged
+  only up to the `<hr>`. In the data of 2026-11-16, 416 of 11,876 pull
+  requests tick the box, 106 of them disclosing in no other way.
+- **Where:** `internal/extract/disclosure.go` (`aiBox`),
+  `internal/classify/classify.go`, `site/src/lib/timeline.ts`
+  (`DISCLOSURE_WORDS`), `site/src/lib/methods/present.ts`.
 - **Found:** sampling (99 of 200 ticked it), confirmed by `check --report`.
 
 ### Trailers that name people

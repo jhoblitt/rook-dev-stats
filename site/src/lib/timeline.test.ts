@@ -5,6 +5,7 @@ import { META, at, dataset, type Event, type Row } from './stats/testing';
 import {
   LAYOUT,
   MARK_STYLES,
+  DISCLOSURE_WORDS,
   ROWS,
   describeTimeline,
   markName,
@@ -177,10 +178,18 @@ describe('prTimeline', () => {
   });
 
   it('heads the timeline with the PR’s title, branch, commits and disclosure in words', () => {
-    const data = dataset([{ number: 70000, created: OPENED, base: 1, commits: 3, disclosure: 3 }]);
+    const trailer = META.disclosure.indexOf('trailer');
+    const data = dataset([{ number: 70000, created: OPENED, base: 1, commits: 3, disclosure: trailer }]);
     const tl = prTimeline(data, 0, { ...table(1, []), titles: ['rgw: a <b>bold</b> title'] });
     expect([tl.title, tl.base, tl.commitCount, tl.disclosure]).toEqual(['rgw: a <b>bold</b> title', 'reef', 3, 'AI use disclosed in a trailer']);
     expect(prTimeline(dataset([{ number: 70000, created: OPENED }]), 0, table(1, [])).disclosure).toBe('AI use not disclosed');
+  });
+
+  it('says a PR whose only disclosure is the ticked AI-guidelines box discloses by it', () => {
+    const checklist = META.disclosure.indexOf('checklist');
+    expect(checklist).toBeGreaterThan(0);
+    const data = dataset([{ number: 70000, created: OPENED, disclosure: checklist }]);
+    expect(prTimeline(data, 0, table(1, [])).disclosure).toBe("AI use disclosed by the PR template's AI-guidelines box");
   });
 
   it('draws a merge and the close GitHub records a second after it as the merge alone', () => {
@@ -658,5 +667,11 @@ describe('timelineLayout', () => {
       'opened to last commit: 13 hours',
       'after the last commit: 4 hours',
     ]);
+  });
+});
+
+describe('DISCLOSURE_WORDS', () => {
+  it('has words for every disclosure class meta lists', () => {
+    for (const c of META.disclosure) expect(DISCLOSURE_WORDS[c], c).toBeTypeOf('string');
   });
 });

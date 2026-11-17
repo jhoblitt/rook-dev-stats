@@ -25,6 +25,7 @@ const (
 // Disclosure classes, named as the site names them.
 const (
 	DisclosureNone        = "none"
+	DisclosureChecklist   = "checklist"
 	DisclosureDescription = "description"
 	DisclosureCoauthor    = "coauthor"
 	DisclosureTrailer     = "trailer"
@@ -32,7 +33,7 @@ const (
 
 // DisclosureClasses returns the disclosure classes from lowest to highest.
 func DisclosureClasses() []string {
-	return []string{DisclosureNone, DisclosureDescription, DisclosureCoauthor, DisclosureTrailer}
+	return []string{DisclosureNone, DisclosureChecklist, DisclosureDescription, DisclosureCoauthor, DisclosureTrailer}
 }
 
 // The record lists a disclosure candidate comes from.
@@ -176,6 +177,11 @@ func comment(t *tables.Tables, r *record.Record, c record.Comment) Comment {
 func disclosure(t *tables.Tables, d record.Disclosure) (cands []Candidate, class string, families []string) {
 	class = DisclosureNone
 	named := map[string]bool{}
+	// The ticked AI-guidelines box says AI assisted without naming a tool.
+	if d.Checklist {
+		class = DisclosureChecklist
+		named[unspecifiedFamily] = true
+	}
 	add := func(text, from, counts string) {
 		c := Candidate{Text: text, From: from}
 		switch {

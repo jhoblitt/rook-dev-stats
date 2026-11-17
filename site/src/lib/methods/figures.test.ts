@@ -177,6 +177,7 @@ describe('disclosureForms', () => {
   it('counts each form of disclosure, and none, by target', () => {
     expect(disclosureForms(data, rows)).toEqual({
       none: { main: 6, other: 2 },
+      checklist: { main: 0, other: 0 },
       description: { main: 0, other: 1 },
       coauthor: { main: 1, other: 0 },
       trailer: { main: 2, other: 0 },

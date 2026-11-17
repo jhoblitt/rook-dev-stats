@@ -109,6 +109,97 @@ var _ = Describe("Candidates", func() {
 		Entry("a RADOS cursor function", "calls list_nobjects_get_cursor() once per page", none()),
 	)
 
+	Describe("the AI-guidelines box", func() {
+		const (
+			ticked   = "- [x] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR."
+			unticked = "- [ ] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR."
+		)
+		// body is a description in the template's shape, line among its
+		// checklist.
+		body := func(lines ...string) string {
+			return "**Description of your changes:**\r\n\r\nFix the leak.\r\n\r\n**Checklist:**\r\n\r\n" +
+				"- [x] Documentation has been updated, if necessary.\r\n" + strings.Join(lines, "\r\n") + "\r\n"
+		}
+		checklist := func(lines ...string) record.Disclosure {
+			d := none()
+			d.Checklist = true
+			if lines != nil {
+				d.Description = lines
+			}
+			return d
+		}
+
+		It("sets Checklist for the ticked template line, which is no description candidate", func() {
+			Expect(extract.Candidates(nil, body(ticked))).To(Equal(checklist()))
+		})
+
+		It("yields neither for the unticked template line", func() {
+			Expect(extract.Candidates(nil, body(unticked))).To(Equal(none()))
+		})
+
+		It("leaves Checklist false for a description with no box, as in 2016", func() {
+			got, _ := extract.Candidates(nil, "Generated with Claude Code\r\n- [x] Unit tests have been added, if necessary.\r\n")
+			Expect(got).To(Equal(description("Generated with Claude Code")))
+			Expect(got.Checklist).To(BeFalse())
+		})
+
+		It("yields both for a ticked box and a disclosure sentence", func() {
+			const sentence = "AI disclosure: Claude Code helped trace the leak; I reviewed every line."
+			Expect(extract.Candidates(nil, body(ticked)+"\r\n"+sentence+"\r\n")).To(Equal(checklist(sentence)))
+		})
+
+		DescribeTable("takes any checklist line whose label starts with reviewed and holds AI guidelines for the box",
+			func(line string, want record.Disclosure) {
+				Expect(extract.Candidates(nil, body(line))).To(Equal(want), "line %q", line)
+			},
+			Entry("ticked with an upper-case X", "- [X] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR.", checklist()),
+			Entry("ticked with a space inside the box", "- [X ] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR.", checklist()),
+			Entry("ticked, the link dropped", "- [x] Reviewed AI guidelines, if AI assisted with the PR.", checklist()),
+			Entry("ticked, without a bullet", "[x] Reviewed AI guidelines", checklist()),
+			Entry("ticked, with an asterisk bullet", "* [x] reviewed ai guidelines.", checklist()),
+			Entry("unticked, the link dropped", "- [ ] Reviewed AI guidelines, if AI assisted with the PR.", none()),
+			Entry("ticked, naming another guide beside it", "- [x] Reviewed developer guide and AI guidelines.", checklist()),
+			Entry("ticked, followed by Mergify's sentence when the box ends the original's description",
+				"- [x] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR.<hr>This is an automatic backport of pull request #1 done by [Mergify](https://mergify.com).",
+				checklist()),
+
+			// A box line that says more than the template is a candidate too:
+			// the tables decide whether what it adds counts.
+			Entry("ticked, saying how AI assisted",
+				"- [x] Reviewed AI guidelines. AI assistance was used for repository navigation.",
+				checklist("- [x] Reviewed AI guidelines. AI assistance was used for repository navigation.")),
+			Entry("ticked, with the template's words and a statement after them",
+				"- [x] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR. (Prepared with AI assistance; minimal fix.)",
+				checklist("- [x] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR. (Prepared with AI assistance; minimal fix.)")),
+			Entry("ticked, saying that AI assisted rather than if it did",
+				"- [x] Reviewed AI guidelines, since AI assisted with the PR.",
+				checklist("- [x] Reviewed AI guidelines, since AI assisted with the PR.")),
+			Entry("ticked, a phrase among the words before the AI guidelines",
+				"- [x] Reviewed the code generated with copilot and ai guidelines",
+				checklist("- [x] Reviewed the code generated with copilot and ai guidelines")),
+			Entry("ticked, AI-generated code named before the AI guidelines",
+				"- [x] Reviewed AI generated code and AI guidelines.",
+				checklist("- [x] Reviewed AI generated code and AI guidelines.")),
+			Entry("unticked, saying more",
+				"- [ ] Reviewed AI guidelines (AI assisted with the PR).",
+				description("- [ ] Reviewed AI guidelines (AI assisted with the PR).")),
+		)
+
+		DescribeTable("is not",
+			func(line string, want record.Disclosure) {
+				Expect(extract.Candidates(nil, body(line))).To(Equal(want), "line %q", line)
+			},
+			Entry("a line about the guidelines that is not a checklist line", "Reviewed the AI guidelines with the team.", description("Reviewed the AI guidelines with the team.")),
+			Entry("a checklist line whose label does not start with reviewed", "- [x] Read the AI guidelines", description("- [x] Read the AI guidelines")),
+			Entry("a checklist line that does not name the AI guidelines", "- [x] Reviewed the AI output", description("- [x] Reviewed the AI output")),
+		)
+
+		It("is read only in the description, never in a commit message", func() {
+			msg := "rgw: fix\n\n- [x] Reviewed AI guidelines, if AI assisted with the PR.\n"
+			Expect(extract.Candidates([]string{msg}, "")).To(Equal(prose("- [x] Reviewed AI guidelines, if AI assisted with the PR.")))
+		})
+	})
+
 	Describe("an address, or what may be one", func() {
 		// commit is a commit message carrying line among its trailers.
 		commit := func(line string) []string {
