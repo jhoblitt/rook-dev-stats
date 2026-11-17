@@ -77,6 +77,25 @@ var _ = Describe("Records", func() {
 				classify.Comment{Kind: classify.CommentOther}),
 		)
 
+		// extract keeps a mention of a command bot followed by any white
+		// space, so the data's patterns accept the same.
+		DescribeTable("take a command to Mergify or Dependabot after any white space under the data's tables",
+			func(text, want string) {
+				b, err := os.ReadFile(filepath.Join("..", "..", "data", tables.CommandsFile))
+				Expect(err).NotTo(HaveOccurred())
+				t = loadTables(map[string]string{tables.CommandsFile: string(b)})
+				r := pr(1)
+				r.Comments = []record.Comment{{By: "bob", Text: text}}
+				Expect(one(r).Comments).To(Equal([]classify.Comment{{Kind: classify.CommandOther, Command: want}}))
+			},
+			Entry("a space", "@mergifyio backport release-1.21", "mergify-backport"),
+			Entry("a no-break space", "@mergifyio backport release-1.21", "mergify-backport"),
+			Entry("a tab", "@Mergifyio\trebase", "mergify-rebase"),
+			Entry("an em space", "@dependabot rebase", "dependabot-rebase"),
+			Entry("a vertical tab", "@dependabot\vrecreate", "dependabot-other"),
+			Entry("a next-line character", "@mergify\u0085rebase", "mergify-rebase"),
+		)
+
 		It("keeps the comments' order", func() {
 			r := pr(1)
 			r.Comments = []record.Comment{{By: "bob"}, {By: "alice"}, {By: "dependabot", Bot: true}}
