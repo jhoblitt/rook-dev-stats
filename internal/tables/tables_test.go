@@ -244,7 +244,6 @@ var _ = Describe("Load", func() {
 		Entry("the reserved kind id all", tables.KindsFile,
 			"kinds:\n  - {id: all, name: All}\n",
 			`kinds: id "all" is reserved`),
-
 		Entry("a kind without an id", tables.KindsFile,
 			"kinds:\n  - {name: Bug fix}\n",
 			"kinds: entry 1 has no id"),

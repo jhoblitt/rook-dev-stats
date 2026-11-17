@@ -271,7 +271,6 @@ Description`))
 			}
 			in.Meta = meta(7, 6)
 		}, `labels.yaml: label "core" is on 5 pull requests and no table classifies it`),
-
 		Entry("more PRs opened in the window than GitHub counted", func() {
 			in.Meta = meta(1, 1)
 		}, `meta.json: the records hold 2 pull requests opened in the window, GitHub's search counted 1: more than 0.5% apart`),
@@ -355,14 +354,12 @@ Counted disclosures that match no family: 2
 
 	It("lists every problem at once, and still reports", func() {
 		in.Records[2].Disclosure.Trailers = []string{"Generated-by: Claude", "Assisted-by: Bard"}
-
 		in.Meta = meta(1, 1)
 
 		err := classify.Check(in, out)
 		Expect(err).To(MatchError(And(
 			ContainSubstring(`trailer key "generated-by"`),
 			ContainSubstring(`trailer key "assisted-by"`),
-
 			ContainSubstring(`opened in the window`),
 		)))
 		Expect(out.String()).To(ContainSubstring("Base branches: 2"))

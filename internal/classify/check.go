@@ -97,7 +97,6 @@ func Check(in CheckInput, out io.Writer) error {
 		errs = append(errs, fmt.Errorf("%s: no family matches %s (%s)", tables.ToolsFile, what, noFamily[key].summary()))
 	}
 	errs = append(errs, labelProblems(t, in.Records)...)
-
 	counts, countErrs := compareCounts(in.Records, in.Meta)
 	errs = append(errs, countErrs...)
 
