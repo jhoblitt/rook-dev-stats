@@ -1,7 +1,6 @@
 <script lang="ts">
   import Footer from './components/Footer.svelte';
   import Header from './components/Header.svelte';
-  import WipBanner from './components/WipBanner.svelte';
   import { type Page, setPage } from './lib/page';
   import type { Route } from './lib/state';
   import Methods from './routes/Methods.svelte';
@@ -53,7 +52,6 @@
 <Header />
 
 <main bind:this={main} tabindex="-1">
-  <WipBanner />
   {#if $selection.route === 'methods'}
     <Methods />
   {:else}
