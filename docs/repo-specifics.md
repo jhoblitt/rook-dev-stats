@@ -97,7 +97,8 @@ Rook where it had fit Ceph.
 - **Varies:** what branches other than the development branch are called.
 - **ceph:** 153 base branches, among them release code names (`reef`,
   `squid`, …), feature branches and `wip-*` branches.
-- **rook:** `release-1.x`.
+- **rook:** `release-0.x` and `release-1.x`, and a handful of one-off
+  branches.
 - **Where:** nothing matches on the name. Any branch other than the
   development branch is "backports and other branches", and the Branch
   filter offers whatever the data holds.

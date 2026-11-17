@@ -4,7 +4,7 @@ A pull request's target is the branch it asks to merge into. Its components come
 
 ## Target
 
-The target is the development branch or another branch, as GitHub reports it at the last fetch. The development branch is `master`, the only name it has had. Every other branch is grouped as "backports and other branches": backports to the `release-1.x` branches and pull requests to any other branch alike.
+The target is the development branch or another branch, as GitHub reports it at the last fetch. The development branch is `master`, the only name it has had. Every other branch is grouped as "backports and other branches": backports to the `release-0.x` and `release-1.x` branches and pull requests to any other branch alike.
 
 ## Component
 
