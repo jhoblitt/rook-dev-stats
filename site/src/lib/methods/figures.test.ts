@@ -141,29 +141,17 @@ describe('noCommits', () => {
 });
 
 describe('standingUnknown', () => {
-  it('counts unknown standing, and how many of those PRs were opened before the window', () => {
-    expect(standingUnknown(data, rows, META.window_start)).toEqual({ unknown: 3, openedBefore: 3 });
+  it('counts the PRs of unknown standing', () => {
+    expect(standingUnknown(data, rows)).toBe(3);
   });
 
-  it('tells an unknown standing inside the window from one before it', () => {
+  it('leaves out a PR whose standing is known', () => {
     const d = dataset([
       { created: START, standing: -1 },
       { created: START, standing: 4 },
       { created: at('2026-01-01T00:00:00Z'), in_window: 0, standing: -1 },
     ]);
-    expect(standingUnknown(d, baseRows(d, DAYS), START)).toEqual({ unknown: 2, openedBefore: 1 });
-  });
-
-  it('counts an unknown standing opened before the period but in the window as opened in the window', () => {
-    const d = dataset(
-      [
-        { created: at('2025-01-01T00:00:00Z'), standing: -1 },
-        { created: at('2024-01-01T00:00:00Z'), in_window: 0, standing: -1 },
-      ],
-      [],
-      EARLY,
-    );
-    expect(standingUnknown(d, baseRows(d, DAYS), EARLY.window_start)).toEqual({ unknown: 2, openedBefore: 1 });
+    expect(standingUnknown(d, baseRows(d, DAYS))).toBe(2);
   });
 });
 

@@ -46,8 +46,6 @@ describe('inline figures on the fixture', () => {
     ['commits.firstUnknown', '1'],
     ['commits.none', '0'],
     ['standing.unknown', '3'],
-    ['standing.unknownBeforeWindow', '3'],
-    ['standing.unknownInWindow', '0'],
     ['kind.unknown', '1'],
     // 1 of 12.
     ['kind.unknownShare', '8.3%'],
@@ -93,7 +91,7 @@ describe('inline figures on the fixture', () => {
   });
 
   it('has a spec above for every inline figure', () => {
-    expect(Object.keys(INLINE_FIGURES).length).toBe(46);
+    expect(Object.keys(INLINE_FIGURES).length).toBe(44);
   });
 });
 
@@ -147,8 +145,6 @@ describe('figures over a period shorter than the window', () => {
     ['prs.openedInPeriod', '1'],
     ['prs.openedBeforePeriod', '2'],
     ['standing.unknown', '2'],
-    ['standing.unknownBeforeWindow', '1'],
-    ['standing.unknownInWindow', '1'],
     ['view.prs', '3'],
     ['view.openedBefore', '2'],
     ['view.notDisclosedInPeriod', '33%'],

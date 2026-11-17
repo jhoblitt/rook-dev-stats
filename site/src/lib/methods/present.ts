@@ -49,7 +49,7 @@ export interface DataFigures {
   neverReady: Split;
   firstCommitUnknown: Split;
   noCommits: Split;
-  standingUnknown: { unknown: number; openedBefore: number };
+  standingUnknown: number;
   kindUnknown: Split;
   disclosure: Record<string, Split>;
   families: FamilyCount[];
@@ -88,7 +88,7 @@ export function dataFigures(data: Dataset, days: Days): DataFigures {
     neverReady: neverReady(data, rows),
     firstCommitUnknown: firstCommitUnknown(data, rows),
     noCommits: noCommits(data, rows),
-    standingUnknown: standingUnknown(data, rows, data.meta.window_start),
+    standingUnknown: standingUnknown(data, rows),
     kindUnknown: kindUnknown(data, rows),
     disclosure: disclosureForms(data, rows),
     families: familyCounts(data, rows),
@@ -144,9 +144,7 @@ export const INLINE_FIGURES: Record<string, Figure<string>> = {
   'prs.neverReady': count((d) => total(d.neverReady)),
   'commits.firstUnknown': count((d) => total(d.firstCommitUnknown)),
   'commits.none': count((d) => total(d.noCommits)),
-  'standing.unknown': count((d) => d.standingUnknown.unknown),
-  'standing.unknownBeforeWindow': count((d) => d.standingUnknown.openedBefore),
-  'standing.unknownInWindow': count((d) => d.standingUnknown.unknown - d.standingUnknown.openedBefore),
+  'standing.unknown': count((d) => d.standingUnknown),
   'kind.unknown': count((d) => total(d.kindUnknown)),
   'kind.unknownShare': { needs: 'data', show: (_m, d) => share(total(d.kindUnknown), d.coverage.active) },
   'disclosure.disclosed': count(disclosed),
