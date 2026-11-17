@@ -386,7 +386,7 @@ var _ = Describe("Build", func() {
 			Expect(string(build(pr(1)).tableRaw(2026)["issues"])).To(Equal("[[]]"))
 		})
 
-		DescribeTable("backport_link: whether the description links the pull request it backports",
+		DescribeTable("backport_link: whether the pull request names the one it backports",
 			func(hints *record.KindHints, want int64) {
 				r := pr(2)
 				r.Base = "release-1.18"

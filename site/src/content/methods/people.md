@@ -1,10 +1,10 @@
 # People and bots
 
-A person is an account that GitHub does not type as a bot and that [`data/bots.yaml`](https://github.com/jhoblitt/ceph-dev-stats/blob/main/data/bots.yaml) does not list. This site identifies people by their GitHub login, and a pull request opened by an account since deleted, which has none, by the name on its commits ([Deleted accounts](#people-deleted-accounts)). Its published data keeps no profile and no name but that one, and is built to keep no e-mail address, though text a contributor wrote, such as a pull request's title, can name someone or hold an address: see [What the data keeps about a person](#privacy).
+A person is an account that GitHub does not type as a bot and that [`data/bots.yaml`](https://github.com/jhoblitt/rook-dev-stats/blob/main/data/bots.yaml) does not list. This site identifies people by their GitHub login, and a pull request opened by an account since deleted, which has none, by the name on its commits ([Deleted accounts](#people-deleted-accounts)). Its published data keeps no profile and no name but that one, and is built to keep no e-mail address, though text a contributor wrote, such as a pull request's title, can name someone or hold an address: see [What the data keeps about a person](#privacy).
 
 ## Bots
 
-GitHub types some accounts as bots itself, such as the accounts of GitHub apps. Other accounts are automated but typed as people's accounts, such as `ceph-jenkins`, ceph/ceph's Jenkins; `data/bots.yaml` lists those, each with the reason, and matches a login in any case. A bot's comments and reviews are counted apart, as bot comments and bot reviews. They are never a response, a human review, or a reviewer's.
+GitHub types some accounts as bots itself, such as the accounts of GitHub apps: Mergify, which opens most of rook/rook's backports, and Dependabot, which opens its dependency updates, are among them. Other accounts are automated but typed as people's accounts, such as `jenkins-rook`, rook/rook's Jenkins CI; `data/bots.yaml` lists those, each with the reason, and matches a login in any case. A bot's comments and reviews are counted apart, as bot comments and bot reviews. They are never a response, a human review, or a reviewer's.
 
 ## The pull request's author
 

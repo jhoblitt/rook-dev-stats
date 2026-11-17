@@ -1,6 +1,6 @@
 # What the data cannot show
 
-The window starts on {{windowStart}}. A pull request opened before then is counted only when it was still open on or after that day. Its record then holds its comments, reviews and lifecycle events from before that day too, but counts of events take only those inside the period. The records can also hold one that finished before then, as [What is counted](#counted) says, but no period starts before that day, so it is never counted. So the site can show the state of the project since {{windowStart}} and how that state has moved, and not how it worked before. The report opens on the whole window, from {{windowStart}} to {{asOf}}, and shows a shorter period only when a reader chooses it.
+The window starts on {{windowStart}}, the day rook/rook was created, so the data holds the project's whole history on GitHub. Counts of events take only those inside the period chosen. The report opens on the whole window, from {{windowStart}} to {{asOf}}, and shows a shorter period only when a reader chooses it.
 
 ## No comparison across years
 
@@ -8,9 +8,9 @@ The report gives no figure comparing the years before AI tools were common with 
 
 ## Author standing
 
-An author's standing is how many pull requests they had opened in ceph/ceph before the one counted. It is counted from a baseline, GitHub's own count of the author's pull requests opened before {{windowStart}}, plus the author's pull requests in the data opened since then and before this one. So it is unknown for a pull request opened before {{windowStart}}, and for an author with no baseline: accounts GitHub types as bots and deleted accounts get none. The standing filter's "unknown" band holds these.
+An author's standing is how many pull requests they had opened in rook/rook before the one counted. It is counted from a baseline, GitHub's own count of the author's pull requests opened before {{windowStart}}, which is none for anyone, since the repository was created that day, plus the author's pull requests in the data opened before this one. So it is unknown for an author with no baseline: accounts GitHub types as bots, Mergify's among them, and deleted accounts get none. The standing filter's "unknown" band holds these.
 
-On the data as of {{asOf}}, standing is unknown for {{standing.unknown}} of the {{prs.active}} pull requests open at some point in the last {{const.recentMonths}} months: {{standing.unknownBeforeWindow}} opened before {{windowStart}}, and {{standing.unknownInWindow}} opened since then by an author with no baseline.
+On the data as of {{asOf}}, standing is unknown for {{standing.unknown}} of the {{prs.active}} pull requests open at some point in the last {{const.recentMonths}} months.
 
 ## Older pull requests
 
@@ -24,7 +24,7 @@ Some rules read things a pull request need not have: reviews with a verdict, dra
 
 ## Reviews before GitHub recorded them
 
-GitHub began recording reviews of pull requests, with their verdicts of approving, requesting changes or commenting, partway through ceph/ceph's history, on {{const.reviewsRecordedFrom}}. Before then the data holds no review, and no comment on a line of code either, since such comments are read only through the reviews they belong to. Conversation comments are read for every pull request, whenever they were made.
+GitHub began recording reviews of pull requests, with their verdicts of approving, requesting changes or commenting, two months into rook/rook's history, on {{const.reviewsRecordedFrom}}. Before then the data holds no review, and no comment on a line of code either, since such comments are read only through the reviews they belong to. Conversation comments are read for every pull request, whenever they were made.
 
 So the activity of a pull request before then is counted as that of one with no reviews, as above, and over a period that starts before that day every figure built from reviews understates review before it:
 

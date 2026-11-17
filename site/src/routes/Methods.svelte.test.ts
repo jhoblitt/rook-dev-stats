@@ -222,7 +222,7 @@ describe('the methods page', () => {
     await methods({ 'events-2026.json': undefined });
     await waitFor(() => expect(screen.getByRole('alert').textContent).toMatch(/events-2026\.json: HTTP 404/));
     expect(article().textContent).toContain('(not available) pull requests, on every branch, were open at some point in the last 6 months');
-    expect(article().textContent).toContain("Ceph's rule asking for an Assisted-by trailer was a draft on 2026-10-12.");
+    expect(article().textContent).toContain('Some contributors tick every box of the checklist, whether or not it applies to them.');
   });
 });
 

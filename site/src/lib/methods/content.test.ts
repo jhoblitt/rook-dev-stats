@@ -45,6 +45,10 @@ const TYPED: Record<string, Record<string, string>> = {
     '00:00': 'the hour an ISO week starts',
     '53': 'the longest period shown by week: a rule of the code, stepFor',
   },
+  kind: {
+    '10': 'the most closing issues a fetch reads of a pull request: a rule of the code, the closingIssuesReferences query',
+    '20': 'the most labels a fetch reads of each closing issue: a rule of the code, the closingIssuesReferences query',
+  },
   tables: {
     '5': 'the fewest pull requests a label must be on for check to require it: a rule of the code, minLabelPRs',
     '0.5%': 'the most the record counts may differ from GitHub’s: a rule of the code',
@@ -52,8 +56,8 @@ const TYPED: Record<string, Record<string, string>> = {
   'review-capacity': { '53': 'the longest period shown by week: a rule of the code, stepFor' },
   'disclosure-comparison': { '90': 'the 90th percentile, the name of a statistic' },
   disclosure: {
-    '2026-10-12': 'the date the trailer rule was seen as a draft: a fact about the world, dated',
-    '2026-11-15': 'the date the tracker listed the motion as defeated: a fact about the world, dated',
+    '2026-04-24': 'the day rook/rook added its AI guidelines and the template’s box: a fact about the world, dated',
+    '2026-07-27': 'the day the guidelines began to permit AI trailers: a fact about the world, dated',
   },
 };
 
@@ -97,7 +101,7 @@ describe('the section files', () => {
       for (const n of inlines(s.blocks)) {
         if (n.type !== 'link') continue;
         if (n.href.startsWith('#')) expect(ids, `${s.id}: ${n.href}`).toContain(n.href.slice(1));
-        else expect(n.href, s.id).toMatch(/^https:\/\/(github\.com|tracker\.ceph\.com)\//);
+        else expect(n.href, s.id).toMatch(/^https:\/\/github\.com\//);
       }
     }
   });
@@ -105,7 +109,7 @@ describe('the section files', () => {
   it('links each hand-edited table to its file on GitHub', () => {
     const tables = files[fileOf('tables')] as string;
     for (const f of ['tools', 'bots', 'commands', 'labels', 'kinds']) {
-      expect(tables).toContain(`(https://github.com/jhoblitt/ceph-dev-stats/blob/main/data/${f}.yaml)`);
+      expect(tables).toContain(`(https://github.com/jhoblitt/rook-dev-stats/blob/main/data/${f}.yaml)`);
     }
   });
 });
