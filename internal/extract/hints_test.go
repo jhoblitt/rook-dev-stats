@@ -100,6 +100,9 @@ var _ = Describe("Hints", func() {
 		Entry("bp naming several: the first", "core: fix it (bp #6950 #6951)", "", 6950),
 		Entry("a title that names a backport but not at its end", "core: fix it (backport #18708) again", "", 0),
 		Entry("a title suffix with no number", "core: fix it (backport)", "", 0),
+		Entry("a title suffix naming a version, not a pull request", "core: fix it (backport 1.5)", "", 0),
+		Entry("a title suffix naming a version after #N: the pull request", "core: fix it (backport #18708 to 1.5)", "", 18708),
+		Entry("a title suffix naming a version, the space dropped", "core: fix it (backport1.15)", "", 0),
 		Entry("the description's sentence and a different title suffix: the description's", "core: fix it (backport #18735)",
 			"This is an automatic backport of pull request #18708 done by [Mergify](https://mergify.com).", 18708),
 		Entry("Mergify's sentence before an earlier backport of", "core: fix it",
@@ -112,6 +115,10 @@ var _ = Describe("Hints", func() {
 		Entry("backport of #0", "core: fix it", "backport of #0", 0),
 		Entry("a description naming the pull request itself, then a title suffix naming another", "core: fix it (backport #18708)",
 			"This is an automatic backport of pull request #16688 done by [Mergify](https://mergify.com).", 18708),
+		Entry("Mergify's sentence naming the pull request itself, then a backport of naming another", "core: fix it (backport #18735)",
+			"backport of #18708\n<hr>This is an automatic backport of pull request #16688 done by [Mergify](https://mergify.com).", 18708),
+		Entry("a backport of naming the pull request itself, then a title suffix naming another", "core: fix it (backport #18708)",
+			"backport of #16688", 18708),
 	)
 
 	It("leaves kind_hints out of a record that has none", func() {
