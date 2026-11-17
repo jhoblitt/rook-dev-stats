@@ -129,10 +129,10 @@ Rook where it had fit Ceph.
   other 11 are not backports: a configuration pull request and 10 of its
   11 merge-queue pull requests. The eleventh, #18779, is titled with the
   backport it merged, `(backport #18723)` included, so it is linked by its
-  title to #18723 and takes that pull request's kind. 3,421 of the 11,876 pull requests name an
-  original, 3,420 of the 4,033 off `master`, and 8 name one GitHub no
-  longer serves. Linking them cuts the kind unknown off `master` from
-  98.6% to 66.1%.
+  title to #18723 and takes that pull request's kind. 3,421 of the 11,876
+  pull requests name an original, 3,420 of the 4,033 off `master`, and 8
+  name one GitHub no longer serves. Linking them cuts the kind unknown off
+  `master` from 99.0% (3,992) to 66.1% (2,665).
 
 ### Who makes a backport, and what its commits carry
 - **Varies:** whether people or a bot open backports, and whether the copied
@@ -176,8 +176,8 @@ Rook where it had fit Ceph.
   (`SourceLabels`, `SourceIssues`), `data/kinds.yaml`.
 - **Found:** the two projects' PR templates and labels. On rook/rook's
   whole history the kind is unknown for 64.5% of the 7,843 pull requests
-  to `master` and 76.1% of all 11,876 before backports are linked to
-  their originals, 65.1% after.
+  to `master`, and for 76.2% (9,053) of all 11,876 before backports are
+  linked to their originals, 65.1% (7,726) after.
 
 ### External issue tracker
 - **Varies:** whether issues live on GitHub or on another host that the tool
