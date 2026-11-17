@@ -42,7 +42,7 @@
   const families = $derived(familiesModel(shares, dataset.meta.families, counts));
   const familyModel = $derived(withCoverage(families.model, period, fetched));
   const familyNote =
-    'In percent of the PRs opened, on one scale. A PR can name more than one tool, and “unspecified” counts a disclosure that names none, so the shares by tool do not add up to the share disclosing.';
+    'In percent of the PRs opened, on one scale. A PR can name more than one tool, and “unspecified” counts a disclosure that names none, a ticked AI-guidelines box included, so the shares by tool do not add up to the share disclosing.';
   const compared = $derived(comparison(dataset, opened));
 
   const noneOpened = 'no PR was opened in this period';

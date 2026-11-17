@@ -255,14 +255,17 @@ Rook where it had fit Ceph.
   chose to count a ticked box as its own, weakest class, "checklist",
   which names no tool. extract reads a description's checklist line whose
   label starts with "reviewed" and holds "ai guidelines" as the box: a
-  ticked one sets the record's `checklist`, and the line is a candidate
-  only when it says more than the template, as some authors' "(Prepared
-  with AI assistance; …)" does. A Mergify backport joins its own sentence
+  ticked one sets the record's `checklist`, and is a candidate only when
+  it says more than the template, as some authors' "(Prepared with AI
+  assistance; …)" does. Rewordings such as "Reviewed the AI guidelines"
+  or "when AI assisted" say no more. An unticked box is never a
+  candidate, whatever it says. A Mergify backport joins its own sentence
   to its original's description with `<hr>`, so when the box ends the
   description the sentence lands on the box's line; the label is judged
   only up to the `<hr>` that Mergify's "This is an automatic backport"
-  follows, so anything else after an `<hr>` is still read. In the data of 2026-11-16, 416 of 11,876 pull
-  requests tick the box, 106 of them disclosing in no other way.
+  follows, so anything else after an `<hr>` is still read. In the data
+  of 2026-11-16, 416 of 11,876 pull requests tick the box, 106 of them
+  disclosing in no other way.
 - **Where:** `internal/extract/disclosure.go` (`aiBox`),
   `internal/classify/classify.go`, `site/src/lib/timeline.ts`
   (`DISCLOSURE_WORDS`), `site/src/lib/methods/present.ts`.
