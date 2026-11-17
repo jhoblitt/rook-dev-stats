@@ -19,7 +19,7 @@ import { AUTHOR_COLUMNS, REVIEWER_COLUMNS } from './sort';
 import { type AuthorRow, type ReviewerRow, authorRows, reviewerRows } from './stats/people';
 import { META, all, at, dataset } from './stats/testing';
 
-// People 0 fixture-author-e, 1 fixture-author-f, 2 fixture-author-a, 10 fixture-author-j (a bot).
+// People 0 fixture-author-e, 1 fixture-author-f, 2 fixture-author-a, 10 mergify (a bot).
 const authors: AuthorRow[] = [
   {
     person: 0,
@@ -120,11 +120,11 @@ describe('the Authors table', () => {
   it('orders by lines changed, by the handle, and puts a median without a number last both ways', () => {
     const by = (column: (typeof AUTHOR_COLUMNS)[number], descending: boolean) =>
       sortPeople(authors, AUTHOR_TABLE, { column, descending }, META).map(login);
-    expect(by('lines', true)).toEqual(['fixture-author-f', 'fixture-author-e', 'fixture-author-a', 'fixture-author-j']);
-    expect(by('author', false)).toEqual(['fixture-author-a', 'fixture-author-e', 'fixture-author-f', 'fixture-author-j']);
-    expect(by('response', false)).toEqual(['fixture-author-a', 'fixture-author-e', 'fixture-author-f', 'fixture-author-j']);
-    expect(by('response', true)).toEqual(['fixture-author-e', 'fixture-author-a', 'fixture-author-f', 'fixture-author-j']);
-    expect(by('merge', true)).toEqual(['fixture-author-f', 'fixture-author-a', 'fixture-author-e', 'fixture-author-j']);
+    expect(by('lines', true)).toEqual(['fixture-author-f', 'fixture-author-e', 'fixture-author-a', 'mergify']);
+    expect(by('author', false)).toEqual(['fixture-author-a', 'fixture-author-e', 'fixture-author-f', 'mergify']);
+    expect(by('response', false)).toEqual(['fixture-author-a', 'fixture-author-e', 'fixture-author-f', 'mergify']);
+    expect(by('response', true)).toEqual(['fixture-author-e', 'fixture-author-a', 'fixture-author-f', 'mergify']);
+    expect(by('merge', true)).toEqual(['fixture-author-f', 'fixture-author-a', 'fixture-author-e', 'mergify']);
   });
 
   it('breaks a tie by the handle', () => {
@@ -133,7 +133,7 @@ describe('the Authors table', () => {
       'fixture-author-f',
       'fixture-author-a',
       'fixture-author-e',
-      'fixture-author-j',
+      'mergify',
     ]);
   });
 
@@ -189,8 +189,8 @@ describe('medianCell', () => {
 
 describe('shownPeople', () => {
   it('leaves out the bot accounts unless asked for them', () => {
-    expect(shownPeople(authors, META, false).map(login)).not.toContain('fixture-author-j');
-    expect(shownPeople(authors, META, true).map(login)).toContain('fixture-author-j');
+    expect(shownPeople(authors, META, false).map(login)).not.toContain('mergify');
+    expect(shownPeople(authors, META, true).map(login)).toContain('mergify');
   });
 });
 

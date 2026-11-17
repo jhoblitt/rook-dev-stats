@@ -304,7 +304,7 @@ describe('at the whole history, 75,000 PRs and 1,000,000 events over fifteen yea
   it('selects over every loaded PR well inside a second, the reviewer filter included', () => {
     expect(timed(() => select(whole, all15))).toBeLessThan(1000);
     expect(timed(() => select(whole, { ...all15, reviewer: meta.people[4] as string }))).toBeLessThan(1000);
-    expect(timed(() => select(whole, { ...lastSix, component: 'rgw', author: meta.people[2] as string }))).toBeLessThan(1000);
+    expect(timed(() => select(whole, { ...lastSix, component: 'object', author: meta.people[2] as string }))).toBeLessThan(1000);
   });
 
   it('buckets fifteen years by month, about 180 of them', () => {

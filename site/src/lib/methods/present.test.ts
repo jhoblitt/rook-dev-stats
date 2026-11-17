@@ -77,13 +77,13 @@ describe('inline figures on the fixture', () => {
     ['view.notDisclosedInPeriod', '67%'],
     ['view.disclosedInPeriod', '100%'],
     ['const.reviewsRecordedFrom', '2016-09-14'],
-    ['people.authors', '6'],
-    ['people.botAuthors', '0'],
+    ['people.authors', '5'],
+    ['people.botAuthors', '1'],
     ['people.reviewers', '5'],
-    ['people.authorsTooFew', '6'],
+    ['people.authorsTooFew', '5'],
     ['people.largestLines', '2,200'],
-    // 2,200 of 3,694.
-    ['people.largestShare', '60%'],
+    // 2,200 of 2,644, the bot dependabot's #66600 left out.
+    ['people.largestShare', '83%'],
     // The fixture has no deleted account.
     ['people.deletedNamedPrs', '0'],
     ['people.deletedNames', '0'],
@@ -224,8 +224,8 @@ describe('table figures on the fixture', () => {
     expect(model('table.disclosureForms').rows).toEqual([
       ['a disclosing trailer, such as Assisted-by:', '2', '0', '2'],
       ['Co-authored-by: naming a tool', '1', '0', '1'],
-      ['disclosure phrasing in the description or a commit message', '0', '1', '1'],
-      ['the PR template’s AI-guidelines box, ticked', '0', '0', '0'],
+      ['disclosure phrasing in the description or a commit message', '0', '0', '0'],
+      ['the PR template’s AI-guidelines box, ticked', '0', '1', '1'],
       ['AI use not disclosed', '6', '2', '8'],
     ]);
   });
@@ -254,9 +254,9 @@ describe('table figures on the fixture', () => {
         ["opened by the group's 3 most active authors", '75%', '100%'],
         ['kind: bug fix', '0%', '33%'],
         ['kind: feature', '50%', '33%'],
-        ['kind: cleanup', '25%', '0%'],
+        ['kind: cleanup', '0%', '0%'],
         ['kind: documentation', '25%', '0%'],
-        ['kind: other', '0%', '33%'],
+        ['kind: other', '25%', '33%'],
         ['kind: unknown', '0%', '0%'],
       ],
     });

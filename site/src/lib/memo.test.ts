@@ -9,7 +9,7 @@ describe('keepEqual', () => {
     const first = defaultFilters(META);
     expect(keep(first)).toBe(first);
     expect(keep({ ...first })).toBe(first);
-    const changed = { ...first, component: 'rgw' };
+    const changed = { ...first, component: 'object' };
     expect(keep(changed)).toBe(changed);
     expect(keep({ ...first })).not.toBe(first);
   });

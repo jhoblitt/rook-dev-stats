@@ -114,7 +114,7 @@ describe('LlmUse', () => {
   });
 
   it('says "no PRs match" in every chart when the selection is empty', async () => {
-    render(App, (await fixturePage('#/?component=cephfs&kind=docs')).props);
+    render(App, (await fixturePage('#/?component=filesystem&kind=docs')).props);
     for (const name of [SHARE, FAMILIES, COMPARE]) {
       expect(section().getByRole('figure', { name }).textContent).toContain('no PRs match');
     }

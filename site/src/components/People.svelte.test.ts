@@ -53,9 +53,8 @@ describe('People', () => {
       ['1', 'fixture-author-d', '2'],
       ['2', 'fixture-author-a', '1'],
       ['3', 'fixture-author-e', '1'],
-      ['4', 'fixture-author-f', '1'],
-      ['5', 'fixture-author-g', '1'],
-      ['6', 'fixture-author-i', '1'],
+      ['4', 'fixture-author-g', '1'],
+      ['5', 'fixture-author-i', '1'],
     ]);
     expect(table('Authors').querySelector('th[aria-sort="descending"]')?.textContent).toMatch(/^PRs opened/);
   });
@@ -154,11 +153,10 @@ describe('People', () => {
     expect(lines().closest('th')?.getAttribute('aria-sort')).toBe('descending');
     expect(cells('Authors').map((r) => [r[0], r[1], r[9]])).toEqual([
       ['1', 'fixture-author-i', '2,200'],
-      ['2', 'fixture-author-f', '1,050'],
-      ['3', 'fixture-author-a', '250'],
-      ['4', 'fixture-author-d', '120'],
-      ['5', 'fixture-author-g', '70'],
-      ['6', 'fixture-author-e', '4'],
+      ['2', 'fixture-author-a', '250'],
+      ['3', 'fixture-author-d', '120'],
+      ['4', 'fixture-author-g', '70'],
+      ['5', 'fixture-author-e', '4'],
     ]);
     await fireEvent.click(lines());
     expect(loc.hash()).toBe('#/?target=master&authorsort=lines');
@@ -182,12 +180,12 @@ describe('People', () => {
   it('leaves out bot accounts until asked, then marks them', async () => {
     const { props, loc } = await fixturePage('#/?target=all');
     render(App, props);
-    expect(people('Authors')).not.toContain('fixture-author-j');
-    expect(section().getByText(/1 bot account not shown/)).toBeTruthy();
+    expect(people('Authors')).not.toContain('mergify');
+    expect(section().getByText(/2 bot accounts not shown/)).toBeTruthy();
     await fireEvent.click(section().getByRole('checkbox', { name: 'Show bot accounts among the authors' }));
     expect(loc.hash()).toBe('#/?target=all&bots=show');
-    const bot = cells('Authors').find((r) => r[1]?.startsWith('fixture-author-j'));
-    expect(bot?.[1]).toBe('fixture-author-j bot');
+    const bot = cells('Authors').find((r) => r[1]?.startsWith('mergify'));
+    expect(bot?.[1]).toBe('mergify bot');
   });
 
   it('says the bot control is the Authors table’s, and why the Reviewers table lists no bot', async () => {
@@ -218,7 +216,7 @@ describe('People', () => {
   });
 
   it('says "no PRs match" for an empty selection', async () => {
-    render(App, (await fixturePage('#/?component=cephfs&kind=docs')).props);
+    render(App, (await fixturePage('#/?component=filesystem&kind=docs')).props);
     expect(section().getByText('no PRs match')).toBeTruthy();
     expect(section().queryByRole('table')).toBeNull();
   });
@@ -234,7 +232,6 @@ describe('People with deleted accounts', () => {
       ['2', `(deleted) ${NAME_A}`, '1'],
       ['3', `(deleted) ${NAME_B}`, '1'],
       ['4', 'fixture-author-a', '1'],
-      ['5', 'fixture-author-f', '1'],
     ]);
     expect(within(table('Authors')).queryByRole('link', { name: /deleted/ })).toBeNull();
   });
@@ -243,7 +240,7 @@ describe('People with deleted accounts', () => {
     render(App, (await fixturePage('', deletedFiles())).props);
     expect(people('Authors')).not.toContain('(deleted, unknown)');
     expect(within(part('Authors')).getByRole('status').textContent?.replace(/\s+/g, ' ').trim()).toBe(
-      '5 authors of the selected PRs opened in the period',
+      '4 authors of the selected PRs opened in the period, and 1 bot account not shown',
     );
     const line = pooledLine('Authors') as HTMLElement;
     expect(table('Authors').compareDocumentPosition(line)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);

@@ -14,8 +14,8 @@ const props = (md: string) => ({
 
 describe('Prose', () => {
   it('links an https address and an anchor on the page', () => {
-    render(Prose, props('# X\n\nSee [GitHub](https://github.com/ceph/ceph) and [below](#x).\n'));
-    expect(screen.getByRole('link', { name: 'GitHub' }).getAttribute('href')).toBe('https://github.com/ceph/ceph');
+    render(Prose, props('# X\n\nSee [GitHub](https://github.com/rook/rook) and [below](#x).\n'));
+    expect(screen.getByRole('link', { name: 'GitHub' }).getAttribute('href')).toBe('https://github.com/rook/rook');
     expect(screen.getByRole('link', { name: 'below' }).getAttribute('href')).toBe('#/methods?section=x');
   });
 

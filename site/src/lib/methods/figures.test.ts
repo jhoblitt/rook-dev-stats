@@ -26,7 +26,7 @@ import {
 
 // The fixture's rows: 0 #64010 and 1 #65220 opened in 2025, before the
 // window; 2 #66100 opened in 2026 before the window; 3–11 opened in it.
-// Rows 1 (reef), 7 (squid) and 11 (tentacle) are not on master. Its window
+// Rows 1 (release-1.17), 7 (release-1.18) and 11 (release-1.19) are not on master. Its window
 // is 2026-05-15 to 2026-11-15, the day fetched_through falls on, and
 // the specs take that as the period too, unless they say otherwise.
 const data = fixture();
@@ -177,8 +177,8 @@ describe('disclosureForms', () => {
   it('counts each form of disclosure, and none, by target', () => {
     expect(disclosureForms(data, rows)).toEqual({
       none: { main: 6, other: 2 },
-      checklist: { main: 0, other: 0 },
-      description: { main: 0, other: 1 },
+      checklist: { main: 0, other: 1 },
+      description: { main: 0, other: 0 },
       coauthor: { main: 1, other: 0 },
       trailer: { main: 2, other: 0 },
     });
@@ -293,20 +293,21 @@ describe('peopleFigures', () => {
   // event in the period on rows 0, 2–6 and 8–10 for the Reviewers table.
   it('counts the authors, the bot accounts hidden among them and the reviewers, as the People tables do', () => {
     const f = peopleFigures(data, defaultRows(data, DAYS), PERIOD);
-    // Authors d (rows 3 and 10), e, f, g, a and i.
-    expect(f.authors).toBe(6);
-    expect(f.botAuthors).toBe(0);
+    // Authors d (rows 3 and 10), e, g, a and i; the bot dependabot (row 5) apart.
+    expect(f.authors).toBe(5);
+    expect(f.botAuthors).toBe(1);
     // f (rows 0, 3, 10), a (2, 6), e (2, 10), i (5, 8) and the reviewer k (9).
     expect(f.reviewers).toBe(5);
     // Every author has fewer than five PRs behind a median to merge.
-    expect(f.authorsTooFew).toBe(6);
+    expect(f.authorsTooFew).toBe(5);
   });
 
   it('finds the largest pull request and its share of all lines changed', () => {
     const f = peopleFigures(data, defaultRows(data, DAYS), PERIOD);
-    // #67000 is 1,500 + 700 lines of the 30 + 4 + 1,050 + 70 + 250 + 2,200 + 90 = 3,694.
+    // #67000 is 1,500 + 700 lines of the 30 + 4 + 70 + 250 + 2,200 + 90 = 2,644, the
+    // bot dependabot's #66600 left out.
     expect(f.largestLines).toBe(2200);
-    expect(f.largestShare).toBeCloseTo(2200 / 3694, 10);
+    expect(f.largestShare).toBeCloseTo(2200 / 2644, 10);
   });
 
   it("leaves bot accounts' pull requests out of the largest pull request and its share, as the Authors table does by default", () => {
@@ -326,9 +327,9 @@ describe('peopleFigures', () => {
 
   it('hides a bot account among the authors and counts it apart', () => {
     const f = peopleFigures(data, baseRows(data, DAYS), PERIOD);
-    // On every branch the authors add h (row 7) and the bot j (row 11).
-    expect(f.authors).toBe(7);
-    expect(f.botAuthors).toBe(1);
+    // On every branch h (row 7) joins the authors, and mergify (row 11) the bots.
+    expect(f.authors).toBe(6);
+    expect(f.botAuthors).toBe(2);
   });
 
   it('gives no largest pull request when no PR was opened in the period', () => {
@@ -418,13 +419,13 @@ describe('disclosureGroups', () => {
   });
 
   it(`gives the share of each group opened by its ${TOP_AUTHORS} most active authors`, () => {
-    // Not disclosed: a opened two, c, e, f and g one each; disclosed: d two, i one.
+    // Not disclosed: a opened two, c, e, dependabot and g one each; disclosed: d two, i one.
     expect(g.notDisclosed.topAuthors).toBeCloseTo(4 / 6, 10);
     expect(g.disclosed.topAuthors).toBe(1);
   });
 
   it('gives the mix of kinds in each group', () => {
-    expect(g.notDisclosed.kinds).toEqual({ bugfix: 1 / 6, feature: 2 / 6, cleanup: 2 / 6, docs: 1 / 6, other: 0, unknown: 0 });
+    expect(g.notDisclosed.kinds).toEqual({ bugfix: 1 / 6, feature: 2 / 6, cleanup: 1 / 6, docs: 1 / 6, other: 1 / 6, unknown: 0 });
     expect(g.disclosed.kinds).toEqual({ bugfix: 1 / 3, feature: 1 / 3, cleanup: 0, docs: 0, other: 1 / 3, unknown: 0 });
   });
 

@@ -118,7 +118,7 @@ describe('DotPlot', () => {
   });
 
   it('says "no PRs match" for an empty selection, and what is missing when none was opened in the period', async () => {
-    render(App, (await fixturePage('#/?component=cephfs&kind=docs')).props);
+    render(App, (await fixturePage('#/?component=filesystem&kind=docs')).props);
     expect(figure().textContent).toContain('no PRs match');
     expect(figure().querySelector('canvas')).toBeNull();
   });

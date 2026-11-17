@@ -202,11 +202,11 @@ describe('Review', () => {
   it('draws the bot commands by command, with their use', async () => {
     render(App, (await fixturePage('')).props);
     const f = figure('Bot commands per week, by command');
-    const jenkins = weekly(data, rows, period, 'commands').values['jenkins-test'] as number[];
-    expect(cells(f).map((r) => r[0])).toEqual(jenkins.map(String));
+    const backport = weekly(data, rows, period, 'commands').values['mergify-backport'] as number[];
+    expect(cells(f).map((r) => r[0])).toEqual(backport.map(String));
     expect(f.querySelectorAll('.command')).toHaveLength(1);
     expect(within(f).queryByRole('button', { name: /^show / })).toBeNull();
-    expect(f.textContent).toContain('jenkins test');
+    expect(f.textContent).toContain('@mergifyio backport');
     expect(f.textContent).toMatch(/PRs opened in the period with a bot command\s*14%/);
     expect(f.textContent).toMatch(/bot commands on merged PRs\s*mean 0\.3 · median 0 · 90th percentile 1/);
   });
@@ -216,7 +216,7 @@ describe('Review', () => {
     const f = figure('Bot commands per week, by command');
     const names = () => [...f.querySelectorAll('.command-name')].map((p) => p.textContent);
     // Seven commands used once each: by name.
-    expect(names()).toEqual(['eta', 'iota', 'jenkins test', 'kappa', 'lambda', 'theta']);
+    expect(names()).toEqual(['@mergifyio backport', 'eta', 'iota', 'kappa', 'lambda', 'theta']);
     const more = within(f).getByRole('button', { name: 'show all 7 commands' });
     expect(more.tagName).toBe('BUTTON');
     expect(more.getAttribute('aria-expanded')).toBe('false');
@@ -345,7 +345,7 @@ describe('Review', () => {
   });
 
   it('says "no PRs match" in every chart when the selection is empty', async () => {
-    render(App, (await fixturePage('#/?component=cephfs&kind=docs')).props);
+    render(App, (await fixturePage('#/?component=filesystem&kind=docs')).props);
     for (const name of TITLES) {
       const f = figure(name);
       expect(f.textContent).toContain('no PRs match');

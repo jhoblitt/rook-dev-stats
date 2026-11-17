@@ -420,13 +420,13 @@ describe('commands', () => {
     const w = {
       week: [at('2026-05-11T00:00:00Z'), at('2026-05-18T00:00:00Z')],
       step: 'week' as const,
-      values: { 'jenkins-test': [1, 0], 'config-check': [2, 1], unused: [0, 0] },
+      values: { 'mergify-backport': [1, 0], 'dependabot-rebase': [2, 1], unused: [0, 0] },
     };
     const names = [...META.commands, { id: 'unused', name: 'unused' }];
     const model = commandsModel(w, names);
     expect(model.bars.map((b) => [b.key, b.label, b.color, b.values])).toEqual([
-      ['config-check', '/config check ok', COLOURS.command, [2, 1]],
-      ['jenkins-test', 'jenkins test', COLOURS.command, [1, 0]],
+      ['dependabot-rebase', '@dependabot rebase', COLOURS.command, [2, 1]],
+      ['mergify-backport', '@mergifyio backport', COLOURS.command, [1, 0]],
     ]);
   });
 
@@ -443,8 +443,8 @@ describe('commands', () => {
 
   it('counts the commands of the fixture by week', () => {
     const model = commandsModel(weekly(data, rows, period, 'commands'), META.commands);
-    // One `jenkins test` on #66500, on 05-20.
-    expect(model.bars.map((b) => [b.key, b.values])).toEqual([['jenkins-test', weeks({ 1: 1 }, 0)]]);
+    // One `@mergifyio backport` on #66500, on 05-20.
+    expect(model.bars.map((b) => [b.key, b.values])).toEqual([['mergify-backport', weeks({ 1: 1 }, 0)]]);
   });
 
   it('writes the share of PRs with a command and the commands on merged PRs', () => {
@@ -459,7 +459,7 @@ describe('commands', () => {
     const model = commandsModel(weekly(data, rows, period, 'commands'), META.commands);
     const figures = commandFigures(commandUse(data, opened));
     expect(commandSummary(model, figures)).toBe(
-      'By week, 27 weeks from 2026-05-11 to 2026-11-09. 1 jenkins test, at most 1 in a week (week of 2026-05-18). ' +
+      'By week, 27 weeks from 2026-05-11 to 2026-11-09. 1 @mergifyio backport, at most 1 in a week (week of 2026-05-18). ' +
         '14% of the PRs opened in the period had a bot command. ' +
         'Bot commands on merged PRs: mean 0.3, median 0, 90th percentile 1.',
     );

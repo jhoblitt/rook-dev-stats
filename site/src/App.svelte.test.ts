@@ -302,8 +302,8 @@ describe('App', () => {
 });
 
 describe('the first load of the whole history', () => {
-  // Fifteen earlier years, 2011 to 2025, of one PR each, before the fixture's 2026.
-  const history = withYears(2011, 1);
+  // Ten earlier years, 2016 to 2025, of one PR each, before the fixture's 2026.
+  const history = withYears(2016, 1);
   const historyMeta = parseMeta(history['meta.json']);
   const status = () => document.querySelector('p.loading') as HTMLElement;
   const progress = () => document.querySelector('p.progress');
@@ -319,19 +319,19 @@ describe('the first load of the whole history', () => {
 
   it('shows the waiting area, says once what it loads, and counts the years arrived outside the live region', async () => {
     const gate = opening();
-    const loading = 'Loading the data for this period: the files of 16 years, 2011 to 2026.';
+    const loading = 'Loading the data for this period: the files of 11 years, 2016 to 2026.';
     await waitFor(() => expect(status().textContent).toBe(loading));
     expect(status().getAttribute('role')).toBe('status');
     expect(document.querySelector('.waiting')?.getAttribute('aria-busy')).toBe('true');
     expect(screen.queryByRole('heading', { level: 2, name: 'Velocity' })).toBeNull();
-    expect(progress()?.textContent).toBe('0 of 16 years have arrived.');
+    expect(progress()?.textContent).toBe('0 of 11 years have arrived.');
     expect(progress()?.closest('[role="status"], [role="alert"], [aria-live]')).toBeNull();
 
-    gate.release(2011);
-    await waitFor(() => expect(progress()?.textContent).toBe('1 of 16 years has arrived.'));
-    gate.release(2012);
+    gate.release(2016);
+    await waitFor(() => expect(progress()?.textContent).toBe('1 of 11 years has arrived.'));
+    gate.release(2017);
     gate.release(2026);
-    await waitFor(() => expect(progress()?.textContent).toBe('3 of 16 years have arrived.'));
+    await waitFor(() => expect(progress()?.textContent).toBe('3 of 11 years have arrived.'));
     expect(status().textContent).toBe(loading);
 
     gate.releaseAll();
@@ -339,17 +339,17 @@ describe('the first load of the whole history', () => {
     expect(progress()).toBeNull();
     expect(status().textContent).toBe('');
     expect(screen.queryByRole('alert')).toBeNull();
-    expect(screen.getByRole('button', { name: 'All, from 1 Jan 2011' }).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: 'All, from 1 Jan 2016' }).getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByRole('button', { name: 'Last 6 months' }).getAttribute('aria-pressed')).toBe('false');
   });
 
   it('names a year that failed, draws the figures over the rest, and fetches only it again on a retry', async () => {
     let reachable = false;
     const gate = opening((f) => (url) =>
-      url.endsWith('events-2014.json') && !reachable ? Promise.resolve(new Response('', { status: 503 })) : f(url),
+      url.endsWith('events-2019.json') && !reachable ? Promise.resolve(new Response('', { status: 503 })) : f(url),
     );
     gate.releaseAll();
-    await waitFor(() => expect(screen.getByRole('alert').textContent).toMatch(/PRs finished in 2014: events-2014\.json, HTTP 503/));
+    await waitFor(() => expect(screen.getByRole('alert').textContent).toMatch(/PRs finished in 2019: events-2019\.json, HTTP 503/));
     expect(screen.getByRole('alert').textContent).toMatch(/everything below leaves these years out/);
     expect(screen.getByRole('heading', { level: 2, name: 'Velocity' })).toBeTruthy();
 
@@ -360,7 +360,7 @@ describe('the first load of the whole history', () => {
     await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
     expect(status().textContent).toBe('All the data for this period has loaded.');
     const years = gate.requested.slice(before).filter((u) => /\/(prs|events)-/.test(u));
-    expect(years.map((u) => u.slice(BASE.length)).sort()).toEqual(['events-2014.json', 'prs-2014.json']);
+    expect(years.map((u) => u.slice(BASE.length)).sort()).toEqual(['events-2019.json', 'prs-2019.json']);
   });
 });
 
@@ -382,9 +382,9 @@ describe('filter bar', () => {
   });
 
   it('shows the filters a hash restores', async () => {
-    render(App, (await page('#/?target=all&component=rbd&standing=unknown&drafts=exclude')).props);
+    render(App, (await page('#/?target=all&component=block&standing=unknown&drafts=exclude')).props);
     expect((screen.getByRole('radio', { name: 'all' }) as HTMLInputElement).checked).toBe(true);
-    expect((screen.getByLabelText('Component') as HTMLSelectElement).value).toBe('rbd');
+    expect((screen.getByLabelText('Component') as HTMLSelectElement).value).toBe('block');
     expect((screen.getByLabelText('Author standing (earlier PRs)') as HTMLSelectElement).value).toBe('unknown');
     expect((screen.getByLabelText('Drafts') as HTMLSelectElement).value).toBe('exclude');
   });
@@ -412,10 +412,10 @@ describe('filter bar', () => {
     it("offers the target's branches, most PRs in the period first, each with its count", async () => {
       const { props } = await page('#/?target=all');
       render(App, props);
-      // The fixture's whole window: rows 0, 2–6 and 8–10 on master, one each on reef, squid and tentacle.
-      expect(offered()).toEqual(['master: 9 PRs', 'reef: 1 PR', 'squid: 1 PR', 'tentacle: 1 PR']);
+      // The fixture's whole window: rows 0, 2–6 and 8–10 on master, one each on release-1.17, release-1.18 and release-1.19.
+      expect(offered()).toEqual(['master: 9 PRs', 'release-1.17: 1 PR', 'release-1.18: 1 PR', 'release-1.19: 1 PR']);
       await fireEvent.click(screen.getByRole('radio', { name: 'backports and other branches' }));
-      expect(offered()).toEqual(['reef: 1 PR', 'squid: 1 PR', 'tentacle: 1 PR']);
+      expect(offered()).toEqual(['release-1.17: 1 PR', 'release-1.18: 1 PR', 'release-1.19: 1 PR']);
       await fireEvent.click(screen.getByRole('radio', { name: 'master' }));
       expect(offered()).toEqual(['master: 9 PRs']);
     });
@@ -423,24 +423,24 @@ describe('filter bar', () => {
     it('writes a branch typed to the address, and returns it to any when the target leaves it out', async () => {
       const { props, loc } = await page('#/?target=backports');
       render(App, props);
-      branch().value = 'Squid';
+      branch().value = 'Release-1.18';
       await fireEvent.change(branch());
-      expect(loc.hash()).toBe('#/?target=backports&base=squid');
-      expect(branch().value).toBe('squid');
+      expect(loc.hash()).toBe('#/?target=backports&base=release-1.18');
+      expect(branch().value).toBe('release-1.18');
       await fireEvent.click(screen.getByRole('radio', { name: 'all' }));
-      expect(loc.hash()).toBe('#/?target=all&base=squid');
+      expect(loc.hash()).toBe('#/?target=all&base=release-1.18');
       await fireEvent.click(screen.getByRole('radio', { name: 'master' }));
       expect(loc.hash()).toBe('#/?target=master');
       expect(branch().value).toBe('');
     });
 
     it('keeps the branch and says so when a name typed is not a branch of the target', async () => {
-      const { props, loc } = await page('#/?target=backports&base=reef');
+      const { props, loc } = await page('#/?target=backports&base=release-1.17');
       render(App, props);
       branch().value = 'master';
       await fireEvent.change(branch());
-      expect(loc.hash()).toBe('#/?target=backports&base=reef');
-      expect(branch().value).toBe('reef');
+      expect(loc.hash()).toBe('#/?target=backports&base=release-1.17');
+      expect(branch().value).toBe('release-1.17');
       expect(screen.getByText('No branch of this target is named “master”.')).toBeTruthy();
       await fireEvent.click(screen.getByRole('button', { name: 'Clear the Branch filter' }));
       expect(loc.hash()).toBe('#/?target=backports');
@@ -527,7 +527,7 @@ describe('filter bar', () => {
     expect(reviewer.getAttribute('list')).toBe(author.getAttribute('list'));
     const list = document.getElementById(author.getAttribute('list') as string) as HTMLDataListElement;
     expect([...list.options].map((o) => o.value)).toEqual(meta.people);
-    expect([...list.options].find((o) => o.value === 'fixture-author-j')?.textContent).toBe('bot');
+    expect([...list.options].find((o) => o.value === 'mergify')?.textContent).toBe('bot');
   });
 
   describe('with deleted accounts', () => {
@@ -545,7 +545,7 @@ describe('filter bar', () => {
       ]);
       expect([...list.options].find((o) => o.value === '(deleted, unknown)')?.textContent).toBe(POOLED_NOTE);
       expect([...list.options].find((o) => o.value === `(deleted) ${NAME_A}`)?.textContent).toBe('');
-      expect([...list.options].find((o) => o.value === 'fixture-author-j')?.textContent).toBe('bot');
+      expect([...list.options].find((o) => o.value === 'mergify')?.textContent).toBe('bot');
     });
 
     it('shows a named deleted author an address restores as the page writes them', async () => {
