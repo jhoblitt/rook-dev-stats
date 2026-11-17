@@ -126,12 +126,14 @@ the name of an author whose commits it copied. A record keeps a comment's
 text only when the comment is one line of at most 80 characters with no `@`
 other than in a mention of Mergify or Dependabot that starts it and is
 followed by white space. That is what a bot command in rook/rook looks
-like, since its bots are addressed by mention and its CI suites start from
-labels, not comments; a comment with a person's mention or an e-mail
-address keeps no text. It never keeps a commit trailer that names a person
-(`Signed-off-by:`, `Reviewed-by:`, a `Co-authored-by:` naming a person, …).
-The lines it keeps as possible disclosures are quoted as written. The raw
-GitHub responses stay in `.cache/`, which git ignores.
+like, because its bots are addressed by mention and, since its move from
+Jenkins to GitHub Actions, its CI suites start from labels, not comments:
+the last Jenkins command in the records dates from September 2019. A
+comment with a person's mention or an e-mail address keeps no text. It
+never keeps a commit trailer that names a person (`Signed-off-by:`,
+`Reviewed-by:`, a `Co-authored-by:` naming a person, …). The lines it
+keeps as possible disclosures are quoted as written. The raw GitHub
+responses stay in `.cache/`, which git ignores.
 
 The tables are applied when the data is read, so editing one never needs a
 new pull.
