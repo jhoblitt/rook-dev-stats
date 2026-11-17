@@ -162,6 +162,9 @@ var _ = Describe("Candidates", func() {
 			Entry("ticked, followed by Mergify's sentence when the box ends the original's description",
 				"- [x] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR.<hr>This is an automatic backport of pull request #1 done by [Mergify](https://mergify.com).",
 				checklist()),
+			Entry("ticked, followed by an older Mergify's \"automated\" sentence",
+				"- [x] Reviewed AI guidelines, if AI assisted with the PR.<hr>This is an automated backport of pull request #1 done by Mergify.io",
+				checklist()),
 
 			// A box line that says more than the template is a candidate too:
 			// the tables decide whether what it adds counts.
@@ -180,6 +183,9 @@ var _ = Describe("Candidates", func() {
 			Entry("ticked, AI-generated code named before the AI guidelines",
 				"- [x] Reviewed AI generated code and AI guidelines.",
 				checklist("- [x] Reviewed AI generated code and AI guidelines.")),
+			Entry("ticked, an <hr> and then a disclosure that is not Mergify's",
+				"- [x] Reviewed AI guidelines, if AI assisted with the PR.<hr>Generated with Claude Code.",
+				checklist("- [x] Reviewed AI guidelines, if AI assisted with the PR.<hr>Generated with Claude Code.")),
 			Entry("unticked, saying more",
 				"- [ ] Reviewed AI guidelines (AI assisted with the PR).",
 				description("- [ ] Reviewed AI guidelines (AI assisted with the PR).")),

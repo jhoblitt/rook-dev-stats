@@ -124,9 +124,10 @@ var checklistLine = regexp.MustCompile(`^(?:[-*+]\s*)?\[\s*([xX]?)\s*\]\s*(.*)$`
 // could say how AI was used.
 var templateLabel = regexp.MustCompile(`^reviewed (?:(?:the )?[a-z]+ guides? and )?(?:\[ai guidelines\]\([^)]*\)|ai guidelines)(?:,? if ai assisted with the pr)?\.?$`)
 
-// mergifyBreak is where Mergify joins its sentence to the description of
-// the pull request it backports.
-const mergifyBreak = "<hr>"
+// mergifyBreak is, lower-cased, where Mergify joins its sentence to the
+// description of the pull request it backports: an <hr>, then "This is an
+// automatic backport", or "automated" in its older versions.
+var mergifyBreak = regexp.MustCompile(`<hr>\s*this is an automat(?:ic|ed) backport`)
 
 // maxCandidate is the most characters of a line a candidate keeps.
 const maxCandidate = 200
@@ -206,7 +207,10 @@ func aiBox(line string) (isBox, ticked, more bool) {
 	if !strings.HasPrefix(label, "reviewed") || !strings.Contains(label, "ai guidelines") {
 		return false, false, false
 	}
-	own, _, _ := strings.Cut(label, mergifyBreak)
+	own := label
+	if loc := mergifyBreak.FindStringIndex(label); loc != nil {
+		own = label[:loc[0]]
+	}
 	return true, m[1] != "", !templateLabel.MatchString(strings.TrimSpace(own))
 }
 
