@@ -1,14 +1,14 @@
 {
   "number": 70002,
   "title": "mds: retry the session flush",
-  "body": "Retry the flush once before giving up.\r\n\r\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\r\n\r\n<!--\r\n- [ ] Tracker (select at least one)\r\n-->\r\n",
+  "body": "**Description of your changes:**\r\n\r\nRetry the flush once before giving up.\r\n\r\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\r\n\r\n**Checklist:**\r\n\r\n- [x] Reviewed the developer guide on Submitting a Pull Request\r\n- [ ] Reviewed [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), if AI assisted with the PR.\r\n",
   "state": "OPEN",
   "isDraft": false,
   "createdAt": "2026-07-01T10:00:00Z",
   "updatedAt": "2026-07-06T11:00:00Z",
   "closedAt": null,
   "mergedAt": null,
-  "baseRefName": "main",
+  "baseRefName": "master",
   "additions": 7,
   "deletions": 1,
   "changedFiles": 1,
@@ -19,10 +19,10 @@
   },
   "labels": [
     {
-      "name": "needs-review"
+      "name": "do-not-merge"
     },
     {
-      "name": "cephfs"
+      "name": "filesystem"
     }
   ],
   "commits": [

@@ -300,9 +300,9 @@ export function waitsNothing(model: BucketModel, span: Span, opened: number): st
  * its Universe conference on 14 September 2016, as reported that day at
  * https://techcrunch.com/2016/09/14/github-gets-built-in-project-management-tools-and-support-for-reviews/.
  * Before it a pull request has no review in the data, nor a comment on a
- * line of code, which the fetch reads only through reviews. In ceph/ceph's
- * records the earliest review is on 29 September 2016, and no pull request
- * opened in 2013 or 2014 has one.
+ * line of code, which the fetch reads only through reviews. In rook/rook's
+ * records the earliest review is on 14 September 2016, two months after the
+ * repository was created.
  *
  * A constant rather than the earliest review in the years loaded: a window
  * that opens after 2016 has a first review of its own, a day or a week in,
@@ -337,10 +337,10 @@ const SPAN_TITLES: Record<'firstCommitToOpened' | 'openedToLastCommit' | 'afterL
 };
 
 /**
- * Whether the filters select backports alone: only the PRs whose description
- * links the one they backport. No target does, since every branch but the
- * development branch holds feature branches' PRs too, and old backports
- * seldom carry the link.
+ * Whether the filters select backports alone: only the PRs that name the
+ * one they backport, by Mergify's sentence, a "backport of" line or a title
+ * suffix. No target does, since every branch but the development branch
+ * holds feature branches' PRs too, and old backports seldom carry the link.
  */
 export function onlyBackports(filters: Pick<Filters, 'backportLink'>): boolean {
   return filters.backportLink === 'linked';

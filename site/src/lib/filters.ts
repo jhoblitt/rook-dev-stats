@@ -43,8 +43,9 @@ export function inTarget(target: Target, base: string): boolean {
 }
 
 /**
- * By the `backport_link` column: whether the description links the PR it
- * backports. Old backports seldom do, so no link does not mean no backport.
+ * By the `backport_link` column: whether the PR names the one it backports,
+ * by Mergify's sentence, a "backport of" line or a title suffix. Old
+ * backports seldom do, so no link does not mean no backport.
  */
 export const BACKPORT_LINKS = [
   { id: 'linked', label: 'links its original' },

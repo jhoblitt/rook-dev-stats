@@ -21,7 +21,7 @@ import { DAY } from './filters';
 
 const KINDS = [...META.event_kinds, 'review_author'];
 const SHA = (c: string) => c.repeat(40);
-const PR = 'https://github.com/ceph/ceph/pull/70000';
+const PR = 'https://github.com/rook/rook/pull/70000';
 
 /** A table for a one-year dataset: refs aligned with its sorted events, commits per row. */
 function table(rows: number, refs: string[], commits: (readonly Commit[])[] = []): TableYear {
@@ -112,11 +112,11 @@ describe('prTimeline', () => {
       'review_author:9': `${PR}#pullrequestreview-205`,
       'draft:10': `${PR}#event-301`,
       'ready:11': `${PR}#event-302`,
-      'force_push:12': `https://github.com/ceph/ceph/commit/${SHA('a')}`,
+      'force_push:12': `https://github.com/rook/rook/commit/${SHA('a')}`,
       'force_push:13': null,
       'closed:14': `${PR}#event-303`,
       'reopened:15': PR,
-      'merged:16': `https://github.com/ceph/ceph/commit/${SHA('b')}`,
+      'merged:16': `https://github.com/rook/rook/commit/${SHA('b')}`,
     });
   });
 
@@ -180,8 +180,8 @@ describe('prTimeline', () => {
   it('heads the timeline with the PR’s title, branch, commits and disclosure in words', () => {
     const trailer = META.disclosure.indexOf('trailer');
     const data = dataset([{ number: 70000, created: OPENED, base: 1, commits: 3, disclosure: trailer }]);
-    const tl = prTimeline(data, 0, { ...table(1, []), titles: ['rgw: a <b>bold</b> title'] });
-    expect([tl.title, tl.base, tl.commitCount, tl.disclosure]).toEqual(['rgw: a <b>bold</b> title', 'reef', 3, 'AI use disclosed in a trailer']);
+    const tl = prTimeline(data, 0, { ...table(1, []), titles: ['object: a <b>bold</b> title'] });
+    expect([tl.title, tl.base, tl.commitCount, tl.disclosure]).toEqual(['object: a <b>bold</b> title', 'release-1.17', 3, 'AI use disclosed in a trailer']);
     expect(prTimeline(dataset([{ number: 70000, created: OPENED }]), 0, table(1, [])).disclosure).toBe('AI use not disclosed');
   });
 
@@ -189,7 +189,7 @@ describe('prTimeline', () => {
     const checklist = META.disclosure.indexOf('checklist');
     expect(checklist).toBeGreaterThan(0);
     const data = dataset([{ number: 70000, created: OPENED, disclosure: checklist }]);
-    expect(prTimeline(data, 0, table(1, [])).disclosure).toBe("AI use disclosed by the PR template's AI-guidelines box");
+    expect(prTimeline(data, 0, table(1, [])).disclosure).toBe('AI use disclosed by the PR template’s AI-guidelines box');
   });
 
   it('draws a merge and the close GitHub records a second after it as the merge alone', () => {
@@ -276,7 +276,7 @@ describe('prTimeline', () => {
   });
 
   describe('the backport wording, only for a PR that links the original it backports', () => {
-    const bases = { bases: ['master', 'squid', 'wip-feature-x'] };
+    const bases = { bases: ['master', 'release-1.18', 'feature-x'] };
     const row = (base: number): Row => ({ number: 26000, created: OPENED, first_commit: OPENED - 30 * DAY, state: 1, closed: OPENED + DAY, base });
     const linking = (original: number): TableYear => ({ ...table(1, []), backport_of: [original] });
     const titles = (base: number, original: number) =>
@@ -347,7 +347,7 @@ describe('markName', () => {
 
 // The fixture's people: 0 fixture-author-e, 1 fixture-author-f, 2
 // fixture-author-a, 3 fixture-author-i, 4 fixture-reviewer-k, 7
-// fixture-author-d, 10 fixture-author-j (a bot account).
+// fixture-author-d, 10 mergify and 11 dependabot (bot accounts).
 describe('who made each mark', () => {
   const ACTORS: Record<string, number> = { comment_other: 1, review_approved: 2, review_changes: 3, review_commented: 4 };
 
@@ -412,7 +412,7 @@ describe('who made each mark', () => {
   });
 
   it('marks an author who is a bot account, and the pooled deleted account as "(deleted, unknown)", with no link', () => {
-    expect(name(withActors(10), 'opened')).toBe('Opened (fixture-author-j, the author, a bot account), 3 Aug 2026 09:00 UTC');
+    expect(name(withActors(10), 'opened')).toBe('Opened (mergify, the author, a bot account), 3 Aug 2026 09:00 UTC');
     const people = [...META.people, 'ghost'];
     const tl = withActors(people.length - 1, people);
     expect(who(tl, 'opened')).toMatchObject({ handle: { text: '(deleted, unknown)', url: null } });

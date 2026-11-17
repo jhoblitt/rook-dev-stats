@@ -25,54 +25,49 @@ const template = "**Checklist:**\r\n\r\n" +
 
 var _ = Describe("Hints", func() {
 	DescribeTable("finds the hints",
-		func(messages []string, description string, issues []record.Issue, want *record.KindHints) {
-			Expect(extract.Hints(16688, "a pull request", messages, description, issues)).To(Equal(want))
+		func(description string, issues []record.Issue, want *record.KindHints) {
+			Expect(extract.Hints(16688, "a pull request", description, issues)).To(Equal(want))
 		},
-		Entry("two closing issues, in GitHub's order, with their labels", nil, "", []record.Issue{
+		Entry("two closing issues, in GitHub's order, with their labels", "", []record.Issue{
 			{Number: 16685, Repository: "rook/rook", Labels: []string{"bug", "ci"}},
 			{Number: 16001, Repository: "rook/rook"},
 		}, &record.KindHints{Issues: []record.Issue{
 			{Number: 16685, Repository: "rook/rook", Labels: []string{"bug", "ci"}},
 			{Number: 16001, Repository: "rook/rook"},
 		}}),
-		Entry("closing issues beside a backport", nil, "backport of #69001", []record.Issue{
+		Entry("closing issues beside a backport", "backport of #69001", []record.Issue{
 			{Number: 4001, Repository: "ceph/ceph-csi", Labels: []string{"bug"}},
 		}, &record.KindHints{
 			Issues:     []record.Issue{{Number: 4001, Repository: "ceph/ceph-csi", Labels: []string{"bug"}}},
 			BackportOf: 69001,
 		}),
-		Entry("an empty list of closing issues", nil, "", []record.Issue{}, nil),
-		Entry("the template with boxes ticked", nil, template, nil, nil),
-		Entry("issues named in the commits and description but not closed by the pull request", []string{
-			"ci: fix it\n\nFixes: https://github.com/rook/rook/issues/16685\nResolves #16001\n",
-		}, "Resolves #16685\r\n", nil, nil),
-		Entry("backport of a pull-request URL", nil,
+		Entry("an empty list of closing issues", "", []record.Issue{}, nil),
+		Entry("the template with boxes ticked", template, nil, nil),
+		Entry("issues named in the description but not closed by the pull request", "Resolves #16685\r\n", nil, nil),
+		Entry("backport of a pull-request URL",
 			"backport of https://github.com/rook/rook/pull/69001\r\n", nil,
 			&record.KindHints{BackportOf: 69001}),
-		Entry("Backport of #<digits>, followed by a colon", nil,
+		Entry("Backport of #<digits>, followed by a colon",
 			"Backport of: #69001 (clean cherry-pick).", nil,
 			&record.KindHints{BackportOf: 69001}),
-		Entry("BACKPORT OF a Markdown link to the pull request", nil,
+		Entry("BACKPORT OF a Markdown link to the pull request",
 			"This is a BACKPORT OF [#69001](https://github.com/rook/rook/pull/69001) to release-1.18.", nil,
 			&record.KindHints{BackportOf: 69001}),
-		Entry("backport of the first pull request named, the later ones ignored", nil,
+		Entry("backport of the first pull request named, the later ones ignored",
 			"backport of https://github.com/rook/rook/pull/69001, https://github.com/rook/rook/pull/69002", nil,
 			&record.KindHints{BackportOf: 69001}),
-		Entry("backport of with no number", nil,
+		Entry("backport of with no number",
 			"This is a backport of the fix for the listing race.", nil, nil),
-		Entry("backport of a pull request in another repository", nil,
+		Entry("backport of a pull request in another repository",
 			"backport of https://github.com/ceph/ceph-csi/pull/69001", nil, nil),
-		Entry("backport of in a commit message rather than the description", []string{
-			"core: fix it\n\nbackport of https://github.com/rook/rook/pull/69001\n",
-		}, "", nil, nil),
-		Entry("nothing at all", []string{"doc: fix a link\n"}, "", nil, nil),
+		Entry("nothing at all", "", nil, nil),
 	)
 
 	// The pull request under test is #16688 throughout.
 	DescribeTable("names the pull request a backport copies",
 		func(title, description string, want int) {
 			var got int
-			if h := extract.Hints(16688, title, nil, description, nil); h != nil {
+			if h := extract.Hints(16688, title, description, nil); h != nil {
 				got = h.BackportOf
 			}
 			Expect(got).To(Equal(want))
@@ -100,18 +95,25 @@ var _ = Describe("Hints", func() {
 		Entry("bp naming several: the first", "core: fix it (bp #6950 #6951)", "", 6950),
 		Entry("a title that names a backport but not at its end", "core: fix it (backport #18708) again", "", 0),
 		Entry("a title suffix with no number", "core: fix it (backport)", "", 0),
+		Entry("a title suffix naming a version, not a pull request", "core: fix it (backport 1.5)", "", 0),
+		Entry("a title suffix naming a version after #N: the pull request", "core: fix it (backport #18708 to 1.5)", "", 18708),
+		Entry("a title suffix naming a version, the space dropped", "core: fix it (backport1.15)", "", 0),
 		Entry("the description's sentence and a different title suffix: the description's", "core: fix it (backport #18735)",
 			"This is an automatic backport of pull request #18708 done by [Mergify](https://mergify.com).", 18708),
 		Entry("Mergify's sentence before an earlier backport of", "core: fix it",
 			"backport of #100\n<hr>This is an automatic backport of pull request #18708 done by [Mergify](https://mergify.com).", 18708),
 		Entry("backport of a Rook pull-request address", "core: fix it",
 			"backport of https://github.com/rook/rook/pull/123", 123),
-		Entry("backport of a Ceph pull-request address", "core: fix it",
-			"backport of https://github.com/ceph/ceph/pull/123", 0),
+		Entry("backport of another repository's pull-request address", "core: fix it",
+			"backport of https://github.com/rook/kubectl-rook-ceph/pull/123", 0),
 		Entry("a title suffix naming the pull request itself", "core: fix it (backport #16688)", "", 0),
 		Entry("backport of #0", "core: fix it", "backport of #0", 0),
 		Entry("a description naming the pull request itself, then a title suffix naming another", "core: fix it (backport #18708)",
 			"This is an automatic backport of pull request #16688 done by [Mergify](https://mergify.com).", 18708),
+		Entry("Mergify's sentence naming the pull request itself, then a backport of naming another", "core: fix it (backport #18735)",
+			"backport of #18708\n<hr>This is an automatic backport of pull request #16688 done by [Mergify](https://mergify.com).", 18708),
+		Entry("a backport of naming the pull request itself, then a title suffix naming another", "core: fix it (backport #18708)",
+			"backport of #16688", 18708),
 	)
 
 	It("leaves kind_hints out of a record that has none", func() {

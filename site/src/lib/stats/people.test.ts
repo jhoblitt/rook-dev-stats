@@ -22,7 +22,7 @@ describe('authorRows over the fixture', () => {
     expect(authors.map((a) => META.people[a.person])).toEqual([
       'fixture-author-d',
       'fixture-author-e',
-      'fixture-author-f',
+      'dependabot',
       'fixture-author-g',
       'fixture-author-a',
       'fixture-author-i',

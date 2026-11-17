@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { commitUrl, eventUrl, prUrl } from './links';
 
-const REPO = 'ceph/ceph';
+const REPO = 'rook/rook';
 const SHA = '4315b600657d926645efaaa79d8cc1d5651bba02';
 
 describe('prUrl', () => {
   it('is the pull request page', () => {
-    expect(prUrl(REPO, 66500)).toBe('https://github.com/ceph/ceph/pull/66500');
+    expect(prUrl(REPO, 66500)).toBe('https://github.com/rook/rook/pull/66500');
   });
 });
 
 describe('commitUrl', () => {
   it('is the commit within the pull request', () => {
-    expect(commitUrl(REPO, 66500, SHA)).toBe(`https://github.com/ceph/ceph/pull/66500/commits/${SHA}`);
+    expect(commitUrl(REPO, 66500, SHA)).toBe(`https://github.com/rook/rook/pull/66500/commits/${SHA}`);
   });
 
   it('is null for an empty or malformed SHA', () => {
@@ -22,7 +22,7 @@ describe('commitUrl', () => {
 });
 
 describe('eventUrl', () => {
-  const pr = 'https://github.com/ceph/ceph/pull/66500';
+  const pr = 'https://github.com/rook/rook/pull/66500';
 
   it.each(['comment_other', 'comment_author', 'command_author', 'command_other', 'bot_account'])(
     'addresses a %s as an issue comment',
@@ -43,7 +43,7 @@ describe('eventUrl', () => {
   });
 
   it.each(['merged', 'force_push'])('addresses a %s as the commit it made', (kind) => {
-    expect(eventUrl(REPO, 66500, kind, SHA)).toBe(`https://github.com/ceph/ceph/commit/${SHA}`);
+    expect(eventUrl(REPO, 66500, kind, SHA)).toBe(`https://github.com/rook/rook/commit/${SHA}`);
   });
 
   it('sends a reopening, which has no address, to the pull request', () => {

@@ -34,15 +34,15 @@ accounts:
 `,
 	tables.CommandsFile: `
 commands:
-  - {id: make-check, name: jenkins test make check, pattern: 'jenkins test make check'}
-  - {id: retest, name: jenkins retest this please, pattern: 'jenkins retest this please'}
+  - {id: mergify-rebase, name: '@mergifyio rebase', pattern: '@mergifyio rebase'}
+  - {id: ok-to-test, name: ok to test, pattern: 'ok to test'}
 `,
 	tables.LabelsFile: `
 components:
-  - {id: rgw, name: RGW, labels: [rgw, 'rgw-*']}
-  - {id: cephfs, name: CephFS, labels: [cephfs]}
-process: [needs-review]
-other: [squid]
+  - {id: object, name: Object, labels: [ceph-rgw, 'object-*']}
+  - {id: filesystem, name: File system, labels: [filesystem]}
+process: [do-not-merge]
+other: [security]
 `,
 	tables.KindsFile: `
 kinds:
@@ -79,7 +79,7 @@ func pr(number int) record.Record {
 	return record.Record{
 		Number:     number,
 		Author:     record.Actor{Login: "alice"},
-		Base:       "main",
+		Base:       "master",
 		Created:    opened,
 		State:      record.StateOpen,
 		Labels:     []string{},

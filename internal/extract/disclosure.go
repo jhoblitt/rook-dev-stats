@@ -16,12 +16,12 @@ import (
 // a tuned rule reaches the records on the next run.
 
 // broad is the broad word list. Everything is case-insensitive except "AI",
-// which is matched only as an upper-case word. "cursor" is a RADOS term, so
-// Cursor is matched only by its agent address here, and as the value of a
-// -by trailer below. "claude" stays unbounded, since values such as
-// "IBM-Bob:ClaudeSonnet" run it into the next word; the words bounded here
-// otherwise match inside "raider", "philanthropic" and "regenerated
-// without".
+// which is matched only as an upper-case word. "cursor" is an ordinary word
+// in code and docs, as in Rook's prometheus-metric-cursor.png, so Cursor is
+// matched only by its agent address here, and as the value of a -by trailer
+// below. "claude" stays unbounded, so a model name run into the next word,
+// such as "ClaudeSonnet", still matches; the words bounded here otherwise
+// match inside "raider", "philanthropic" and "regenerated without".
 var broad = regexp.MustCompile(`(?i:` +
 	`claude|\banthropic\b|copilot|gemini|codex|chatgpt|openai|` +
 	`\bgpt(?:\b|\d)|\bllms?\b|` +
@@ -33,14 +33,13 @@ var broad = regexp.MustCompile(`(?i:` +
 // byValue is what else the value of a -by trailer may name.
 var byValue = regexp.MustCompile(`(?i)\bcursor\b`)
 
-// toolAddresses are the addresses, lower-cased, that tools sign a line
-// with: every address the committed candidates held when the list was made,
-// and none of a person. An address not here is a person's until a
-// maintainer, prompted by extract's log, adds it. A token is compared with
+// toolAddresses are the addresses, lower-cased, that tools are known to sign
+// a line with, and none of a person. An address not here is a person's until
+// a maintainer, prompted by extract's log, adds it. A token is compared with
 // them whole: nothing in this file looks for one inside a longer string.
 var toolAddresses = map[string]bool{
 	"noreply@anthropic.com":  true, // Claude Code
-	"norpley@anthropic.com":  true, // Claude Code's, misspelled in one commit
+	"norpley@anthropic.com":  true, // Claude Code's, misspelled
 	"cursoragent@cursor.com": true, // Cursor's agent
 	"bob@ibm.com":            true, // IBM Bob
 }
@@ -119,14 +118,18 @@ var checklistLine = regexp.MustCompile(`^(?:[-*+]\s*)?\[\s*([xX]?)\s*\]\s*(.*)$`
 
 // templateLabel is, lower-cased, a label that says no more than the
 // AI-guidelines box of rook/rook's pull request template, with or without
-// its link and its condition. It may name another guide first, as in
-// "reviewed developer guide and ai guidelines", but no other words: they
-// could say how AI was used.
-var templateLabel = regexp.MustCompile(`^reviewed (?:(?:the )?[a-z]+ guides? and )?(?:\[ai guidelines\]\([^)]*\)|ai guidelines)(?:,? if ai assisted with the pr)?\.?$`)
+// its link and its condition, in the rewordings people give it: "the"
+// before "ai guidelines", "when" for "if", punctuation dropped or added. It
+// may name another guide first, as in "reviewed developer guide and ai
+// guidelines", but no other words: they could say how AI was used.
+var templateLabel = regexp.MustCompile(`^reviewed\s+(?:(?:the\s+)?[a-z]+\s+guides?\s+and\s+)?(?:the\s+)?` +
+	`(?:\[ai guidelines\]\([^)]*\)|ai\s+guidelines)` +
+	`(?:[,;:.]?\s+(?:if|when)\s+ai\s+assisted\s+with\s+the\s+pr)?[.!]?$`)
 
-// mergifyBreak is where Mergify joins its sentence to the description of
-// the pull request it backports.
-const mergifyBreak = "<hr>"
+// mergifyBreak is, lower-cased, where Mergify joins its sentence to the
+// description of the pull request it backports: an <hr>, then "This is an
+// automatic backport", or "automated" in its older versions.
+var mergifyBreak = regexp.MustCompile(`<hr>\s*this is an automat(?:ic|ed) backport`)
 
 // maxCandidate is the most characters of a line a candidate keeps.
 const maxCandidate = 200
@@ -138,9 +141,9 @@ const maxCandidate = 200
 //   - commit_prose: any other commit-message line that matches;
 //   - description: any description line that matches.
 //
-// A description line that is the AI-guidelines box sets Checklist when it
-// is ticked, and is a candidate only when it says more than the template
-// does.
+// A description line that is the AI-guidelines box is never a candidate
+// when it is unticked, whatever it says. A ticked one sets Checklist, and
+// is a candidate too only when it says more than the template does.
 //
 // A line with a never-kept key is dropped from all three, and so is a line
 // withhold refuses, which is counted in withheld under the key withhold
@@ -177,7 +180,10 @@ func Candidates(messages []string, description string) (d record.Disclosure, wit
 	for line := range strings.Lines(description) {
 		line = strings.TrimSpace(line)
 		if isBox, ticked, more := aiBox(line); isBox {
-			checklist = checklist || ticked
+			if !ticked {
+				continue
+			}
+			checklist = true
 			if !more {
 				continue
 			}
@@ -206,7 +212,10 @@ func aiBox(line string) (isBox, ticked, more bool) {
 	if !strings.HasPrefix(label, "reviewed") || !strings.Contains(label, "ai guidelines") {
 		return false, false, false
 	}
-	own, _, _ := strings.Cut(label, mergifyBreak)
+	own := label
+	if loc := mergifyBreak.FindStringIndex(label); loc != nil {
+		own = label[:loc[0]]
+	}
 	return true, m[1] != "", !templateLabel.MatchString(strings.TrimSpace(own))
 }
 

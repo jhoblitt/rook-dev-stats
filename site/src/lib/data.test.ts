@@ -35,10 +35,10 @@ const events2025 = earlier['events-2025.json'] as typeof events2026;
 
 describe('parseMeta', () => {
   it('reads the fixture', () => {
-    expect(meta.repo).toBe('ceph/ceph');
+    expect(meta.repo).toBe('rook/rook');
     expect(meta.window_start).toBe(Date.UTC(2026, 4, 15) / 1000);
     expect(meta.years).toEqual([2026]);
-    expect(meta.components.map((c) => c.id)).toEqual(['cephfs', 'mgr', 'rbd', 'rgw']);
+    expect(meta.components.map((c) => c.id)).toEqual(['filesystem', 'mgr', 'block', 'object']);
     expect(meta.disclosure).toEqual(['none', 'checklist', 'description', 'coauthor', 'trailer']);
     expect(meta.kinds).toEqual([
       { id: 'bugfix', name: 'Bug fix' },
@@ -72,9 +72,9 @@ describe('parseMeta', () => {
   });
 
   it('reads the people the data names, and which of them are bots', () => {
-    expect(meta.people).toHaveLength(11);
+    expect(meta.people).toHaveLength(12);
     expect(meta.people[4]).toBe('fixture-reviewer-k');
-    expect(meta.people_bots).toEqual([10]);
+    expect(meta.people_bots).toEqual([10, 11]);
   });
 
   it.each([
@@ -82,7 +82,7 @@ describe('parseMeta', () => {
     ['with people that are not logins', { people: ['a', 3] }, /meta\.json.*"people"/],
     ['with a login named twice', { people: ['a', 'b', 'a'], people_bots: [] }, /meta\.json.*"people".*"a" twice/],
     ['without people_bots', { people_bots: undefined }, /meta\.json.*"people_bots"/],
-    ['with a bot index past the last person', { people_bots: [10, 11] }, /meta\.json.*"people_bots" has 11 at 1, outside "people" of 11/],
+    ['with a bot index past the last person', { people_bots: [10, 12] }, /meta\.json.*"people_bots" has 12 at 1, outside "people" of 12/],
     ['with a negative bot index', { people_bots: [-1] }, /meta\.json.*"people_bots"/],
   ])('rejects a meta %s, naming the file and the field', (_name, patch, message) => {
     expect(() => parseMeta({ ...rawMeta, ...patch })).toThrow(DataError);
@@ -102,10 +102,10 @@ describe('parseMeta', () => {
 
   it.each([
     ['that is not a list of indexes', { people_deleted: 'ghost' }, /meta\.json.*"people_deleted"/],
-    ['with an index past the last person', { people_deleted: [NAMED_B + 1] }, /meta\.json.*"people_deleted" has 14 at 0, outside "people" of 14/],
+    ['with an index past the last person', { people_deleted: [NAMED_B + 1] }, /meta\.json.*"people_deleted" has 15 at 0, outside "people" of 15/],
     ['naming a login', { people_deleted: [2] }, /meta\.json.*"people_deleted" names "fixture-author-a", which is not "ghost:" and a name/],
     ['naming the pooled entry', { people_deleted: [POOLED] }, /meta\.json.*"people_deleted" names "ghost", which is not "ghost:" and a name/],
-    ['naming a bot', { people_deleted: [NAMED_A], people_bots: [10, NAMED_A] }, /meta\.json.*"people_deleted" names "ghost:Ada Example", which "people_bots" lists too/],
+    ['naming a bot', { people_deleted: [NAMED_A], people_bots: [10, 11, NAMED_A] }, /meta\.json.*"people_deleted" names "ghost:Ada Example", which "people_bots" lists too/],
   ])('rejects a people_deleted %s', (_name, patch, message) => {
     expect(() => parseMeta({ ...deletedMeta(), ...patch })).toThrow(DataError);
     expect(() => parseMeta({ ...deletedMeta(), ...patch })).toThrow(message);
@@ -132,7 +132,7 @@ describe('parsePrs', () => {
   it('reads the kind column, -1 for unknown', () => {
     const prs = parsePrs(prs2026, 'prs-2026.json', meta);
     expect(prs.kind).toBeInstanceOf(Int32Array);
-    expect([...prs.kind]).toEqual([0, -1, 2, 0, 3, 2, 1, 0, 1, 4, 1, 3]);
+    expect([...prs.kind]).toEqual([0, -1, 2, 0, 3, 4, 1, 0, 1, 4, 1, 3]);
   });
 
   it('rejects a year file whose columns differ in length, naming the file and the column', () => {
@@ -181,7 +181,7 @@ describe('parsePrs', () => {
   });
 
   // Each index column against its dictionary in the fixture's meta: 4 bases,
-  // 4 disclosures, 3 families, 4 components and 5 kinds.
+  // 5 disclosures, 3 families, 4 components and 5 kinds.
   const at3 = <T>(column: readonly T[], value: T) => column.map((v, i) => (i === 3 ? value : v));
   it.each([
     ['kind past the last kind', 'kind', { kind: at3(prs2026.kind, 5) }],
@@ -205,12 +205,12 @@ describe('parsePrs', () => {
   });
 
   it.each([
-    ['past the last person', 11],
+    ['past the last person', 12],
     ['of -1, since every PR has an author', -1],
   ])('rejects a year file whose author is %s, naming the file, the column and the row', (_name, value) => {
     const bad = { ...prs2026, author: at3(prs2026.author, value) };
     expect(() => parsePrs(bad, 'prs-2026.json', meta)).toThrow(DataError);
-    expect(() => parsePrs(bad, 'prs-2026.json', meta)).toThrow(/prs-2026\.json.*"author" has .* at row 3, outside "people" of 11/);
+    expect(() => parsePrs(bad, 'prs-2026.json', meta)).toThrow(/prs-2026\.json.*"author" has .* at row 3, outside "people" of 12/);
   });
 
   it('accepts every kind in the dictionary and -1', () => {
@@ -233,11 +233,11 @@ describe('parseEvents', () => {
     expect([...parseEvents(events2026, 'events-2026.json', 12, meta).actor]).toEqual(events2026.actor);
   });
 
-  it.each([11, -2])('rejects an actor of %i, outside people, naming the file and the event', (value) => {
+  it.each([12, -2])('rejects an actor of %i, outside people, naming the file and the event', (value) => {
     const bad = { ...events2026, actor: events2026.actor.map((v, i) => (i === 4 ? value : v)) };
     expect(() => parseEvents(bad, 'events-2026.json', 12, meta)).toThrow(DataError);
     expect(() => parseEvents(bad, 'events-2026.json', 12, meta)).toThrow(
-      new RegExp(`events-2026\\.json.*"actor" has ${value} at event 4, outside "people" of 11`),
+      new RegExp(`events-2026\\.json.*"actor" has ${value} at event 4, outside "people" of 12`),
     );
   });
 
@@ -287,16 +287,16 @@ describe('parseTable', () => {
 
   it('reads the closing issues, the PR a backport is of, and where each kind came from', () => {
     expect(table.issues).toEqual([
-      [[71234, 'ceph/ceph']],
+      [[71234, 'rook/rook']],
       [],
       [],
-      [[72001, 'ceph/ceph']],
+      [[72001, 'rook/rook']],
       [],
       [],
-      [[72510, 'ceph/ceph']],
-      [[72140, 'ceph/ceph']],
+      [[72510, 'rook/rook']],
+      [[72140, 'rook/rook']],
       [
-        [72377, 'ceph/ceph'],
+        [72377, 'rook/rook'],
         [4001, 'ceph/ceph-csi'],
       ],
       [],
@@ -338,9 +338,9 @@ describe('parseTable', () => {
     ['a comment ref that is a sha', 'refs', { refs: at(table2026.refs, 0, sha) }],
     ['a ref that is not an id', 'refs', { refs: at(table2026.refs, 0, 'issuecomment-1') }],
     ['issues one short', 'issues', { issues: table2026.issues.slice(1) }],
-    ['an issue that is not a positive number', 'issues', { issues: at(table2026.issues, 1, [[0, 'ceph/ceph']]) }],
+    ['an issue that is not a positive number', 'issues', { issues: at(table2026.issues, 1, [[0, 'rook/rook']]) }],
     ['an issue without its repository', 'issues', { issues: at(table2026.issues, 1, [[72001]]) }],
-    ['an issue whose repository is not owner/name', 'issues', { issues: at(table2026.issues, 1, [[72001, 'ceph']]) }],
+    ['an issue whose repository is not owner/name', 'issues', { issues: at(table2026.issues, 1, [[72001, 'rook']]) }],
     ['an issue as a bare number', 'issues', { issues: at(table2026.issues, 1, [72001] as unknown as (string | number)[][]) }],
     ['the tracker as a kind source', 'kind_source', { kind_source: at(table2026.kind_source, 0, 'tracker') }],
     ['the checklist as a kind source', 'kind_source', { kind_source: at(table2026.kind_source, 0, 'checklist') }],
@@ -434,7 +434,7 @@ describe('locateRow and locateEvent', () => {
     const table = parseTable(table2026, 'table-2026.json', y2026, twoYears);
     // Row 4 is #66500; event 19 is its merge, the fifteenth event of 2026.
     expect(data.prs.number[4]).toBe(66500);
-    expect(table.titles[locateRow(data, 4).index]).toBe('rgw: check the bucket owner before a copy');
+    expect(table.titles[locateRow(data, 4).index]).toBe('object: check the bucket owner before a copy');
     expect(data.events.pr[19]).toBe(4);
     expect(meta.event_kinds[data.events.kind[19] as number]).toBe('merged');
     expect(table.refs[locateEvent(data, 19).index]).toMatch(SHA);

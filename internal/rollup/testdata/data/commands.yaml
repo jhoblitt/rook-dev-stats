@@ -1,3 +1,3 @@
 commands:
-  - {id: make-check, name: jenkins test make check, pattern: 'jenkins test make check'}
-  - {id: retest, name: jenkins retest this please, pattern: 'jenkins retest this please'}
+  - {id: mergify-rebase, name: '@mergifyio rebase', pattern: '@mergifyio rebase'}
+  - {id: ok-to-test, name: ok to test, pattern: 'ok to test'}

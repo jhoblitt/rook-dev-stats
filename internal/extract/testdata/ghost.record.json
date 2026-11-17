@@ -4,7 +4,7 @@
   "title": "doc: fix a link",
   "author": {"login": "ghost", "bot": false},
   "association": "none",
-  "base": "main",
+  "base": "master",
   "created": "2026-05-20T10:00:00Z",
   "state": "merged",
   "draft": false,

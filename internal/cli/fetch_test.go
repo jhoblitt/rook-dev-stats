@@ -33,7 +33,7 @@ var _ = Describe("fetch", func() {
 	closedPR := func(number int, updated time.Time) fetch.Entry {
 		return fetch.Entry{
 			Number: number, Title: "pr", State: "CLOSED", CreatedAt: updated.Add(-time.Hour),
-			UpdatedAt: updated, ClosedAt: &updated, BaseRefName: "main",
+			UpdatedAt: updated, ClosedAt: &updated, BaseRefName: "master",
 			Author: &fetch.Actor{Login: "alice", Typename: "User"},
 		}
 	}
@@ -238,7 +238,7 @@ var _ = Describe("fetch", func() {
 		It("walks the whole window and asks every baseline again when the data is of a later window, so extract counts standing once", func() {
 			later := time.Date(2026, 5, 20, 0, 0, 0, 0, time.UTC)
 			Expect(later.After(fetch.WindowStart)).To(BeTrue(), "the data's window must start after the window in force")
-			Expect(os.WriteFile(filepath.Join(dataDir, "meta.json"), []byte(`{"repo":"ceph/ceph","window_start":"`+
+			Expect(os.WriteFile(filepath.Join(dataDir, "meta.json"), []byte(`{"repo":"rook/rook","window_start":"`+
 				later.Format(time.RFC3339)+`","fetched_through":"2026-11-14T12:00:00Z","github_counts":{"opened_in_window":1,"open":0}}`), 0o600)).To(Succeed())
 			Expect(os.WriteFile(filepath.Join(dataDir, "authors.json"), []byte(`{"alice": 5}`), 0o600)).To(Succeed())
 			Expect(os.WriteFile(filepath.Join(cacheDir, "authors.json"), []byte(`{"alice": 5}`), 0o600)).To(Succeed())

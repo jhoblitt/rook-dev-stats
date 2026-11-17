@@ -109,7 +109,7 @@ describe('PrTable', () => {
       const compares = vi.spyOn(Intl.Collator.prototype, 'compare', 'get');
       for (const go of waiting.splice(0)) go();
       await waitFor(() => expect(table().getAttribute('aria-busy')).toBe('false'));
-      await waitFor(() => expect(within(table()).getByText('rgw: check the bucket owner before a copy')).toBeTruthy());
+      await waitFor(() => expect(within(table()).getByText('object: check the bucket owner before a copy')).toBeTruthy());
       const count = compares.mock.calls.length;
       compares.mockRestore();
       return count;
@@ -173,7 +173,7 @@ describe('PrTable', () => {
   it('loads the table file of each year the selection needs, and no other', async () => {
     const { props, requested } = await page('#/?kind=feature');
     render(App, props);
-    await waitFor(() => expect(region().getByText('mds, mgr: report stuck client requests')).toBeTruthy());
+    await waitFor(() => expect(region().getByText('file, mgr: report stuck client requests')).toBeTruthy());
     expect(requested.filter((u) => u.includes('table-'))).toEqual([`${BASE}table-2026.json`]);
     expect(within(table()).getByText('fixture-author-a')).toBeTruthy();
   });
@@ -183,13 +183,13 @@ describe('PrTable', () => {
     await waitFor(() => expect(region().getByText(/PRs finished in 2026 or still open could not be loaded/)).toBeTruthy());
     expect(region().getByText(/table-2026\.json: HTTP 404/)).toBeTruthy();
     // #60010's title, from 2025's file, which loaded.
-    await waitFor(() => expect(within(table()).getByText('rgw: fix a stall in multisite bucket sync')).toBeTruthy());
+    await waitFor(() => expect(within(table()).getByText('object: fix a stall in multisite bucket sync')).toBeTruthy());
   });
 
   it('loads no table file of a year before the period, nor of a year it lists no PR from', async () => {
     const { props, requested } = await page('#/?from=2026-05-15', earlier, twoYears);
     render(App, props);
-    await waitFor(() => expect(within(table()).getByText('mds: rework the client session table')).toBeTruthy());
+    await waitFor(() => expect(within(table()).getByText('file: rework the filesystem mirror reconcile')).toBeTruthy());
     expect(requested.filter((u) => u.includes('-2025'))).toEqual([]);
   });
 
@@ -220,15 +220,15 @@ describe('PrTable', () => {
 
   it('sorts by title once the titles are there', async () => {
     render(App, (await page('#/?sort=title')).props);
-    await waitFor(() => expect(within(table()).getByText('doc: fix a typo')).toBeTruthy());
-    expect(listed()[0]).toBe(66510);
+    await waitFor(() => expect(within(table()).getByText('block: [WIP] add a journal mirroring mode')).toBeTruthy());
+    expect(listed()[0]).toBe(66700);
     expect(DEFAULT_SORT.column).toBe('opened');
   });
 
   it('links each number to the PR on GitHub, in a new tab', async () => {
     render(App, (await page('')).props);
     const link = within(table()).getByRole('link', { name: '#66500 on GitHub, opens in a new tab' });
-    expect(link.getAttribute('href')).toBe('https://github.com/ceph/ceph/pull/66500');
+    expect(link.getAttribute('href')).toBe('https://github.com/rook/rook/pull/66500');
     expect(link.getAttribute('target')).toBe('_blank');
     expect(link.getAttribute('rel')).toBe('noopener noreferrer');
   });
@@ -240,9 +240,9 @@ describe('PrTable', () => {
     expect(links[0]?.getAttribute('href')).toBe('https://github.com/fixture-author-d');
     expect(links[0]?.getAttribute('target')).toBe('_blank');
     expect(links[0]?.getAttribute('rel')).toBe('noopener noreferrer');
-    // fixture-author-j is a bot account.
-    const bot = within(table()).getByRole('link', { name: 'fixture-author-j on GitHub, opens in a new tab' });
-    expect(bot.closest('td')?.textContent).toMatch(/fixture-author-j\s*bot/);
+    // mergify is a bot account.
+    const bot = within(table()).getByRole('link', { name: 'mergify on GitHub, opens in a new tab' });
+    expect(bot.closest('td')?.textContent).toMatch(/mergify\s*bot/);
   });
 
   it("filters by a row's author, and clears the filter when chosen again", async () => {
@@ -262,10 +262,10 @@ describe('PrTable', () => {
   it('writes the PR chosen from a row to the URL, and marks the row', async () => {
     const { props, loc } = await page('');
     render(App, props);
-    await waitFor(() => expect(within(table()).getByText('doc: fix a typo')).toBeTruthy());
-    await fireEvent.click(within(table()).getByRole('button', { name: 'doc: fix a typo' }));
+    await waitFor(() => expect(within(table()).getByText('docs: fix a typo')).toBeTruthy());
+    await fireEvent.click(within(table()).getByRole('button', { name: 'docs: fix a typo' }));
     expect(loc.hash()).toBe('#/?target=master&pr=66510');
-    const row = within(table()).getByRole('button', { name: 'doc: fix a typo' }).closest('tr');
+    const row = within(table()).getByRole('button', { name: 'docs: fix a typo' }).closest('tr');
     expect(row?.getAttribute('aria-current')).toBe('true');
   });
 
@@ -277,7 +277,7 @@ describe('PrTable', () => {
   });
 
   it('says "no PRs match" for an empty selection', async () => {
-    render(App, (await page('#/?component=cephfs&kind=docs')).props);
+    render(App, (await page('#/?component=filesystem&kind=docs')).props);
     expect(region().getByText('no PRs match')).toBeTruthy();
     expect(region().queryByRole('table')).toBeNull();
   });
@@ -320,7 +320,8 @@ describe('the title files the PR table fetches', () => {
     await fireEvent.click(within(table()).getByRole('button', { name: /^Title/ }));
     await waitFor(() => expect(table().getAttribute('aria-busy')).toBe('false'));
     expect(titleFiles(requested).sort()).toEqual([2020, 2021, 2022, 2023, 2024, 2025, 2026].map((y) => `table-${y}.json`));
-    expect(listed()[0]).toBe(10000);
+    // 2026's "block: …" and "build(deps): …", then 2020's first copy.
+    expect(listed().slice(0, 3)).toEqual([66700, 66600, 10000]);
   });
 
   it('take in a new year’s file as the rows move to it, fetching none already held', async () => {
@@ -403,7 +404,7 @@ describe('before the table is on screen', () => {
     expect(requested).toContain(`${BASE}table-2026.json`);
     // The timeline asks for the same file for the same PR, so the table must
     // show it loaded its own: its rows carry the titles.
-    await waitFor(() => expect(within(table()).getByText('mds, mgr: report stuck client requests')).toBeTruthy());
+    await waitFor(() => expect(within(table()).getByText('file, mgr: report stuck client requests')).toBeTruthy());
   });
 
   afterAll(() => {
@@ -423,14 +424,14 @@ describe('the selected PR', () => {
     await waitFor(() => expect(panel().textContent).toContain('Bug fix, from the PR it backports'));
     const open = within(panel()).getByRole('link', { name: 'Open on GitHub, #66800, opens in a new tab' });
     expect(open.textContent).toBe('Open on GitHub');
-    expect(open.getAttribute('href')).toBe('https://github.com/ceph/ceph/pull/66800');
+    expect(open.getAttribute('href')).toBe('https://github.com/rook/rook/pull/66800');
     expect(open.getAttribute('rel')).toBe('noopener noreferrer');
     const issue = within(panel()).getByRole('link', { name: 'Issue #72140 on GitHub, opens in a new tab' });
     expect(issue.textContent).toBe('#72140');
-    expect(issue.getAttribute('href')).toBe('https://github.com/ceph/ceph/issues/72140');
+    expect(issue.getAttribute('href')).toBe('https://github.com/rook/rook/issues/72140');
     expect(issue.getAttribute('target')).toBe('_blank');
     const original = within(panel()).getByRole('link', { name: '#66500 on GitHub, opens in a new tab' });
-    expect(original.getAttribute('href')).toBe('https://github.com/ceph/ceph/pull/66500');
+    expect(original.getAttribute('href')).toBe('https://github.com/rook/rook/pull/66500');
     await fireEvent.click(within(panel()).getByRole('button', { name: 'Show #66500 here' }));
     expect(loc.hash()).toBe('#/?target=all&pr=66500');
   });
@@ -446,7 +447,7 @@ describe('the selected PR', () => {
     render(App, (await page('#/?pr=66900')).props);
     await waitFor(() => expect(panel().textContent).toContain('Closes'));
     const own = within(panel()).getByRole('link', { name: 'Issue #72377 on GitHub, opens in a new tab' });
-    expect(own.getAttribute('href')).toBe('https://github.com/ceph/ceph/issues/72377');
+    expect(own.getAttribute('href')).toBe('https://github.com/rook/rook/issues/72377');
     const other = within(panel()).getByRole('link', { name: 'Issue ceph/ceph-csi#4001 on GitHub, opens in a new tab' });
     expect(other.textContent).toBe('ceph/ceph-csi#4001');
     expect(other.getAttribute('href')).toBe('https://github.com/ceph/ceph-csi/issues/4001');
@@ -458,9 +459,9 @@ describe('the selected PR', () => {
     const issues = table.issues.map((t, i) =>
       i === 8
         ? [
-            [72377, 'ceph/ceph'],
+            [72377, 'rook/rook'],
             [4001, 'ceph/ceph-csi'],
-            [72377, 'ceph/ceph'],
+            [72377, 'rook/rook'],
           ]
         : t,
     );

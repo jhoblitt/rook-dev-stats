@@ -38,7 +38,7 @@ var _ = Describe("extract", func() {
 		opened := time.Date(2026, 6, 1, 0, 0, 0, 0, time.UTC)
 		writeJSON(filepath.Join(cacheDir, fetch.RawDir, "7.json"), fetch.Entry{
 			Number: 7, Title: "pr", State: "OPEN", CreatedAt: opened, UpdatedAt: opened,
-			BaseRefName: "main", Author: &fetch.Actor{Login: "alice", Typename: "User"},
+			BaseRefName: "master", Author: &fetch.Actor{Login: "alice", Typename: "User"},
 			FormatVersion: fetch.FormatVersion,
 		})
 		writeJSON(filepath.Join(cacheDir, "authors.json"), map[string]any{"window_start": fetch.WindowStart, "authors": map[string]int{"alice": 2}})

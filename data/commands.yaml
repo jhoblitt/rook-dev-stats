@@ -11,27 +11,27 @@
 #
 # A command addressed to Mergify or Dependabot starts with a mention of the
 # bot, the only "@" extract keeps, or with the mention written as a link to
-# the bot's GitHub page. A no-break space after the handle, as one comment
-# has, is a space.
+# the bot's GitHub page. Any white space may follow the handle, as it may
+# where extract keeps the mention: one comment has a no-break space there.
 commands:
   # Mergify, rook/rook's backport and merge-queue bot: "@mergifyio backport
   # release-1.21" opens a backport to that branch.
   - id: mergify-backport
     name: '@mergifyio backport'
-    pattern: '(@|https://github\.com/)mergify(io)?[ \x{a0}]+backport( .+)?'
+    pattern: '(@|https://github\.com/)mergify(io)?[\s\v\x{85}\pZ]+backport( .+)?'
   - id: mergify-rebase
     name: '@mergifyio rebase'
-    pattern: '(@|https://github\.com/)mergify(io)?[ \x{a0}]+rebase'
+    pattern: '(@|https://github\.com/)mergify(io)?[\s\v\x{85}\pZ]+rebase'
   - id: mergify-other
     name: '@mergifyio, another request'
-    pattern: '(@|https://github\.com/)mergify(io)?[ \x{a0}]+.+'
+    pattern: '(@|https://github\.com/)mergify(io)?[\s\v\x{85}\pZ]+.+'
   # Dependabot, which opens rook/rook's dependency updates.
   - id: dependabot-rebase
     name: '@dependabot rebase'
-    pattern: '(@|https://github\.com/)dependabot[ \x{a0}]+rebase'
+    pattern: '(@|https://github\.com/)dependabot[\s\v\x{85}\pZ]+rebase'
   - id: dependabot-other
     name: '@dependabot, another request'
-    pattern: '(@|https://github\.com/)dependabot[ \x{a0}]+.+'
+    pattern: '(@|https://github\.com/)dependabot[\s\v\x{85}\pZ]+.+'
   # Jenkins, rook/rook's CI before GitHub Actions: "ok to test" lets it
   # test a pull request from outside the organisation, and "test this
   # please" or "retest this please" asks it for a run.

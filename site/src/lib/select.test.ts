@@ -32,8 +32,8 @@ describe('select', () => {
   it.each([
     ['target master', { target: 'master' }, [0, 2, 3, 4, 5, 6, 8, 9, 10]],
     ['target backports and other branches', { target: 'backports' }, [1, 7, 11]],
-    ['component rgw', { component: 'rgw' }, [0, 3, 7, 9]],
-    ['component mgr, one of two on #66900', { component: 'mgr' }, [5, 8, 10]],
+    ['component object', { component: 'object' }, [0, 3, 7, 9]],
+    ['component mgr, one of two on #66900', { component: 'mgr' }, [8, 10]],
     ['size up to 10', { size: 'le10' }, [1, 4]],
     ['size 11–100', { size: '11-100' }, [3, 6, 7, 10, 11]],
     ['size 101–1,000', { size: '101-1000' }, [0, 2, 8]],
@@ -49,9 +49,9 @@ describe('select', () => {
     ['reopened only', { reopenedOnly: true }, [8]],
     ['kind bug fix', { kind: 'bugfix' }, [0, 3, 7]],
     ['kind feature', { kind: 'feature' }, [6, 8, 10]],
-    ['kind cleanup', { kind: 'cleanup' }, [2, 5]],
+    ['kind cleanup', { kind: 'cleanup' }, [2]],
     ['kind documentation', { kind: 'docs' }, [4, 11]],
-    ['kind other', { kind: 'other' }, [9]],
+    ['kind other', { kind: 'other' }, [5, 9]],
     ['kind unknown', { kind: 'unknown' }, [1]],
     // Opened before August and not finished before July.
     ['period July 2026', { from: '2026-07-01', to: '2026-07-31' }, [1, 2, 5, 6, 7, 8]],
@@ -79,12 +79,12 @@ describe('select', () => {
 // The fixture's people: 0 fixture-author-e, 1 fixture-author-f, 2
 // fixture-author-a, 3 fixture-author-i, 4 fixture-reviewer-k, 5
 // fixture-author-b, 6 fixture-author-c, 7 fixture-author-d, 8
-// fixture-author-g, 9 fixture-author-h, 10 fixture-author-j (a bot).
+// fixture-author-g, 9 fixture-author-h, 10 mergify and 11 dependabot (bots).
 describe('the Author and Reviewer filters', () => {
   it.each([
     ['fixture-author-a', [0, 8]],
     ['fixture-author-d', [3, 10]],
-    ['fixture-author-j', [11]],
+    ['mergify', [11]],
     ['fixture-reviewer-k', []],
   ])('keep the PRs %s opened', (login, expected) => {
     expect(rows({ author: login })).toEqual(expected);
@@ -265,20 +265,20 @@ describe('openedIn', () => {
 describe('the Branch and Backport link filters', () => {
   // Bases sorted as the rollup sorts them, names with each character a branch
   // name holds beside letters.
-  const bases = ['feature/ptl-ci-test', 'master', 'pacific-16.2.7_RC1', 'reef', 'squid'];
-  const [FEATURE, MASTER, PACIFIC_RC, REEF, SQUID] = [0, 1, 2, 3, 4];
+  const bases = ['feature/ptl-ci-test', 'master', 'release-1.16.2_RC1', 'release-1.17', 'release-1.18'];
+  const [FEATURE, MASTER, RC, RELEASE_17, RELEASE_18] = [0, 1, 2, 3, 4];
   const meta = { ...META, bases, window_start: at('2019-01-01T00:00:00Z') };
   const t = (day: string) => at(`${day}T00:00:00Z`);
   const d = dataset(
     [
       { number: 100, created: t('2019-03-01'), closed: t('2019-03-10'), state: 1, base: MASTER },
       { number: 101, created: t('2023-03-01'), closed: t('2023-03-05'), state: 1, base: MASTER, backport_link: 1 },
-      { number: 102, created: t('2023-04-01'), closed: t('2023-04-05'), state: 1, base: REEF, backport_link: 1 },
-      { number: 103, created: t('2023-05-01'), closed: t('2023-05-05'), state: 1, base: REEF },
-      { number: 104, created: t('2024-05-01'), closed: t('2024-05-05'), state: 1, base: REEF, backport_link: 1 },
-      { number: 105, created: t('2024-06-01'), closed: t('2024-06-05'), state: 2, base: SQUID, backport_link: 1 },
+      { number: 102, created: t('2023-04-01'), closed: t('2023-04-05'), state: 1, base: RELEASE_17, backport_link: 1 },
+      { number: 103, created: t('2023-05-01'), closed: t('2023-05-05'), state: 1, base: RELEASE_17 },
+      { number: 104, created: t('2024-05-01'), closed: t('2024-05-05'), state: 1, base: RELEASE_17, backport_link: 1 },
+      { number: 105, created: t('2024-06-01'), closed: t('2024-06-05'), state: 2, base: RELEASE_18, backport_link: 1 },
       { number: 106, created: t('2024-07-01'), closed: t('2024-07-05'), state: 1, base: FEATURE },
-      { number: 107, created: t('2021-12-01'), closed: t('2021-12-05'), state: 1, base: PACIFIC_RC, backport_link: 1 },
+      { number: 107, created: t('2021-12-01'), closed: t('2021-12-05'), state: 1, base: RC, backport_link: 1 },
       { number: 108, created: t('2024-08-01'), closed: t('2024-08-05'), state: 1, base: MASTER },
     ],
     [],
@@ -289,11 +289,11 @@ describe('the Branch and Backport link filters', () => {
 
   it.each([
     ['master: master', 'master', 'master', [0, 1, 8]],
-    ['backports and other branches: reef', 'backports', 'reef', [2, 3, 4]],
+    ['backports and other branches: release-1.17', 'backports', 'release-1.17', [2, 3, 4]],
     ['backports and other branches: a name with a slash', 'backports', 'feature/ptl-ci-test', [6]],
-    ['backports and other branches: a name with dots and an underscore', 'backports', 'pacific-16.2.7_RC1', [7]],
+    ['backports and other branches: a name with dots and an underscore', 'backports', 'release-1.16.2_RC1', [7]],
     ['all: master', 'all', 'master', [0, 1, 8]],
-    ['all: squid', 'all', 'squid', [5]],
+    ['all: release-1.18', 'all', 'release-1.18', [5]],
   ] satisfies [string, Target, string, number[]][])('a branch under the target %s', (_name, target, base, expected) => {
     expect(of({ target, base })).toEqual(expected);
   });
@@ -315,9 +315,9 @@ describe('the Branch and Backport link filters', () => {
   });
 
   it('combines the branch, the backport link, the target and the period', () => {
-    expect(of({ target: 'backports', base: 'reef', backportLink: 'unlinked' })).toEqual([3]);
-    expect(of({ target: 'backports', base: 'reef', backportLink: 'linked' })).toEqual([2, 4]);
-    expect(of({ target: 'backports', base: 'reef', backportLink: 'linked', from: '2024-01-01' })).toEqual([4]);
+    expect(of({ target: 'backports', base: 'release-1.17', backportLink: 'unlinked' })).toEqual([3]);
+    expect(of({ target: 'backports', base: 'release-1.17', backportLink: 'linked' })).toEqual([2, 4]);
+    expect(of({ target: 'backports', base: 'release-1.17', backportLink: 'linked', from: '2024-01-01' })).toEqual([4]);
     expect(of({ target: 'master', backportLink: 'linked' })).toEqual([1]);
   });
 
@@ -330,34 +330,34 @@ describe('the Branch and Backport link filters', () => {
 
     it('lists every other branch under backports and other branches, ties by name', () => {
       expect(choices({ target: 'backports' })).toEqual([
-        { base: 'reef', count: 3 },
+        { base: 'release-1.17', count: 3 },
         { base: 'feature/ptl-ci-test', count: 1 },
-        { base: 'pacific-16.2.7_RC1', count: 1 },
-        { base: 'squid', count: 1 },
+        { base: 'release-1.16.2_RC1', count: 1 },
+        { base: 'release-1.18', count: 1 },
       ]);
     });
 
     it('lists every branch under all', () => {
       expect(choices({ target: 'all' }).map((c) => c.base)).toEqual([
         'master',
-        'reef',
+        'release-1.17',
         'feature/ptl-ci-test',
-        'pacific-16.2.7_RC1',
-        'squid',
+        'release-1.16.2_RC1',
+        'release-1.18',
       ]);
     });
 
     it('counts the PRs active in the period, and keeps a branch with none in it, last', () => {
       expect(choices({ target: 'backports', from: '2024-01-01' })).toEqual([
         { base: 'feature/ptl-ci-test', count: 1 },
-        { base: 'reef', count: 1 },
-        { base: 'squid', count: 1 },
-        { base: 'pacific-16.2.7_RC1', count: 0 },
+        { base: 'release-1.17', count: 1 },
+        { base: 'release-1.18', count: 1 },
+        { base: 'release-1.16.2_RC1', count: 0 },
       ]);
     });
 
     it('counts as if no other filter were chosen', () => {
-      expect(choices({ target: 'backports', base: 'reef', backportLink: 'unlinked', size: 'gt1000' })).toEqual(
+      expect(choices({ target: 'backports', base: 'release-1.17', backportLink: 'unlinked', size: 'gt1000' })).toEqual(
         choices({ target: 'backports' }),
       );
     });

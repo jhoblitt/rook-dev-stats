@@ -4,14 +4,14 @@
   "title": "mds: retry the session flush",
   "author": {"login": "dave-example", "bot": false},
   "association": "contributor",
-  "base": "main",
+  "base": "master",
   "created": "2026-07-01T10:00:00Z",
   "state": "open",
   "draft": false,
   "additions": 7,
   "deletions": 1,
   "files": 1,
-  "labels": ["cephfs", "needs-review"],
+  "labels": ["do-not-merge", "filesystem"],
   "commits": {"count": 1, "first_authored": "2026-07-01T09:30:00Z", "last_committed": "2026-07-05T08:00:00Z", "list": [
     {"authored": "2026-07-01T09:30:00Z", "committed": "2026-07-05T08:00:00Z"}
   ]},

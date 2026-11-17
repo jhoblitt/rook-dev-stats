@@ -172,8 +172,8 @@ describe('weekly by calendar week', () => {
       ],
     );
     expect(weekly(data, all(data), PERIOD, 'commands').values).toEqual({
-      'jenkins-test': [2, 0, 0],
-      'config-check': [0, 1, 0],
+      'mergify-backport': [2, 0, 0],
+      'dependabot-rebase': [0, 1, 0],
     });
   });
 });

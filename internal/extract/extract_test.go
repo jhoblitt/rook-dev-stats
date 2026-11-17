@@ -35,7 +35,7 @@ func quiet() *slog.Logger {
 func entry(number int, login string, created time.Time) fetch.Entry {
 	return fetch.Entry{
 		Number: number, Title: "a pull request", State: "OPEN",
-		CreatedAt: created, UpdatedAt: created, BaseRefName: "main",
+		CreatedAt: created, UpdatedAt: created, BaseRefName: "master",
 		AuthorAssociation: "MEMBER",
 		Author:            &fetch.Actor{Login: login, Typename: "User"},
 		Labels:            []fetch.Label{}, Commits: []fetch.Commit{}, Comments: []fetch.Comment{},
@@ -138,13 +138,13 @@ var _ = Describe("FromEntry", func() {
 		})
 
 		It("is trimmed before it is measured", func() {
-			Expect(text("  /audit retest \r\n")).To(Equal("/audit retest"))
+			Expect(text("  /retest \r\n")).To(Equal("/retest"))
 			Expect(text(" " + strings.Repeat("x", 80) + "\n\n")).To(Equal(strings.Repeat("x", 80)))
 		})
 
 		It("is not kept for a comment of more than one line", func() {
-			Expect(text("jenkins test make check\njenkins test api")).To(BeEmpty())
-			Expect(text("jenkins test make check\r\njenkins test api")).To(BeEmpty())
+			Expect(text("@mergifyio rebase\n/retest")).To(BeEmpty())
+			Expect(text("@mergifyio rebase\r\n/retest")).To(BeEmpty())
 		})
 
 		DescribeTable("is not kept for a short line containing an @",
@@ -152,7 +152,7 @@ var _ = Describe("FromEntry", func() {
 				Expect(text(body)).To(BeEmpty(), "comment %q", body)
 			},
 			Entry("a mention", "@alice can you take another look?"),
-			Entry("a mention after a command", "jenkins test make check @alice"),
+			Entry("a mention after a command", "@mergifyio rebase @alice"),
 			Entry("an e-mail address", "Reviewed-by: Ana Smith <ana@example.com>"),
 			Entry("an @ alone", "ping @"),
 			Entry("a second @ after a command bot's mention", "@mergifyio backport release-1.21 @someone"),

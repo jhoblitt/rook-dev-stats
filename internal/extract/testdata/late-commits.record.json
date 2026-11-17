@@ -4,7 +4,7 @@
   "title": "common: tidy the option table",
   "author": {"login": "judy-example", "bot": false},
   "association": "none",
-  "base": "main",
+  "base": "master",
   "created": "2026-10-01T10:00:00Z",
   "state": "closed",
   "draft": true,

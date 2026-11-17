@@ -26,8 +26,9 @@ var (
 		`|\[?#(\d+)\b)`)
 	// titleSuffix is a title ending "(backport #N)", or "(bp #N)" as older
 	// Mergify versions wrote it, and the hand-written variants without the
-	// space or the #, with a hyphen, or with more after the number.
-	titleSuffix = regexp.MustCompile(`(?i)\((?:backport|bp)[\s-]*#?(\d+)\b[^()]*\)\s*$`)
+	// space or the #, with a hyphen, or with more after the number. A number
+	// without # that a dot follows is a version, as in "(backport 1.5)".
+	titleSuffix = regexp.MustCompile(`(?i)\((?:backport|bp)[\s-]*(?:#(\d+)\b[^()]*|(\d+)(?:[^.\d()][^()]*)?)\)\s*$`)
 )
 
 // Hints gathers what a pull request's kind can be decided from, or nil when
@@ -37,9 +38,7 @@ var (
 //   - the pull request this one is a backport of: the first named, other
 //     than number itself, by Mergify's sentence in the description, then
 //     "backport of" in the description, then the title's suffix.
-//
-// The commit messages decide nothing yet.
-func Hints(number int, title string, messages []string, description string, issues []record.Issue) *record.KindHints {
+func Hints(number int, title, description string, issues []record.Issue) *record.KindHints {
 	h := record.KindHints{BackportOf: backport(number, title, description)}
 	if len(issues) > 0 {
 		h.Issues = issues

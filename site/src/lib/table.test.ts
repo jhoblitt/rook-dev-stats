@@ -66,13 +66,13 @@ describe('sortRows', () => {
   });
 
   it("sorts by the author's login from the data, before any table file is there", () => {
-    // Authors a, c, d, e, f, g, a, i, d of the default selection.
+    // Authors a, c, d, e, dependabot, g, a, i, d of the default selection.
     const selected = select(data, state.filters);
     expect(numbers(sortRows(data, selected, { column: 'author', descending: false }))).toEqual([
-      64010, 66900, 66100, 66500, 67100, 66510, 66600, 66700, 67000,
+      66600, 64010, 66900, 66100, 66500, 67100, 66510, 66700, 67000,
     ]);
     expect(numbers(sortRows(data, selected, { column: 'author', descending: true }))).toEqual([
-      67000, 66700, 66600, 66510, 66500, 67100, 66100, 64010, 66900,
+      67000, 66700, 66510, 66500, 67100, 66100, 64010, 66900, 66600,
     ]);
   });
 
@@ -207,14 +207,14 @@ describe('kindDecided', () => {
 
 describe('links', () => {
   it('builds the PR’s and an issue’s addresses, the issue’s in its own repository', () => {
-    expect(prUrl('ceph/ceph', 66500)).toBe('https://github.com/ceph/ceph/pull/66500');
-    expect(issueUrl('ceph/ceph', 72001)).toBe('https://github.com/ceph/ceph/issues/72001');
+    expect(prUrl('rook/rook', 66500)).toBe('https://github.com/rook/rook/pull/66500');
+    expect(issueUrl('rook/rook', 72001)).toBe('https://github.com/rook/rook/issues/72001');
     expect(issueUrl('ceph/ceph-csi', 4001)).toBe('https://github.com/ceph/ceph-csi/issues/4001');
   });
 
   it('names an issue by number in the PR’s repository, and with its repository in another', () => {
-    expect(issueName('ceph/ceph', [72001, 'ceph/ceph'])).toBe('#72001');
-    expect(issueName('ceph/ceph', [4001, 'ceph/ceph-csi'])).toBe('ceph/ceph-csi#4001');
+    expect(issueName('rook/rook', [72001, 'rook/rook'])).toBe('#72001');
+    expect(issueName('rook/rook', [4001, 'ceph/ceph-csi'])).toBe('ceph/ceph-csi#4001');
   });
 });
 

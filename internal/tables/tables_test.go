@@ -29,35 +29,35 @@ ignore:
 
 const validBots = `
 accounts:
-  - login: Ceph-Jenkins
+  - login: Jenkins-Rook
     why: posts CI results as a user
 `
 
 const validCommands = `
 commands:
-  - id: make-check
-    name: jenkins test make check
-    pattern: 'jenkins test make check'
-  - id: jenkins-test
-    name: jenkins test
-    pattern: 'jenkins test .+'
-  - id: render-docs
-    name: jenkins render docs
-    pattern: 'Jenkins Render Docs'
+  - id: mergify-rebase
+    name: '@mergifyio rebase'
+    pattern: '@mergifyio rebase'
+  - id: mergify-other
+    name: '@mergifyio, another request'
+    pattern: '@mergifyio .+'
+  - id: ok-to-test
+    name: ok to test
+    pattern: 'OK To Test'
 `
 
 const validLabels = `
 components:
-  - id: rgw
-    name: RGW
-    labels: [rgw, 'rgw-*']
-  - id: cephfs
-    name: CephFS
-    labels: [cephfs]
+  - id: object
+    name: Object
+    labels: [ceph-rgw, 'object-*']
+  - id: filesystem
+    name: File system
+    labels: [filesystem]
   - id: build
     name: Build
     labels: ['build*']
-process: [needs-review, 'wip-*-testing']
+process: [do-not-merge, 'debug-*-mirroring']
 other: [DNM, 'what?', '[wip]', 'a\b']
 `
 
@@ -102,7 +102,7 @@ var _ = Describe("Load", func() {
 
 		Expect(t.Tools.TrailerKeys).To(Equal([]string{"Assisted-By", "claude-session"}))
 		Expect(t.Tools.Families).To(HaveLen(2))
-		Expect(t.Bots.Accounts).To(ConsistOf(HaveField("Login", "Ceph-Jenkins")))
+		Expect(t.Bots.Accounts).To(ConsistOf(HaveField("Login", "Jenkins-Rook")))
 		Expect(t.Commands.List).To(HaveLen(3))
 		Expect(t.Labels.Components).To(HaveLen(3))
 		Expect(t.Kinds.List).To(Equal([]tables.Kind{{ID: "bugfix", Name: "Bug fix"}, {ID: "feature", Name: "Feature"}}))
@@ -120,7 +120,7 @@ var _ = Describe("Load", func() {
 	It("takes an empty file for an empty table", func() {
 		t := load(map[string]string{tables.BotsFile: ""})
 		Expect(t.Bots.Accounts).To(BeEmpty())
-		Expect(t.Bots.Listed("Ceph-Jenkins")).To(BeFalse())
+		Expect(t.Bots.Listed("Jenkins-Rook")).To(BeFalse())
 	})
 
 	It("fails on a missing table, naming it", func() {
@@ -152,7 +152,7 @@ var _ = Describe("Load", func() {
 		dir := writeTables(map[string]string{
 			tables.ToolsFile:    "phrases: ['(a', '(b']\n",
 			tables.CommandsFile: "commands:\n  - {id: x, name: x, pattern: '(c'}\n",
-			tables.LabelsFile:   "nonsense: true\ncomponents:\n  - {id: rgw, name: RGW}\n",
+			tables.LabelsFile:   "nonsense: true\ncomponents:\n  - {id: object, name: Object}\n",
 		})
 
 		_, err := tables.Load(dir)
@@ -161,7 +161,7 @@ var _ = Describe("Load", func() {
 			ContainSubstring(`phrases: "(b" is not a valid regexp`),
 			ContainSubstring(`commands: "x": pattern "(c" is not a valid regexp`),
 			ContainSubstring("field nonsense not found"),
-			ContainSubstring(`components: "rgw" has no labels`),
+			ContainSubstring(`components: "object" has no labels`),
 		)))
 	})
 
@@ -224,17 +224,17 @@ var _ = Describe("Load", func() {
 			"commands:\n  - {id: retest, name: a, pattern: a}\n  - {id: retest, name: b, pattern: b}\n",
 			`commands: id "retest" appears twice`),
 		Entry("a duplicate component id", tables.LabelsFile,
-			"components:\n  - {id: rgw, name: A, labels: [a]}\n  - {id: rgw, name: B, labels: [b]}\n",
-			`components: id "rgw" appears twice`),
+			"components:\n  - {id: object, name: A, labels: [a]}\n  - {id: object, name: B, labels: [b]}\n",
+			`components: id "object" appears twice`),
 		Entry("a component without labels", tables.LabelsFile,
-			"components:\n  - {id: rgw, name: RGW}\n",
-			`components: "rgw" has no labels`),
+			"components:\n  - {id: object, name: Object}\n",
+			`components: "object" has no labels`),
 		Entry("a component without an id", tables.LabelsFile,
-			"components:\n  - {name: RGW, labels: [rgw]}\n",
+			"components:\n  - {name: Object, labels: [ceph-rgw]}\n",
 			"components: entry 1 has no id"),
 		Entry("a component without a name", tables.LabelsFile,
-			"components:\n  - {id: rgw, labels: [rgw]}\n",
-			`components: "rgw" has no name`),
+			"components:\n  - {id: object, labels: [ceph-rgw]}\n",
+			`components: "object" has no name`),
 		Entry("a duplicate kind id", tables.KindsFile,
 			"kinds:\n  - {id: bugfix, name: A}\n  - {id: bugfix, name: B}\n",
 			`kinds: id "bugfix" appears twice`),
@@ -244,7 +244,6 @@ var _ = Describe("Load", func() {
 		Entry("the reserved kind id all", tables.KindsFile,
 			"kinds:\n  - {id: all, name: All}\n",
 			`kinds: id "all" is reserved`),
-
 		Entry("a kind without an id", tables.KindsFile,
 			"kinds:\n  - {name: Bug fix}\n",
 			"kinds: entry 1 has no id"),
@@ -314,7 +313,7 @@ var _ = Describe("Tools", func() {
 var _ = Describe("Bots", func() {
 	It("lists an account in any case", func() {
 		t := load(nil)
-		Expect(t.Bots.Listed("ceph-jenkins")).To(BeTrue())
+		Expect(t.Bots.Listed("jenkins-rook")).To(BeTrue())
 		Expect(t.Bots.Listed("alice")).To(BeFalse())
 	})
 })
@@ -330,12 +329,12 @@ var _ = Describe("Commands", func() {
 		func(text, want string) {
 			Expect(t.Commands.Match(text)).To(Equal(want))
 		},
-		Entry("an exact command", "jenkins test make check", "make-check"),
-		Entry("a command in upper case", "Jenkins Test Make Check", "make-check"),
-		Entry("a later, broader command", "jenkins test windows", "jenkins-test"),
-		Entry("command text inside a sentence", "please jenkins test make check", ""),
-		Entry("command text with more after it", "jenkins test make check please", "jenkins-test"),
-		Entry("a pattern written with capitals", "jenkins render docs", "render-docs"),
+		Entry("an exact command", "@mergifyio rebase", "mergify-rebase"),
+		Entry("a command in upper case", "@Mergifyio Rebase", "mergify-rebase"),
+		Entry("a later, broader command", "@mergifyio backport release-1.18", "mergify-other"),
+		Entry("command text inside a sentence", "please @mergifyio rebase", ""),
+		Entry("command text with more after it", "@mergifyio rebase please", "mergify-other"),
+		Entry("a pattern written with capitals", "ok to test", "ok-to-test"),
 		Entry("no command", "LGTM", ""),
 		Entry("no text", "", ""),
 	)
@@ -349,23 +348,23 @@ var _ = Describe("Labels", func() {
 	})
 
 	It("gives the components whose label patterns match, in table order", func() {
-		Expect(t.Labels.ComponentsOf([]string{"cephfs", "rgw-multisite", "rgw", "needs-review"})).
-			To(Equal([]string{"rgw", "cephfs"}))
-		Expect(t.Labels.ComponentsOf([]string{"needs-review"})).To(BeEmpty())
+		Expect(t.Labels.ComponentsOf([]string{"filesystem", "object-bucket-claims", "ceph-rgw", "do-not-merge"})).
+			To(Equal([]string{"object", "filesystem"}))
+		Expect(t.Labels.ComponentsOf([]string{"do-not-merge"})).To(BeEmpty())
 	})
 
 	DescribeTable("classifies a label through any of its lists",
 		func(label string, want bool) {
 			Expect(t.Labels.Classified(label)).To(Equal(want))
 		},
-		Entry("a component label", "rgw", true),
-		Entry("a component pattern with a star", "rgw-multisite", true),
-		Entry("a process label", "needs-review", true),
-		Entry("a process pattern with a star", "wip-alice-testing", true),
+		Entry("a component label", "ceph-rgw", true),
+		Entry("a component pattern with a star", "object-bucket-claims", true),
+		Entry("a process label", "do-not-merge", true),
+		Entry("a process pattern with a star", "debug-multi-cluster-mirroring", true),
 		Entry("an other label", "DNM", true),
 		Entry("a star that crosses a slash", "build/ops", true),
-		Entry("a star in the middle", "wip-yuri3-testing", true),
-		Entry("a star in the middle, the rest not matching", "wip-testing-x", false),
+		Entry("a star in the middle", "debug-ci-mirroring", true),
+		Entry("a star in the middle, the rest not matching", "debug-mirroring-x", false),
 		Entry("a literal question mark", "what?", true),
 		Entry("a question mark is not a wildcard", "whatx", false),
 		Entry("literal brackets", "[wip]", true),

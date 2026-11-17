@@ -41,7 +41,7 @@ describe('handle', () => {
 
   it.each([
     ['empty', ''],
-    ['with a slash', 'ceph/ceph'],
+    ['with a slash', 'rook/rook'],
     ['a path upward', '..'],
     ['an address', 'https://example.com'],
     ['with a space', 'two words'],

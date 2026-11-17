@@ -74,25 +74,12 @@ export function noCommits(data: Dataset, rows: Uint32Array): Split {
   return split(data, rows, (r) => data.prs.commits[r] === 0);
 }
 
-/**
- * PRs of unknown standing, and how many of them were opened before
- * `windowStart`, where the records' count of an author's earlier PRs begins;
- * the rest are by an author with no baseline.
- */
-export function standingUnknown(
-  data: Dataset,
-  rows: Uint32Array,
-  windowStart: number,
-): { unknown: number; openedBefore: number } {
+/** The PRs of unknown standing. */
+export function standingUnknown(data: Dataset, rows: Uint32Array): number {
   const p = data.prs;
   let unknown = 0;
-  let openedBefore = 0;
-  for (const r of rows) {
-    if ((p.standing[r] as number) >= 0) continue;
-    unknown++;
-    if ((p.created[r] as number) < windowStart) openedBefore++;
-  }
-  return { unknown, openedBefore };
+  for (const r of rows) if ((p.standing[r] as number) < 0) unknown++;
+  return unknown;
 }
 
 export function kindUnknown(data: Dataset, rows: Uint32Array): Split {

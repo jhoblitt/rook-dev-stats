@@ -107,8 +107,9 @@
       <div class="notes">
         <p>
           Commits and lines are those of the pull requests a person opened, because the data does not record who wrote
-          each commit. A backport’s commits and lines count for whoever opened the backport, so the Target filter
-          separates original work on master from backports. Lines are a pull request’s whole
+          each commit. A backport’s commits and lines count for whoever opened the backport, most often Mergify’s bot
+          account, which is left out until bot accounts are shown; the Target filter separates original work on master
+          from backports. Lines are a pull request’s whole
           diff, lines added plus lines deleted, so one large import can dominate a total.
         </p>
         <p>

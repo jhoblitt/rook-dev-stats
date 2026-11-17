@@ -72,9 +72,9 @@ describe('round trip through the hash', () => {
       from: '2026-06-01',
       to: '2026-09-30',
       target: 'backports',
-      base: 'squid',
+      base: 'release-1.18',
       backportLink: 'unlinked',
-      component: 'rgw',
+      component: 'object',
       size: '101-1000',
       standing: 'unknown',
       disclosure: 'not-disclosed',
@@ -104,11 +104,11 @@ describe('round trip through the hash', () => {
     ['target all', { filters: { ...defaults.filters, target: 'all' } }],
     ['target backports', { filters: { ...defaults.filters, target: 'backports' } }],
     ['branch under master', { filters: { ...defaults.filters, base: 'master' } }],
-    ['branch under backports', { filters: { ...defaults.filters, target: 'backports', base: 'reef' } }],
-    ['branch under all', { filters: { ...defaults.filters, target: 'all', base: 'tentacle' } }],
+    ['branch under backports', { filters: { ...defaults.filters, target: 'backports', base: 'release-1.17' } }],
+    ['branch under all', { filters: { ...defaults.filters, target: 'all', base: 'release-1.19' } }],
     ['backport link', { filters: { ...defaults.filters, backportLink: 'linked' } }],
     ['no backport link', { filters: { ...defaults.filters, backportLink: 'unlinked' } }],
-    ['component', { filters: { ...defaults.filters, component: 'cephfs' } }],
+    ['component', { filters: { ...defaults.filters, component: 'filesystem' } }],
     ['size band', { filters: { ...defaults.filters, size: 'le10' } }],
     ['standing band', { filters: { ...defaults.filters, standing: 'first' } }],
     ['disclosure', { filters: { ...defaults.filters, disclosure: 'disclosed' } }],
@@ -122,7 +122,7 @@ describe('round trip through the hash', () => {
     ['reopened', { filters: { ...defaults.filters, reopenedOnly: true } }],
     ['author', { filters: { ...defaults.filters, author: 'fixture-author-a' } }],
     ['reviewer', { filters: { ...defaults.filters, reviewer: 'fixture-author-e' } }],
-    ['a bot as author', { filters: { ...defaults.filters, author: 'fixture-author-j' } }],
+    ['a bot as author', { filters: { ...defaults.filters, author: 'mergify' } }],
     ['week', { week: '2026-11-09' }],
     ['band', { band: 'lt7' }],
     ['pr', { pr: 64010 }],
@@ -153,16 +153,16 @@ describe('round trip through the hash', () => {
   });
 
   it('writes the kind as its id after the component, or unknown', () => {
-    expect(hashFromState(withFilters({ component: 'rgw', kind: 'feature' }), meta)).toBe(
-      '#/?target=master&component=rgw&kind=feature',
+    expect(hashFromState(withFilters({ component: 'object', kind: 'feature' }), meta)).toBe(
+      '#/?target=master&component=object&kind=feature',
     );
     expect(hashFromState(withFilters({ kind: 'unknown' }), meta)).toBe('#/?target=master&kind=unknown');
   });
 
   it('writes the branch and the backport link right after the target', () => {
     expect(
-      hashFromState(withFilters({ target: 'backports', base: 'reef', backportLink: 'unlinked', component: 'rgw' }), meta),
-    ).toBe('#/?target=backports&base=reef&backport=unlinked&component=rgw');
+      hashFromState(withFilters({ target: 'backports', base: 'release-1.17', backportLink: 'unlinked', component: 'object' }), meta),
+    ).toBe('#/?target=backports&base=release-1.17&backport=unlinked&component=object');
     expect(hashFromState(withFilters({ backportLink: 'linked' }), meta)).toBe('#/?target=master&backport=linked');
   });
 
@@ -214,7 +214,7 @@ describe('unknown values fall back to their defaults', () => {
     ['branch named in another case', '#/?base=MAIN'],
     ['branch that is empty', '#/?base='],
     ['branch named like a prototype key', '#/?base=__proto__'],
-    ['branch outside the target', '#/?target=master&base=reef'],
+    ['branch outside the target', '#/?target=master&base=release-1.17'],
     ['backport link', '#/?backport=maybe'],
     ['component', '#/?component=no-such-component'],
     ['component named like a prototype key', '#/?component=__proto__'],
@@ -259,8 +259,8 @@ describe('unknown values fall back to their defaults', () => {
   });
 
   it('keeps the valid parameters beside an unknown one', () => {
-    expect(stateFromHash('#/?target=all&size=huge&component=rbd', meta)).toEqual(
-      withFilters({ target: 'all', component: 'rbd' }),
+    expect(stateFromHash('#/?target=all&size=huge&component=block', meta)).toEqual(
+      withFilters({ target: 'all', component: 'block' }),
     );
   });
 
@@ -307,12 +307,12 @@ describe('the author filter in the address, with deleted accounts', () => {
 });
 
 describe('the Branch filter in the address', () => {
-  const odd = parseMeta({ ...rawMeta, bases: ['feature/ptl-ci-test', 'main', 'pacific-16.2.7_RC1', 'reef', 'wip-a&b=c#d%e'] });
+  const odd = parseMeta({ ...rawMeta, bases: ['feature/ptl-ci-test', 'main', 'release-1.16.2_RC1', 'release-1.17', 'feature-a&b=c#d%e'] });
 
   it.each([
     ['a slash', 'feature/ptl-ci-test', 'feature%2Fptl-ci-test'],
-    ['dots and an underscore', 'pacific-16.2.7_RC1', 'pacific-16.2.7_RC1'],
-    ['characters the address would read otherwise', 'wip-a&b=c#d%e', 'wip-a%26b%3Dc%23d%25e'],
+    ['dots and an underscore', 'release-1.16.2_RC1', 'release-1.16.2_RC1'],
+    ['characters the address would read otherwise', 'feature-a&b=c#d%e', 'feature-a%26b%3Dc%23d%25e'],
   ])('round-trips a branch name with %s', (_what, base, written) => {
     const state = { ...defaultState(odd), filters: { ...defaultFilters(odd), target: 'backports' as const, base } };
     const hash = hashFromState(state, odd);
@@ -321,7 +321,7 @@ describe('the Branch filter in the address', () => {
   });
 
   it('takes a branch the data does not name as no filter, keeping the others', () => {
-    expect(stateFromHash('#/?target=backports&base=octopus&backport=linked', odd).filters).toMatchObject({
+    expect(stateFromHash('#/?target=backports&base=release-0.9&backport=linked', odd).filters).toMatchObject({
       target: 'backports',
       base: null,
       backportLink: 'linked',
@@ -595,17 +595,17 @@ describe('createStateStore', () => {
   });
 
   it('returns the branch to any when the target changes to one that does not hold it, and says so in the address', () => {
-    const f = fakeLocation('#/?target=backports&base=reef&backport=unlinked');
+    const f = fakeLocation('#/?target=backports&base=release-1.17&backport=unlinked');
     const store = createStateStore(meta, f.loc);
-    expect(get(store).filters.base).toBe('reef');
+    expect(get(store).filters.base).toBe('release-1.17');
     store.update((s) => ({ ...s, filters: { ...s.filters, target: 'all' } }));
-    expect(get(store).filters.base).toBe('reef');
+    expect(get(store).filters.base).toBe('release-1.17');
     store.update((s) => ({ ...s, filters: { ...s.filters, target: 'master' } }));
     expect(get(store).filters).toMatchObject({ target: 'master', base: null, backportLink: 'unlinked' });
     store.update((s) => ({ ...s, filters: { ...s.filters, target: 'backports' } }));
     expect(get(store).filters.base).toBeNull();
     expect(f.writes).toEqual([
-      'push #/?target=all&base=reef&backport=unlinked',
+      'push #/?target=all&base=release-1.17&backport=unlinked',
       'push #/?target=master&backport=unlinked',
       'push #/?target=backports&backport=unlinked',
     ]);

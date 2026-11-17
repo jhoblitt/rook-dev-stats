@@ -181,8 +181,8 @@ describe('the methods page', () => {
     expect(table.mock.calls).toEqual([[2026]]);
   });
 
-  it('fetches on a fresh load of a fifteen-year window only the last six months’ year files and tables', async () => {
-    const { props, requested } = await fixturePage('#/methods', withYears(2011, 1));
+  it('fetches on a fresh load of a ten-year window only the last six months’ year files and tables', async () => {
+    const { props, requested } = await fixturePage('#/methods', withYears(2016, 1));
     render(App, props);
     await waitFor(() => expect(screen.queryByRole('status')).toBeNull());
     expect(requested.map((u) => u.slice(u.lastIndexOf('/') + 1))).toEqual([
@@ -222,7 +222,7 @@ describe('the methods page', () => {
     await methods({ 'events-2026.json': undefined });
     await waitFor(() => expect(screen.getByRole('alert').textContent).toMatch(/events-2026\.json: HTTP 404/));
     expect(article().textContent).toContain('(not available) pull requests, on every branch, were open at some point in the last 6 months');
-    expect(article().textContent).toContain("Ceph's rule asking for an Assisted-by trailer was a draft on 2026-10-12.");
+    expect(article().textContent).toContain('Some contributors tick every box of the checklist, whether or not it applies to them.');
   });
 });
 

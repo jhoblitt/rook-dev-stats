@@ -33,7 +33,7 @@ function shown(el: HTMLElement): string {
 }
 
 const SHA = (c: string) => c.repeat(40);
-const PR = 'https://github.com/ceph/ceph/pull/67300';
+const PR = 'https://github.com/rook/rook/pull/67300';
 const OPENED = at('2026-08-03T09:00:00Z');
 const hour = (h: number) => OPENED + h * 3600;
 const KINDS = [...rawMeta.event_kinds, 'review_author'];
@@ -46,8 +46,8 @@ const AUTHOR = 'fixture-author-e, the author';
 const EVERY: { kind: string; ref: string; sub?: number; actor?: number; name: string; href: string | null }[] = [
   { kind: 'comment_other', ref: '101', actor: 1, name: 'Comment by another person (fixture-author-f)', href: `${PR}#issuecomment-101` },
   { kind: 'comment_author', ref: '102', name: `Comment by the author (${AUTHOR})`, href: `${PR}#issuecomment-102` },
-  { kind: 'command_author', ref: '103', sub: 0, name: `Bot command by the author: jenkins test (${AUTHOR})`, href: `${PR}#issuecomment-103` },
-  { kind: 'command_other', ref: '104', sub: 1, name: 'Bot command by another person: /config check ok', href: `${PR}#issuecomment-104` },
+  { kind: 'command_author', ref: '103', sub: 0, name: `Bot command by the author: @mergifyio backport (${AUTHOR})`, href: `${PR}#issuecomment-103` },
+  { kind: 'command_other', ref: '104', sub: 1, name: 'Bot command by another person: @dependabot rebase', href: `${PR}#issuecomment-104` },
   { kind: 'bot_account', ref: '105', name: 'Comment by a bot account', href: `${PR}#issuecomment-105` },
   { kind: 'review_approved', ref: '201', actor: 2, name: 'Review approving (fixture-author-a)', href: `${PR}#pullrequestreview-201` },
   { kind: 'review_changes', ref: '202', actor: 3, name: 'Review requesting changes (fixture-author-i)', href: `${PR}#pullrequestreview-202` },
@@ -56,11 +56,11 @@ const EVERY: { kind: string; ref: string; sub?: number; actor?: number; name: st
   { kind: 'review_author', ref: '205', name: `Reply by the author in a review thread (${AUTHOR})`, href: `${PR}#pullrequestreview-205` },
   { kind: 'draft', ref: '301', name: 'Converted to draft', href: `${PR}#event-301` },
   { kind: 'ready', ref: '302', name: 'Marked ready for review', href: `${PR}#event-302` },
-  { kind: 'force_push', ref: SHA('a'), name: 'Force-push', href: `https://github.com/ceph/ceph/commit/${SHA('a')}` },
+  { kind: 'force_push', ref: SHA('a'), name: 'Force-push', href: `https://github.com/rook/rook/commit/${SHA('a')}` },
   { kind: 'force_push', ref: '', name: 'Force-push', href: null },
   { kind: 'closed', ref: '303', name: 'Closed for 1 hour', href: `${PR}#event-303` },
   { kind: 'reopened', ref: '', name: 'Reopened after 1 hour closed', href: PR },
-  { kind: 'merged', ref: SHA('b'), name: 'Merged', href: `https://github.com/ceph/ceph/commit/${SHA('b')}` },
+  { kind: 'merged', ref: SHA('b'), name: 'Merged', href: `https://github.com/rook/rook/commit/${SHA('b')}` },
 ];
 
 /** The fixture with #67300 added as the 2026 file's last row, carrying every event kind. */
@@ -173,7 +173,7 @@ describe('PrTimeline', () => {
       'fixture-author-e, the author',
     );
     expect(who('Comment by a bot account').textContent?.trim()).toBe('a bot');
-    expect(who('Bot command by another person: /config check ok').textContent?.trim()).toBe('');
+    expect(who('Bot command by another person: @dependabot rebase').textContent?.trim()).toBe('');
     expect(within(table).queryAllByRole('button', { name: /^Filter by/ })).toHaveLength(0);
   });
 
@@ -427,7 +427,7 @@ describe('the chosen PR’s section', () => {
     const { props } = await fixturePage('#/?target=all');
     render(App, { props });
     const table = within(screen.getByRole('region', { name: 'Pull requests' }));
-    await fireEvent.click(await table.findByRole('button', { name: 'doc: fix a typo' }));
+    await fireEvent.click(await table.findByRole('button', { name: 'docs: fix a typo' }));
     const section = await screen.findByRole('region', { name: 'Pull request #66510' });
     await waitFor(() => expect(scrolled).toEqual([section]));
     expect(document.activeElement).toBe(within(section).getByRole('heading', { level: 2 }));
@@ -449,14 +449,14 @@ describe('the chosen PR’s section', () => {
 
   it('says in one line when the filters leave the chosen PR out of the selection', async () => {
     const line = /^This pull request is not in the current selection/;
-    // #66800 is a backport, to squid: outside the default target, master.
+    // #66800 is a backport, to release-1.18: outside the default target, master.
     let section = await timeline('#/?target=master&pr=66800');
     expect(within(section).getByText(line)).toBeTruthy();
     cleanup();
     section = await timeline('#/?target=all&pr=66800');
     expect(within(section).queryByText(line)).toBeNull();
     cleanup();
-    // #66600 is fixture-author-f's, not fixture-author-d's.
+    // #66600 is dependabot's, not fixture-author-d's.
     section = await timeline('#/?target=all&author=fixture-author-d&pr=66600');
     expect(within(section).getByText(line).textContent?.replace(/\s+/g, ' ').trim()).toBe(
       'This pull request is not in the current selection: the filters leave it out, so no chart, lane or table on this page counts it.',
@@ -533,7 +533,7 @@ describe('a PR in a year the period does not load', () => {
   });
 
   it('offers a backport’s original from a year not loaded, and shows it from there', async () => {
-    // #65220, open on reef, made a backport of #60010.
+    // #65220, open on release-1.17, made a backport of #60010.
     const table = { ...rawTable2026, backport_of: rawTable2026.backport_of.map((b, i) => (i === 1 ? 60010 : b)) };
     const { section } = await shown('#/?target=all&from=2026-05-15&pr=65220', { ...earlier, 'table-2026.json': table });
     await fireEvent.click(await within(section).findByRole('button', { name: 'Show #60010 here' }));

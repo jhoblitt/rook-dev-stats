@@ -1,17 +1,17 @@
 {
   "number": 70001,
   "updated": "2026-06-20T17:30:00Z",
-  "title": "squid: rgw: fix a <leak> & a race",
+  "title": "object: fix a <leak> & a race",
   "author": {"login": "alice-example", "bot": false},
   "association": "member",
-  "base": "squid",
+  "base": "release-1.18",
   "created": "2026-06-02T08:00:00Z",
   "state": "merged",
   "draft": false,
   "additions": 40,
   "deletions": 12,
   "files": 3,
-  "labels": ["rgw", "squid"],
+  "labels": ["ceph-rgw", "release-1.18"],
   "commits": {"count": 2, "first_authored": "2026-02-10T08:00:00Z", "last_committed": "2026-06-01T12:05:00Z", "list": [
     {"authored": "2026-02-10T08:00:00Z", "committed": "2026-06-01T12:00:00Z"},
     {"authored": "2026-02-11T10:00:00Z", "committed": "2026-06-01T12:05:00Z"}
@@ -25,7 +25,7 @@
     {"at": "2026-06-10T15:00:00Z", "by": "bob-example", "bot": false, "state": "approved"}
   ],
   "comments": [
-    {"at": "2026-06-03T09:00:00Z", "by": "alice-example", "bot": false, "text": "jenkins test make check"}
+    {"at": "2026-06-03T09:00:00Z", "by": "alice-example", "bot": false, "text": "@mergifyio rebase"}
   ],
   "disclosure": {"trailers": ["Assisted-by: Claude Code"], "description": [], "commit_prose": []},
   "kind_hints": {"backport_of": 69001}

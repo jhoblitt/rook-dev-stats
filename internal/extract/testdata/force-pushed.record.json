@@ -4,7 +4,7 @@
   "title": "mgr/dashboard: page the host list",
   "author": {"login": "ivan-example", "bot": false},
   "association": "member",
-  "base": "main",
+  "base": "master",
   "created": "2026-09-01T12:00:00Z",
   "state": "open",
   "draft": false,

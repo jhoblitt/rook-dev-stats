@@ -13,7 +13,7 @@ There is no median time to merge: the groups can differ in age, and a median far
 
 ## What else sets the groups apart
 
-This table sets the two groups side by side on things other than disclosure: the pull requests on the development branch, `main` or `master`, opened in the last {{const.recentMonths}} months, which are those the AI-use section compares over those months with every other filter as the report opens, as of {{asOf}}:
+This table sets the two groups side by side on things other than disclosure: the pull requests on the development branch, `master`, opened in the last {{const.recentMonths}} months, which are those the AI-use section compares over those months with every other filter as the report opens, as of {{asOf}}:
 
 {{table.disclosureGroups}}
 

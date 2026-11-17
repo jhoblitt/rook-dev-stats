@@ -1,8 +1,8 @@
 // The reader's filters and selection, kept in the URL hash so any view can be
 // linked:
 //
-//   #/<route>?target=backports&base=reef&backport=unlinked&from=2026-06-01&to=2026-08-31
-//     &component=rgw&kind=bugfix
+//   #/<route>?target=backports&base=release-1.17&backport=unlinked&from=2026-06-01&to=2026-08-31
+//     &component=object&kind=bugfix
 //     &size=11-100&standing=first&disclosure=disclosed&drafts=exclude&reopened=only
 //     &author=<login>&reviewer=<login>&week=2026-06-01&band=lt7&pr=66600&sort=-size
 //     &authorsort=-lines&reviewersort=first&bots=show

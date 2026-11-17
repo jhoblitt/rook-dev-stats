@@ -68,8 +68,8 @@ function edges(svg: SVGElement): [number, number] {
 
 const PERIODS = [
   { name: 'six months', hash: '#/', files: {} },
-  { name: 'two years', hash: '#/?from=2024-11-15', files: withYears(2011, 1) },
-  { name: 'fifteen years', hash: '#/', files: withYears(2011, 1) },
+  { name: 'two years', hash: '#/?from=2024-11-15', files: withYears(2016, 1) },
+  { name: 'ten years', hash: '#/', files: withYears(2016, 1) },
 ];
 
 describe('the charts over the period share one time axis, within a section and across sections', () => {

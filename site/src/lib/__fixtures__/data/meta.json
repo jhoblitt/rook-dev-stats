@@ -1,5 +1,5 @@
 {
-  "repo": "ceph/ceph",
+  "repo": "rook/rook",
   "fetched_through": 1794722400,
   "window_start": 1778803200,
   "years": [
@@ -7,26 +7,26 @@
   ],
   "bases": [
     "master",
-    "reef",
-    "squid",
-    "tentacle"
+    "release-1.17",
+    "release-1.18",
+    "release-1.19"
   ],
   "components": [
     {
-      "id": "cephfs",
-      "name": "CephFS"
+      "id": "filesystem",
+      "name": "File system"
     },
     {
       "id": "mgr",
-      "name": "mgr"
+      "name": "Manager"
     },
     {
-      "id": "rbd",
-      "name": "RBD"
+      "id": "block",
+      "name": "Block"
     },
     {
-      "id": "rgw",
-      "name": "RGW"
+      "id": "object",
+      "name": "Object"
     }
   ],
   "families": [
@@ -45,12 +45,12 @@
   ],
   "commands": [
     {
-      "id": "jenkins-test",
-      "name": "jenkins test"
+      "id": "mergify-backport",
+      "name": "@mergifyio backport"
     },
     {
-      "id": "config-check",
-      "name": "/config check ok"
+      "id": "dependabot-rebase",
+      "name": "@dependabot rebase"
     }
   ],
   "kinds": [
@@ -110,9 +110,11 @@
     "fixture-author-d",
     "fixture-author-g",
     "fixture-author-h",
-    "fixture-author-j"
+    "mergify",
+    "dependabot"
   ],
   "people_bots": [
-    10
+    10,
+    11
   ]
 }

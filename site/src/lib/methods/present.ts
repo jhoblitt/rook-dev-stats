@@ -49,7 +49,7 @@ export interface DataFigures {
   neverReady: Split;
   firstCommitUnknown: Split;
   noCommits: Split;
-  standingUnknown: { unknown: number; openedBefore: number };
+  standingUnknown: number;
   kindUnknown: Split;
   disclosure: Record<string, Split>;
   families: FamilyCount[];
@@ -88,7 +88,7 @@ export function dataFigures(data: Dataset, days: Days): DataFigures {
     neverReady: neverReady(data, rows),
     firstCommitUnknown: firstCommitUnknown(data, rows),
     noCommits: noCommits(data, rows),
-    standingUnknown: standingUnknown(data, rows, data.meta.window_start),
+    standingUnknown: standingUnknown(data, rows),
     kindUnknown: kindUnknown(data, rows),
     disclosure: disclosureForms(data, rows),
     families: familyCounts(data, rows),
@@ -144,9 +144,7 @@ export const INLINE_FIGURES: Record<string, Figure<string>> = {
   'prs.neverReady': count((d) => total(d.neverReady)),
   'commits.firstUnknown': count((d) => total(d.firstCommitUnknown)),
   'commits.none': count((d) => total(d.noCommits)),
-  'standing.unknown': count((d) => d.standingUnknown.unknown),
-  'standing.unknownBeforeWindow': count((d) => d.standingUnknown.openedBefore),
-  'standing.unknownInWindow': count((d) => d.standingUnknown.unknown - d.standingUnknown.openedBefore),
+  'standing.unknown': count((d) => d.standingUnknown),
   'kind.unknown': count((d) => total(d.kindUnknown)),
   'kind.unknownShare': { needs: 'data', show: (_m, d) => share(total(d.kindUnknown), d.coverage.active) },
   'disclosure.disclosed': count(disclosed),
@@ -221,7 +219,7 @@ const DISCLOSURE_LABELS: Record<string, string> = {
   trailer: 'a disclosing trailer, such as Assisted-by:',
   coauthor: 'Co-authored-by: naming a tool',
   description: 'disclosure phrasing in the description or a commit message',
-  checklist: "the PR template's AI-guidelines box, ticked",
+  checklist: 'the PR template’s AI-guidelines box, ticked',
   none: NOT_DISCLOSED,
 };
 const DISCLOSURE_ORDER = ['trailer', 'coauthor', 'description', 'checklist', 'none'];

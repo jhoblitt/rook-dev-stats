@@ -16,8 +16,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/jhoblitt/rook-dev-stats/internal/fetch"
 	"github.com/jhoblitt/rook-dev-stats/internal/version"
 )
+
+// repository is the owner/name the commands' help text names.
+const repository = fetch.Owner + "/" + fetch.Name
 
 // Run executes the command tree against args and returns the first error.
 func Run(ctx context.Context, args []string, stdin io.Reader, stdout, stderr io.Writer) error {
@@ -30,7 +34,7 @@ func newRootCmd(stdin io.Reader, stdout, stderr io.Writer) *cobra.Command {
 	v := viper.New()
 	cmd := &cobra.Command{
 		Use:           "rookstats",
-		Short:         "Fetch rook/rook pull requests and build the data behind the statistics site",
+		Short:         "Fetch " + repository + " pull requests and build the data behind the statistics site",
 		Version:       version.String(),
 		SilenceUsage:  true,
 		SilenceErrors: true,

@@ -135,10 +135,10 @@ describe('createDataStore', () => {
   });
 });
 
-// Fifteen earlier years, 2011 to 2025, of one PR each, before the fixture's 2026.
-const history = withYears(2011, 1);
+// Ten earlier years, 2016 to 2025, of one PR each, before the fixture's 2026.
+const history = withYears(2016, 1);
 const historyMeta = parseMeta(history['meta.json']);
-const EVERY_YEAR = Array.from({ length: 16 }, (_, i) => 2011 + i);
+const EVERY_YEAR = Array.from({ length: 11 }, (_, i) => 2016 + i);
 
 function memory(initial: string): HashLocation {
   let hash = initial;
@@ -146,7 +146,7 @@ function memory(initial: string): HashLocation {
 }
 
 describe('the first load', () => {
-  it('needs every year of a fifteen-year window for the default period, and the last year alone for the last six months', () => {
+  it('needs every year of a ten-year window for the default period, and the last year alone for the last six months', () => {
     expect(firstYears(historyMeta, defaultState(historyMeta))).toEqual(EVERY_YEAR);
     expect(firstYears(historyMeta, { ...defaultState(historyMeta), filters: recentFilters(historyMeta) })).toEqual([2026]);
   });
@@ -162,7 +162,7 @@ describe('the first load', () => {
       EVERY_YEAR.flatMap((y) => [`events-${y}.json`, `prs-${y}.json`]).sort(),
     );
 
-    gate.release(2011);
+    gate.release(2016);
     gate.release(2026);
     await vi.waitFor(() => expect(get(data).progress?.arrived).toBe(2));
     expect(get(data).loading).toBe(true);
@@ -171,29 +171,29 @@ describe('the first load', () => {
     gate.releaseAll();
     await vi.waitFor(() => expect(get(data).loading).toBe(false));
     expect(get(data)).toMatchObject({ errors: [], progress: null });
-    expect(get(data).dataset.size).toBe(15 + 12);
+    expect(get(data).dataset.size).toBe(10 + 12);
   });
 
   it('reports a year that failed once the rest have arrived, and fetches only it again on a retry', async () => {
     let reachable = false;
     const { fetch, requested } = fixtureFetch(history);
     const flaky: Fetch = (url) =>
-      url.endsWith('events-2014.json') && !reachable ? Promise.resolve(new Response('', { status: 503 })) : fetch(url);
+      url.endsWith('events-2019.json') && !reachable ? Promise.resolve(new Response('', { status: 503 })) : fetch(url);
     const loader = new DataLoader(historyMeta, BASE, flaky);
     const selection = writable(defaultState(historyMeta));
     const data = createDataStore(loader, selection, firstYears(historyMeta, get(selection)));
     await vi.waitFor(() => expect(get(data).loading).toBe(false));
-    expect(get(data).errors).toEqual([{ year: 2014, file: 'events-2014.json', message: 'HTTP 503', retry: true }]);
-    expect(get(data).dataset.size).toBe(14 + 12);
+    expect(get(data).errors).toEqual([{ year: 2019, file: 'events-2019.json', message: 'HTTP 503', retry: true }]);
+    expect(get(data).dataset.size).toBe(9 + 12);
 
     reachable = true;
     const before = requested.length;
     data.retry();
-    expect(get(data)).toMatchObject({ loading: true, retry: { state: 'running' }, progress: { arrived: 15, years: EVERY_YEAR } });
+    expect(get(data)).toMatchObject({ loading: true, retry: { state: 'running' }, progress: { arrived: 10, years: EVERY_YEAR } });
     await vi.waitFor(() => expect(get(data).loading).toBe(false));
     expect(get(data)).toMatchObject({ errors: [], retry: { state: 'succeeded' } });
-    expect(get(data).dataset.size).toBe(15 + 12);
-    expect(requested.slice(before).map((u) => u.slice(BASE.length)).sort()).toEqual(['events-2014.json', 'prs-2014.json']);
+    expect(get(data).dataset.size).toBe(10 + 12);
+    expect(requested.slice(before).map((u) => u.slice(BASE.length)).sort()).toEqual(['events-2019.json', 'prs-2019.json']);
   });
 
   it('takes the years at once, loading nothing, when they are no years', () => {

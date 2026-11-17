@@ -31,4 +31,4 @@ An event can lack its address when GitHub returned none for it, or when its reco
 
 ## Rebuilding the data
 
-The records the site's data is built from are public, under `data/` in [the site's repository](https://github.com/jhoblitt/ceph-dev-stats), and `cephstats rollup` rebuilds the site's data from them and the hand-edited tables without fetching anything.
+The records the site's data is built from are public, under `data/` in [the site's repository](https://github.com/jhoblitt/rook-dev-stats), and `rookstats rollup` rebuilds the site's data from them and the hand-edited tables without fetching anything.

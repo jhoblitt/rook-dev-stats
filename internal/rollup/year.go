@@ -48,8 +48,8 @@ type prsFile struct {
 	Standing      []int   `json:"standing"`
 	Kind          []int   `json:"kind"`
 	Author        []int   `json:"author"`
-	// BackportLink is 1 for a pull request whose description links the
-	// one it backports, the flag the site filters on without its table.
+	// BackportLink is 1 for a pull request that names the one it
+	// backports, the flag the site filters on without its table.
 	BackportLink []int `json:"backport_link"`
 }
 

@@ -55,17 +55,17 @@ var _ = Describe("Records", func() {
 				record.Comment{By: "github-actions", Bot: true, Text: "build passed"},
 				classify.Comment{Kind: classify.BotAccount}),
 			Entry("a bot account posting command text is a bot account",
-				record.Comment{By: "jenkins", Bot: true, Text: "jenkins test make check"},
+				record.Comment{By: "jenkins", Bot: true, Text: "@mergifyio rebase"},
 				classify.Comment{Kind: classify.BotAccount}),
 			Entry("an account bots.yaml lists posting command text is a bot account",
-				record.Comment{By: "CI-User", Text: "jenkins test make check"},
+				record.Comment{By: "CI-User", Text: "@mergifyio rebase"},
 				classify.Comment{Kind: classify.BotAccount}),
 			Entry("the author posting a command is a command, not an author comment",
-				record.Comment{By: "alice", Text: "jenkins test make check"},
-				classify.Comment{Kind: classify.CommandAuthor, Command: "make-check"}),
+				record.Comment{By: "alice", Text: "@mergifyio rebase"},
+				classify.Comment{Kind: classify.CommandAuthor, Command: "mergify-rebase"}),
 			Entry("another person posting a command in another case",
-				record.Comment{By: "bob", Text: "Jenkins retest this please"},
-				classify.Comment{Kind: classify.CommandOther, Command: "retest"}),
+				record.Comment{By: "bob", Text: "OK to test"},
+				classify.Comment{Kind: classify.CommandOther, Command: "ok-to-test"}),
 			Entry("the author",
 				record.Comment{By: "alice", Text: "rebased"},
 				classify.Comment{Kind: classify.CommentAuthor}),
@@ -75,6 +75,25 @@ var _ = Describe("Records", func() {
 			Entry("another person",
 				record.Comment{By: "bob", Text: "LGTM"},
 				classify.Comment{Kind: classify.CommentOther}),
+		)
+
+		// extract keeps a mention of a command bot followed by any white
+		// space, so the data's patterns accept the same.
+		DescribeTable("take a command to Mergify or Dependabot after any white space under the data's tables",
+			func(text, want string) {
+				b, err := os.ReadFile(filepath.Join("..", "..", "data", tables.CommandsFile))
+				Expect(err).NotTo(HaveOccurred())
+				t = loadTables(map[string]string{tables.CommandsFile: string(b)})
+				r := pr(1)
+				r.Comments = []record.Comment{{By: "bob", Text: text}}
+				Expect(one(r).Comments).To(Equal([]classify.Comment{{Kind: classify.CommandOther, Command: want}}))
+			},
+			Entry("a space", "@mergifyio backport release-1.21", "mergify-backport"),
+			Entry("a no-break space", "@mergifyio backport release-1.21", "mergify-backport"),
+			Entry("a tab", "@Mergifyio\trebase", "mergify-rebase"),
+			Entry("an em space", "@dependabot rebase", "dependabot-rebase"),
+			Entry("a vertical tab", "@dependabot\vrecreate", "dependabot-other"),
+			Entry("a next-line character", "@mergify\u0085rebase", "mergify-rebase"),
 		)
 
 		It("keeps the comments' order", func() {
@@ -91,7 +110,7 @@ var _ = Describe("Records", func() {
 				r.Author = author
 				r.Comments = []record.Comment{
 					{By: fetch.GhostLogin, Text: "thanks"},
-					{By: fetch.GhostLogin, Text: "jenkins test make check"},
+					{By: fetch.GhostLogin, Text: "@mergifyio rebase"},
 				}
 				r.Reviews = []record.Review{{By: fetch.GhostLogin, State: record.ReviewApproved}}
 
@@ -99,7 +118,7 @@ var _ = Describe("Records", func() {
 				Expect(got.AuthorHuman).To(BeTrue())
 				Expect(got.Comments).To(Equal([]classify.Comment{
 					{Kind: classify.CommentOther},
-					{Kind: classify.CommandOther, Command: "make-check"},
+					{Kind: classify.CommandOther, Command: "mergify-rebase"},
 				}))
 				Expect(got.Reviews).To(Equal([]classify.Review{{Human: true, Other: true}}))
 			},
@@ -247,6 +266,29 @@ var _ = Describe("Records", func() {
 			Expect(got.Families).To(Equal([]string{"copilot"}))
 		})
 
+		DescribeTable("counts a reworded AI-guidelines box by its tick alone under the data's tables",
+			func(line, class string, families []string) {
+				b, err := os.ReadFile(filepath.Join("..", "..", "data", tables.ToolsFile))
+				Expect(err).NotTo(HaveOccurred())
+				t = loadTables(map[string]string{tables.ToolsFile: string(b)})
+				r := pr(1)
+				r.Disclosure, _ = extract.Candidates(nil, line+"\r\n")
+				got := one(r)
+				Expect(got.Disclosure).To(Equal(class))
+				Expect(got.Families).To(Equal(families))
+			},
+			Entry("the, and if AI assisted, ticked",
+				"- [x] Reviewed the AI guidelines, if AI assisted with the PR.", classify.DisclosureChecklist, []string{"unspecified"}),
+			Entry("the, and if AI assisted, unticked",
+				"- [ ] Reviewed the AI guidelines, if AI assisted with the PR.", classify.DisclosureNone, nil),
+			Entry("when AI assisted, ticked",
+				"- [x] Reviewed AI guidelines, when AI assisted with the PR", classify.DisclosureChecklist, []string{"unspecified"}),
+			Entry("when AI assisted, unticked",
+				"- [ ] Reviewed AI guidelines, when AI assisted with the PR", classify.DisclosureNone, nil),
+			Entry("the AI guidelines alone, ticked",
+				"- [x] Reviewed the AI guidelines", classify.DisclosureChecklist, []string{"unspecified"}),
+		)
+
 		It("gives a Mergify backport that carries its original's description, box ticked, the original's disclosure", func() {
 			const original = "**Description of your changes:**\r\n\r\nFix the leak.\r\n\r\n**Checklist:**\r\n\r\n" +
 				"- [x] Unit tests have been added, if necessary.\r\n" +
@@ -317,13 +359,13 @@ var _ = Describe("Records", func() {
 	Describe("components", func() {
 		It("are the components whose labels the PR carries, in table order", func() {
 			r := pr(1)
-			r.Labels = []string{"cephfs", "needs-review", "rgw-multisite"}
-			Expect(one(r).Components).To(Equal([]string{"rgw", "cephfs"}))
+			r.Labels = []string{"filesystem", "do-not-merge", "object-bucket-claims"}
+			Expect(one(r).Components).To(Equal([]string{"object", "filesystem"}))
 		})
 
 		It("are none without a component label", func() {
 			r := pr(1)
-			r.Labels = []string{"needs-review"}
+			r.Labels = []string{"do-not-merge"}
 			Expect(one(r).Components).To(BeEmpty())
 		})
 	})
@@ -358,7 +400,7 @@ var _ = Describe("Records", func() {
 			},
 			Entry("no hints", pr(1), "", ""),
 			Entry("kind labels that agree",
-				withHints(1, record.KindHints{}, "bug-fix", "rgw"),
+				withHints(1, record.KindHints{}, "bug-fix", "ceph-rgw"),
 				"bugfix", tables.SourceLabels),
 			Entry("kind labels that disagree",
 				withHints(1, record.KindHints{}, "bug-fix", "feature"),
