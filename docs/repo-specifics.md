@@ -23,8 +23,9 @@ Rook where it had fit Ceph.
   Each window starts on the day GitHub says the repository was created, so
   it covers the whole history.
 - **Where:** `internal/fetch/fetch.go` (`Owner`, `Name`, `WindowStart`). The
-  site builds every GitHub address from the data's `meta.repo`. The name is
-  spelled again in the commands' help text (`internal/cli`).
+  site builds every GitHub address from the data's `meta.repo`, and the
+  commands' help text (`internal/cli`) names the repository from `Owner`
+  and `Name`. The methods pages and the README spell it in prose.
 - **Found:** porting. The sibling reported that the identity is these three
   constants plus about ten site strings.
 
@@ -117,14 +118,18 @@ Rook where it had fit Ceph.
   pull request other than the backport itself decides: Mergify's sentence,
   then "backport of" with `#N` or this repository's address, then the
   title's suffix. A backport of a backport carries two of Mergify's
-  sentences; the first, the original's, wins.
+  sentences; the first, the original's, wins. In a title, a number with no
+  `#` before it and a dot after it is a release: `(backport 1.5)` names no
+  pull request.
 - **Where:** `internal/extract/hints.go` (`mergifySentence`, `backportOf`,
   `titleSuffix`); the address is built from `internal/fetch/fetch.go`
   (`Owner`, `Name`).
 - **Found:** the raw cache. 3,297 of Mergify's 3,308 pull requests name
-  an original, 3,295 by its sentence and 2 by their title alone; the
-  other 11 are its merge-queue and configuration pull requests, not
-  backports. 3,421 of the 11,876 pull requests name an
+  an original, 3,295 by its sentence and 2 by their title alone. The
+  other 11 are not backports: a configuration pull request and 10 of its
+  11 merge-queue pull requests. The eleventh, #18779, is titled with the
+  backport it merged, `(backport #18723)` included, so it is linked by its
+  title to #18723 and takes that pull request's kind. 3,421 of the 11,876 pull requests name an
   original, 3,420 of the 4,033 off `master`, and 8 name one GitHub no
   longer serves. Linking them cuts the kind unknown off `master` from
   98.6% to 66.1%.
@@ -255,7 +260,8 @@ Rook where it had fit Ceph.
   with AI assistance; …)" does. A Mergify backport joins its own sentence
   to its original's description with `<hr>`, so when the box ends the
   description the sentence lands on the box's line; the label is judged
-  only up to the `<hr>`. In the data of 2026-11-16, 416 of 11,876 pull
+  only up to the `<hr>` that Mergify's "This is an automatic backport"
+  follows, so anything else after an `<hr>` is still read. In the data of 2026-11-16, 416 of 11,876 pull
   requests tick the box, 106 of them disclosing in no other way.
 - **Where:** `internal/extract/disclosure.go` (`aiBox`),
   `internal/classify/classify.go`, `site/src/lib/timeline.ts`
@@ -282,9 +288,9 @@ Rook where it had fit Ceph.
     `/audit override`;
   - also `/config check ok` and `unstale`.
 - **rook:** mentions of bot accounts (`@mergifyio backport release-1.21`,
-  `@dependabot rebase`). One has a no-break space after the mention, so the
-  command patterns accept it. CI suites are triggered by label (`debug-*`,
-  `skip-ci`), not by comment.
+  `@dependabot rebase`). The command patterns accept any white space after
+  the mention, as extract does; one comment has a no-break space there. CI
+  suites are triggered by label (`debug-*`, `skip-ci`), not by comment.
 - **Where:** `data/commands.yaml`, and `internal/extract/extract.go`
   (`commentText`). That rule keeps a comment's text only when it is one line
   of at most 80 characters with no `@`. For Rook, a leading mention of a
@@ -319,17 +325,34 @@ Rook where it had fit Ceph.
 
 ### Methods pages and README
 - **Varies:** every sentence that describes the project's conventions.
+- **ceph:** the tracker and its tickets, the `master`-to-`main` rename,
+  Jenkins and audit-bot commands, and Ceph's draft trailer rule.
+- **rook:** `master` only; kind from labels and closing issues, with the
+  10-issue and 20-label limits of a fetch and when an issue's relabelling
+  reaches the page; Mergify's backport sentence and title; Mergify and
+  Dependabot commands; the AI guidelines of 2026-04-24, the trailers they
+  permit since 2026-07-27, and the box as the weakest disclosure; no
+  external tracker; a window from the repository's creation, so no pull
+  request is opened before it and every author's baseline is 0.
 - **Where:** `site/src/content/methods/*.md`, `README.md`. Figures are
   placeholders computed from the data; sentences are not.
-- **Found:** porting.
+  `site/src/lib/methods/content.test.ts` lists the numbers a page may
+  type, such as those limits and dates, each with its reason.
+- **Found:** porting, each sentence read against the code it describes.
 
 ### Test data
 - **Varies:** the examples the tests are built from.
 - **ceph:** recorded responses and fixtures carry Ceph's tracker addresses,
   backport descriptions and dates.
-- **rook:** they are replaced task by task. The extract fixtures and the
-  site fixture carry closing issues instead of tracker tickets; the site
-  fixture is otherwise still Ceph's.
+- **rook:** rook/rook throughout: `master` and `release-1.x`, Rook's
+  labels and components, Mergify, Dependabot and "ok to test" commands,
+  and Rook's PR template. The site fixture keeps the times and sizes its
+  specs pin, with Rook's identities: a Mergify backport, a Dependabot
+  update, a backport linked to its original that ticks the AI-guidelines
+  box, and closing issues, one in another repository. The long-history
+  fixture starts in 2016. Issues closed in another repository use
+  `ceph/ceph-csi`, a repository rook/rook's pull requests do close issues
+  in.
 - **Where:** `internal/extract/testdata`, `site/src/lib/__fixtures__`,
   `site/e2e/smoke.spec.ts`.
 - **Found:** the sibling.

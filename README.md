@@ -3,15 +3,19 @@
 [![ci](https://github.com/jhoblitt/rook-dev-stats/actions/workflows/ci.yml/badge.svg)](https://github.com/jhoblitt/rook-dev-stats/actions/workflows/ci.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/jhoblitt/rook-dev-stats/badge)](https://scorecard.dev/viewer/?uri=github.com/jhoblitt/rook-dev-stats)
 
-Interactive statistics on [ceph/ceph](https://github.com/ceph/ceph) pull
-requests: how long a pull request waits for a human response, for approval
-and for merge, how much of that is spent after the code stopped changing,
-and whether disclosed AI assistance is changing any of it. A Go tool,
+Interactive statistics on [rook/rook](https://github.com/rook/rook) pull
+requests, published at <https://jhoblitt.github.io/rook-dev-stats/>: how
+long a pull request waits for a human response, for approval and for
+merge, how much of that is spent after the code stopped changing, and
+whether disclosed AI assistance is changing any of it. A Go tool,
 `rookstats`, fetches the pull requests and builds the data; a static site
-renders it and computes the statistics in the browser.
+renders it and computes the statistics in the browser. The page's methods
+section says how each figure is counted.
 
-The design is
-[`docs/superpowers/specs/2026-11-15-ceph-pr-stats-design.md`](docs/superpowers/specs/2026-11-15-ceph-pr-stats-design.md).
+Its sibling, [ceph-dev-stats](https://github.com/jhoblitt/ceph-dev-stats),
+does the same for Ceph; [`docs/repo-specifics.md`](docs/repo-specifics.md)
+lists what differs between the two repositories. The design is
+[`docs/superpowers/specs/2026-11-16-rook-pr-stats-design.md`](docs/superpowers/specs/2026-11-16-rook-pr-stats-design.md).
 
 ## Install
 
@@ -27,10 +31,10 @@ go build -o bin/rookstats ./cmd/rookstats
 lists each one's flags, every flag also settable as a `ROOKSTATS_`
 environment variable.
 
-- `fetch` walks ceph/ceph's pull requests from GitHub into the local raw
+- `fetch` walks rook/rook's pull requests from GitHub into the local raw
   cache, `.cache/`: every pull request updated since a day before the
   `fetched_through` time in `data/meta.json` (or since the window start,
-  2011-09-01, the day ceph/ceph was created, when there is none or its
+  2016-07-08, the day rook/rook was created, when there is none or its
   `window_start` is later), and every one still open. `--full` walks back
   to the window start, listing every pull request in the repository's
   history. `--refetch` fetches again every pull request the walk lists,
@@ -92,7 +96,7 @@ are derived from it by `rookstats rollup` and are not committed.
 | File | What it holds | Written by |
 |---|---|---|
 | `prs/YYYY-MM.jsonl` | one record per pull request, in the file of the month it was opened: its author, times, state, size, labels, commits, lifecycle events, reviews and comments, the lines that might disclose AI use, the issues GitHub links as closed by it, and the pull request it says it backports. The author of a pull request opened by an account since deleted is the login `ghost` and, when its commits give one, a `name` | `extract` |
-| `authors.json` | for each author, how many pull requests they opened before `meta.json`'s `window_start`: the baseline their `prior_prs` starts from, and 0 for everyone once that is 2011-09-01. `extract` adds the cache's baselines to it while `meta.json` is of the window `extract` derives for, and otherwise replaces it with them | `extract` |
+| `authors.json` | for each author, how many pull requests they opened before `meta.json`'s `window_start`: the baseline their `prior_prs` starts from, and 0 for everyone once that is 2016-07-08. `extract` adds the cache's baselines to it while `meta.json` is of the window `extract` derives for, and otherwise replaces it with them | `extract` |
 | `meta.json` | the window start, when the last walk began, and GitHub's counts at its end: the pull requests opened since the window start, and those open. The open ones are the total of the repository's pull-request listing. So are those opened since the window start when it is no later than the repository's creation, since every pull request is then in the window; for a later window they are the count of a search, which has been seen to omit pull requests the listing returns. `opened_in_window_source` says which, `listing` or `search`; a `meta.json` without it is from the search | `extract` |
 | `tools.yaml` | what counts as a disclosure, and which tool it names | by hand |
 | `bots.yaml` | accounts GitHub types as users whose comments are automated | by hand |
@@ -100,33 +104,34 @@ are derived from it by `rookstats rollup` and are not committed.
 | `labels.yaml` | which labels are components, process states, or neither | by hand |
 | `kinds.yaml` | what makes a pull request a bug fix, a feature, a cleanup or documentation | by hand |
 
-A record names people by login. GitHub gives every deleted account the
-one placeholder login `ghost` and keeps nothing else about it, so the
-comments and reviews of deleted accounts cannot be told apart and are all
-`ghost`'s. For a pull request a deleted account opened, the names on its
-commits survive in git: `fetch` reads them for those pull requests only,
-and the record's author carries one `name`, the committer name most
-common on its commits, leaving out the `GitHub` that GitHub records as
-the committer of a commit made through its web interface (only when every
-commit's committer is that web committer, the most common author name
-instead; on a tie, the name on the earlier commit). The committer rather
-than the author, since a backport keeps the authors of the commits it
-copies. In the request for these names `fetch` asks GitHub for no e-mail
-address. git's name is free text, though, so before a name is cached its control and format
-characters are removed and its whitespace collapsed, and a name that
-holds an `@`, which may be an address, is dropped: it is not cached as a
-name, is never a candidate, and is never published. A committer whose name was
-dropped, or cleaned to nothing, still rules the authors out: when no
-other committer is named, the pull request gets no name and stays
-`ghost`'s, rather than take the name of an author whose commits it
-copied. A record keeps a comment's text only when the
-comment is one line of at most 80 characters with no `@` but a leading
-mention of Mergify or Dependabot, which is what a bot command looks like
-and what a person's mention or an e-mail address never is,
-and it never keeps a commit trailer that names a person (`Signed-off-by:`,
-`Reviewed-by:`, a `Co-authored-by:` naming a person, …). The lines it keeps
-as possible disclosures are quoted as written. The raw GitHub responses
-stay in `.cache/`, which git ignores.
+A record names people by login. GitHub gives every deleted account the one
+placeholder login `ghost` and keeps nothing else about it, so the comments
+and reviews of deleted accounts cannot be told apart and are all `ghost`'s.
+For a pull request a deleted account opened, the names on its commits
+survive in git: `fetch` reads them for those pull requests only, and the
+record's author carries one `name`, the committer name most common on its
+commits, leaving out the `GitHub` that GitHub records as the committer of a
+commit made through its web interface (only when every commit's committer
+is that web committer, the most common author name instead; on a tie, the
+name on the earlier commit). The committer rather than the author, since a
+backport keeps the authors of the commits it copies. In the request for
+these names `fetch` asks GitHub for no e-mail address. git's name is free
+text, though, so before a name is cached its control and format characters
+are removed and its whitespace collapsed, and a name that holds an `@`,
+which may be an address, is dropped: it is not cached as a name, is never a
+candidate, and is never published. A committer whose name was dropped, or
+cleaned to nothing, still rules the authors out: when no other committer is
+named, the pull request gets no name and stays `ghost`'s, rather than take
+the name of an author whose commits it copied. A record keeps a comment's
+text only when the comment is one line of at most 80 characters with no `@`
+other than in a mention of Mergify or Dependabot that starts it and is
+followed by white space. That is what a bot command in rook/rook looks
+like, since its bots are addressed by mention and its CI suites start from
+labels, not comments; a comment with a person's mention or an e-mail
+address keeps no text. It never keeps a commit trailer that names a person
+(`Signed-off-by:`, `Reviewed-by:`, a `Co-authored-by:` naming a person, …).
+The lines it keeps as possible disclosures are quoted as written. The raw
+GitHub responses stay in `.cache/`, which git ignores.
 
 The tables are applied when the data is read, so editing one never needs a
 new pull.
@@ -171,7 +176,7 @@ cover yet. Then:
 
 When the cache format changes, the next `fetch` finds the entries in the
 older format and walks back to the window start by itself, through every
-pull request since ceph/ceph was created, to fetch them again; the next
+pull request since rook/rook was created, to fetch them again; the next
 `extract` then re-derives their records. Once that walk has finished,
 `fetch` asks GitHub by number about each entry it left in the older format.
 One whose pull request GitHub cannot find is kept as it is and marked in the
@@ -193,10 +198,10 @@ every entry of an older cache format, but it does not fetch again an entry
 whose `updatedAt` has not moved.
 
 So neither sees a change GitHub makes without moving `updatedAt`. One such
-change has been seen: GitHub began returning the commit of an old
-force-push without touching the pull request. Comparing a refreshed cache
-with a walk into an empty one, over 6,270 pull requests, found it once,
-and it changed only that event's link. `--refetch`, which
+change has been seen, in ceph-dev-stats: GitHub began returning the commit
+of an old force-push without touching the pull request. Comparing a
+refreshed cache with a walk into an empty one, over 6,270 pull requests,
+found it once, and it changed only that event's link. `--refetch`, which
 `make data-refresh` takes from `ROOKSTATS_REFETCH=true`, picks such a
 change up: it fetches again every pull request the walk lists, though
 cached at the same `updatedAt`, and replaces its entry, and `extract` then
@@ -207,20 +212,18 @@ window start:
 ROOKSTATS_FULL=true ROOKSTATS_REFETCH=true make data-refresh
 ```
 
-Over the six-month window a walk that fetched every pull request took about
-28 minutes for 6,270 of them; the whole history is roughly twelve times as
-many. If it stops, the entries it replaced stay, but it does not resume:
-run again with `ROOKSTATS_REFETCH=true`, it fetches every pull request
-again; without it, only those updated since they were cached, and the rest
-keep the entries they had.
+A cold walk of the whole history, about 11,900 pull requests into an empty
+cache, took about 35 minutes. If it stops, the entries it replaced stay,
+but it does not resume: run again with `ROOKSTATS_REFETCH=true`, it fetches
+every pull request again; without it, only those updated since they were
+cached, and the rest keep the entries they had.
 
 A refetch is also a refresh, so every pull request updated since the last
-commit of `data/`, or during the hours of the walk, changes its record
-anyway. What only a refetch finds is a record that changed while its
-`updated` time did not: in each month file `git diff --stat data/prs`
-lists, compare the committed version (`git show
-HEAD:data/prs/<month>.jsonl`) with the new one for the records whose
-`updated` is the same in both.
+commit of `data/`, or while the walk ran, changes its record anyway. What
+only a refetch finds is a record that changed while its `updated` time did
+not: in each month file `git diff --stat data/prs` lists, compare the
+committed version (`git show HEAD:data/prs/<month>.jsonl`) with the new one
+for the records whose `updated` is the same in both.
 
 ## Publishing
 
@@ -228,12 +231,12 @@ The site is published at <https://jhoblitt.github.io/rook-dev-stats/>, and
 a merged refresh reaches it through a release. Each push to `main` runs the
 `release` workflow, which runs CI and then semantic-release. That cuts a
 version when a commit since the last tag calls for one: a `feat`, `fix`,
-`perf`, `refactor`, `docs` or `revert` commit, a `chore(data)` commit such as
-a data refresh, or any commit marked breaking. The release tags the version and deploys the
-site built from that tag to GitHub Pages, with the version in the footer.
-Any other commit (`build`, `ci`, `test`, `style`, or another `chore`,
-Dependabot's included) cuts no release unless marked breaking, and reaches
-the site with the next release.
+`perf`, `refactor`, `docs` or `revert` commit, a `chore(data)` commit such
+as a data refresh, or any commit marked breaking. The release tags the
+version and deploys the site built from that tag to GitHub Pages, with the
+version in the footer. Any other commit (`build`, `ci`, `test`, `style`, or
+another `chore`, Dependabot's included) cuts no release unless marked
+breaking, and reaches the site with the next release.
 
 To roll the site back, run the `deploy` workflow by hand with an older
 release tag, which must be on `main`:
