@@ -186,9 +186,28 @@ var _ = Describe("Candidates", func() {
 			Entry("ticked, an <hr> and then a disclosure that is not Mergify's",
 				"- [x] Reviewed AI guidelines, if AI assisted with the PR.<hr>Generated with Claude Code.",
 				checklist("- [x] Reviewed AI guidelines, if AI assisted with the PR.<hr>Generated with Claude Code.")),
-			Entry("unticked, saying more",
-				"- [ ] Reviewed AI guidelines (AI assisted with the PR).",
-				description("- [ ] Reviewed AI guidelines (AI assisted with the PR).")),
+		)
+
+		DescribeTable("counts a ticked rewording of the template as the box alone",
+			func(line string) {
+				Expect(extract.Candidates(nil, body(line))).To(Equal(checklist()), "line %q", line)
+			},
+			Entry("with the before AI guidelines", "- [x] Reviewed the AI guidelines"),
+			Entry("with the, and if AI assisted", "- [x] Reviewed the AI guidelines, if AI assisted with the PR."),
+			Entry("when for if, no comma, no full stop", "- [x] Reviewed AI guidelines when AI assisted with the PR"),
+			Entry("when for if, with a comma", "- [x] Reviewed AI guidelines, when AI assisted with the PR"),
+			Entry("with the before the link", "- [x] Reviewed the [AI guidelines](https://rook.io/docs/rook/latest/Contributing/ai-guidelines), when AI assisted with the PR."),
+			Entry("another guide, then the AI guidelines with the", "- [x] Reviewed the developer guide and the AI guidelines, if AI assisted with the PR."),
+		)
+
+		DescribeTable("never takes an unticked box for a candidate, whatever it says",
+			func(line string) {
+				Expect(extract.Candidates(nil, body(line))).To(Equal(none()), "line %q", line)
+			},
+			Entry("with the, and if AI assisted", "- [ ] Reviewed the AI guidelines, if AI assisted with the PR."),
+			Entry("when for if", "- [ ] Reviewed AI guidelines, when AI assisted with the PR"),
+			Entry("saying more", "- [ ] Reviewed AI guidelines (AI assisted with the PR)."),
+			Entry("naming a tool", "- [ ] Reviewed AI guidelines, generated with Claude Code."),
 		)
 
 		DescribeTable("is not",

@@ -266,6 +266,29 @@ var _ = Describe("Records", func() {
 			Expect(got.Families).To(Equal([]string{"copilot"}))
 		})
 
+		DescribeTable("counts a reworded AI-guidelines box by its tick alone under the data's tables",
+			func(line, class string, families []string) {
+				b, err := os.ReadFile(filepath.Join("..", "..", "data", tables.ToolsFile))
+				Expect(err).NotTo(HaveOccurred())
+				t = loadTables(map[string]string{tables.ToolsFile: string(b)})
+				r := pr(1)
+				r.Disclosure, _ = extract.Candidates(nil, line+"\r\n")
+				got := one(r)
+				Expect(got.Disclosure).To(Equal(class))
+				Expect(got.Families).To(Equal(families))
+			},
+			Entry("the, and if AI assisted, ticked",
+				"- [x] Reviewed the AI guidelines, if AI assisted with the PR.", classify.DisclosureChecklist, []string{"unspecified"}),
+			Entry("the, and if AI assisted, unticked",
+				"- [ ] Reviewed the AI guidelines, if AI assisted with the PR.", classify.DisclosureNone, nil),
+			Entry("when AI assisted, ticked",
+				"- [x] Reviewed AI guidelines, when AI assisted with the PR", classify.DisclosureChecklist, []string{"unspecified"}),
+			Entry("when AI assisted, unticked",
+				"- [ ] Reviewed AI guidelines, when AI assisted with the PR", classify.DisclosureNone, nil),
+			Entry("the AI guidelines alone, ticked",
+				"- [x] Reviewed the AI guidelines", classify.DisclosureChecklist, []string{"unspecified"}),
+		)
+
 		It("gives a Mergify backport that carries its original's description, box ticked, the original's disclosure", func() {
 			const original = "**Description of your changes:**\r\n\r\nFix the leak.\r\n\r\n**Checklist:**\r\n\r\n" +
 				"- [x] Unit tests have been added, if necessary.\r\n" +

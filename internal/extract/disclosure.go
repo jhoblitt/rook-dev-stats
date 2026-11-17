@@ -119,10 +119,13 @@ var checklistLine = regexp.MustCompile(`^(?:[-*+]\s*)?\[\s*([xX]?)\s*\]\s*(.*)$`
 
 // templateLabel is, lower-cased, a label that says no more than the
 // AI-guidelines box of rook/rook's pull request template, with or without
-// its link and its condition. It may name another guide first, as in
-// "reviewed developer guide and ai guidelines", but no other words: they
-// could say how AI was used.
-var templateLabel = regexp.MustCompile(`^reviewed (?:(?:the )?[a-z]+ guides? and )?(?:\[ai guidelines\]\([^)]*\)|ai guidelines)(?:,? if ai assisted with the pr)?\.?$`)
+// its link and its condition, in the rewordings people give it: "the"
+// before "ai guidelines", "when" for "if", punctuation dropped or added. It
+// may name another guide first, as in "reviewed developer guide and ai
+// guidelines", but no other words: they could say how AI was used.
+var templateLabel = regexp.MustCompile(`^reviewed\s+(?:(?:the\s+)?[a-z]+\s+guides?\s+and\s+)?(?:the\s+)?` +
+	`(?:\[ai guidelines\]\([^)]*\)|ai\s+guidelines)` +
+	`(?:[,;:.]?\s+(?:if|when)\s+ai\s+assisted\s+with\s+the\s+pr)?[.!]?$`)
 
 // mergifyBreak is, lower-cased, where Mergify joins its sentence to the
 // description of the pull request it backports: an <hr>, then "This is an
@@ -139,9 +142,9 @@ const maxCandidate = 200
 //   - commit_prose: any other commit-message line that matches;
 //   - description: any description line that matches.
 //
-// A description line that is the AI-guidelines box sets Checklist when it
-// is ticked, and is a candidate only when it says more than the template
-// does.
+// A description line that is the AI-guidelines box is never a candidate
+// when it is unticked, whatever it says. A ticked one sets Checklist, and
+// is a candidate too only when it says more than the template does.
 //
 // A line with a never-kept key is dropped from all three, and so is a line
 // withhold refuses, which is counted in withheld under the key withhold
@@ -178,7 +181,10 @@ func Candidates(messages []string, description string) (d record.Disclosure, wit
 	for line := range strings.Lines(description) {
 		line = strings.TrimSpace(line)
 		if isBox, ticked, more := aiBox(line); isBox {
-			checklist = checklist || ticked
+			if !ticked {
+				continue
+			}
+			checklist = true
 			if !more {
 				continue
 			}
