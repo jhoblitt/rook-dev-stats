@@ -337,10 +337,10 @@ const SPAN_TITLES: Record<'firstCommitToOpened' | 'openedToLastCommit' | 'afterL
 };
 
 /**
- * Whether the filters select backports alone: only the PRs whose description
- * links the one they backport. No target does, since every branch but the
- * development branch holds feature branches' PRs too, and old backports
- * seldom carry the link.
+ * Whether the filters select backports alone: only the PRs that name the
+ * one they backport, by Mergify's sentence, a "backport of" line or a title
+ * suffix. No target does, since every branch but the development branch
+ * holds feature branches' PRs too, and old backports seldom carry the link.
  */
 export function onlyBackports(filters: Pick<Filters, 'backportLink'>): boolean {
   return filters.backportLink === 'linked';
